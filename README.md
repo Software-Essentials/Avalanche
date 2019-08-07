@@ -2,6 +2,7 @@ Avalanche is here!
 The NodeJS framework for creating APIs, Web platforms, App services, or fullstack solutions!
 No more structuring your Node projects over and over again.
 
+***IMPORTANT NOTE: THE CODE FOR THIS REPOSITORY WILL BE UPLOADED WITHIN A FEW DAYS. IT IS NOT AVAILABLE YET!***
 
 # Getting started
 
