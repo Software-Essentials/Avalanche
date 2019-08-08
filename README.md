@@ -13,19 +13,29 @@ A step by step guide how to get a development environment up and running
 Install [NodeJS](https://nodejs.org/en/) from their [website](https://nodejs.org/en/)
 
 
-## NPM Install
+## Installation
 
-**1. Initialize Avalanche.**
+**1. Initialize project.**
+```
+npm init
+```
+
+**2. Install Avalanche.**
+```
+npm install avalanche
+```
+
+**3. Initialize Avalanche.**
 ```
 avalanche init
 ```
 
-**2. Run your local webserver.**
+**4. Run your local webserver.**
 ```
 avalanche run
 ```
 
-**3. Navigate to [localhost](http://localhost).**
+**5. Navigate to [localhost](http://localhost).**
 
 Done! For more info, browse the Avalanche wiki on GitHub.
 
