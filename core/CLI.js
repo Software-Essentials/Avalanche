@@ -4,6 +4,7 @@ const projectPWD = process.env.PWD;
 const program = require("commander");
 const fs = require("fs");
 const package = require(`${projectPWD}/package.json`);
+const avalanchePackage = require("../package.json");
 
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
@@ -134,7 +135,7 @@ program
 
 
 if (typeof cmdValue !== "undefined") {
-  if(typeof package.avalancheConfig === "undefined" && cmdValue !== "init") {
+  if(typeof package.avalancheConfig === "undefined" && cmdValue !== "init" && cmdValue !== "version") {
     console.log("\x1b[31m%s\x1b[0m", `(error) This is not an Avalanche project. use "avalanche init" to initialize.`);
     process.exit();
   }
@@ -153,6 +154,9 @@ if (typeof cmdValue !== "undefined") {
       break;
     case "fix":
       fix();
+      break;
+    case "version":
+      console.log(avalanchePackage.version);
       break;
     default:
       console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] Command not recognised!`);
