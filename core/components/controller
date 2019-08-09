@@ -1,0 +1,67 @@
+// Imports
+const Controller = require("../../core/structure/Controller.js");
+
+
+
+class MainController extends Controller {
+
+  /**
+   *
+   */
+  index(request, response) {
+    response.json({
+      success: true,
+      message: "Showing all records.",
+      data: [
+        "foo",
+        "bar"
+      ]
+    });
+  }
+
+  /**
+   *
+   */
+  show(request, response) {
+    response.json({
+      success: true,
+      message: "Showing record.",
+      data: "foo"
+    });
+  }
+
+  /**
+   *
+   */
+  store(request, response) {
+    response.json({
+      success: true,
+      message: "Record added."
+    });
+  }
+
+  /**
+   *
+   */
+  update(request, response) {
+    response.json({
+      success: true,
+      message: "Record updated."
+    });
+  }
+
+  /**
+   *
+   */
+  destroy(request, response) {
+    response.json({
+      success: true,
+      message: "Record deleted."
+    });
+  }
+
+}
+
+
+
+module.exports = MainController;

@@ -1,0 +1,7 @@
+[
+    {
+        "path": "/",
+        "method": "GET",
+        "controller": "MainViewController"
+    }
+]

@@ -2,8 +2,6 @@ Avalanche is here!
 The NodeJS framework for creating APIs, Web platforms, App services, or fullstack solutions!
 No more structuring your Node projects over and over again.
 
-***IMPORTANT NOTE: THE CODE FOR THIS REPOSITORY WILL BE UPLOADED WITHIN A FEW DAYS. IT IS NOT AVAILABLE YET!***
-
 # Getting started
 
 A step by step guide how to get a development environment up and running
@@ -25,17 +23,22 @@ npm init
 npm install avalanche
 ```
 
-**3. Initialize Avalanche.**
+**3. Link the Avalanche CLI.**
+```
+npm link
+```
+
+**4. Initialize Avalanche.**
 ```
 avalanche init
 ```
 
-**4. Run your local webserver.**
+**5. Run your local webserver.**
 ```
 avalanche run
 ```
 
-**5. Navigate to [localhost](http://localhost).**
+**6. Navigate to [localhost](http://localhost).**
 
 Done! For more info, browse the Avalanche wiki on GitHub.
 

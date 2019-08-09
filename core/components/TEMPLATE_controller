@@ -1,0 +1,47 @@
+// Imports
+const Controller = require("../../core/structure/Controller.js");
+
+
+
+class <#name?> extends Controller {
+
+  /**
+   *
+   */
+  index(request, response) {
+    
+  }
+
+  /**
+   *
+   */
+  show(request, response) {
+    
+  }
+
+  /**
+   *
+   */
+  store(request, response) {
+    
+  }
+
+  /**
+   *
+   */
+  update(request, response) {
+
+  }
+
+  /**
+   *
+   */
+  destroy(request, response) {
+
+  }
+
+}
+
+
+
+module.exports = <#name?>;
