@@ -1,0 +1,25 @@
+// Imports
+const ViewController = require("../../core/structure/ViewController.js");
+
+
+
+/**
+ *
+ */
+class MainViewController extends ViewController {
+
+  constructor(request, response) {
+    super(request, response);
+  }
+
+  willLoad(request, response, self) {
+    self.layout = "main";
+    self.template = "default";
+    super.willLoad(request, response, self);
+  }
+
+}
+
+
+
+module.exports = MainViewController;

@@ -28,33 +28,49 @@ const files = [
     standard: true
   },
   {
-    src: "/core/components/controller",
-    dest: "/app/controllers/MainController.js"
-  },
-  {
-    src: "/core/components/view",
-    dest: "/app/views/MainViewController.js"
-  },
-  {
-    src: "/core/components/routes_api",
-    dest: "/app/routes/api.json"
-  },
-  {
-    src: "/core/components/routes_web",
-    dest: "/app/routes/web.json"
-  },
-  {
-    src: "/core/components/template",
-    dest: "/app/templates/default.hbs"
-  },
-  {
-    src: "/core/components/template_layout",
-    dest: "/app/templates/layouts/main.layout.hbs"
-  },
-  {
     src: "/core/components/helpers",
     dest: "/app/helpers/util.js",
     standard: true
+  },
+  {
+    src: "/core/components/example1_controller",
+    dest: "/app/controllers/MainController.js",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example1_view",
+    dest: "/app/views/MainViewController.js",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example1_routes_api",
+    dest: "/app/routes/api.json",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example1_routes_web",
+    dest: "/app/routes/web.json",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example1_template",
+    dest: "/app/templates/default.hbs",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example1_template_layout",
+    dest: "/app/templates/layouts/main.layout.hbs",
+    template: "example1"
+  },
+  {
+    src: "/core/components/example2_controller",
+    dest: "/app/controllers/PostController.js",
+    template: "example2"
+  },
+  {
+    src: "/core/components/example2_routes",
+    dest: "/app/routes/api.json",
+    template: "example2"
   }
 ];
 
@@ -124,7 +140,7 @@ if (typeof cmdValue !== "undefined") {
   }
   switch(cmdValue) {
     case "init":
-      init();
+      init(envValue);
       break;
     case "run":
       run();
@@ -151,6 +167,7 @@ function init() {
     process.exit();
   }
   console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Initializing project...`);
+  const example = typeof arguments[0] === "string" ? arguments[0] : null;
   for (const folder of folders) {
     const path = `${projectPWD}${folder}`;
     if(!fs.existsSync(path)) {
@@ -160,7 +177,7 @@ function init() {
   for (const file of files) {
     const src = `${projectPWD}${file.src}`;
     const dest = `${projectPWD}${file.dest}`;
-    if(fs.existsSync(src) && !fs.existsSync(dest)) {
+    if(fs.existsSync(src) && !fs.existsSync(dest) && (file.standard === true || file.template === example)) {
       fs.copyFileSync(src, dest, COPYFILE_EXCL);
     }
   }
