@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node framework",
   "main": "core/Core.js",
   "author": "Lawrence Bensaid",
