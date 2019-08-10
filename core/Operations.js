@@ -16,6 +16,7 @@ const folders = [
   "/app/templates/emails",
   "/app/templates/layouts",
   "/app/templates/partials",
+  "/app/templates/status",
   "/app/views",
   "/app/helpers"
 ];
@@ -29,6 +30,11 @@ const files = [
     src: "/core/components/helpers",
     dest: "/app/helpers/util.js",
     standard: true
+  },
+  {
+    src: "/core/components/example1_status404",
+    dest: "/app/templates/status/404.hbs",
+    template: "example1"
   },
   {
     src: "/core/components/example1_controller",
@@ -57,7 +63,7 @@ const files = [
   },
   {
     src: "/core/components/example1_template_layout",
-    dest: "/app/templates/layouts/main.layout.hbs",
+    dest: "/app/templates/layouts/layout.hbs",
     template: "example1"
   },
   {
@@ -152,8 +158,9 @@ function info() {
   string += `  \x1b[1m||\x1b[0m   isNodeProject:\t\t  \x1b[33m\x1b[1m${isNodeProject}\x1b[0m\n`;
   string += `  \x1b[1m||\x1b[0m   isAvalancheProject:\t  \x1b[33m\x1b[1m${isAvalancheProject}\x1b[0m\n`;
   if(isAvalancheProject) {
-    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${getRoutes(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${getModels(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${getControllers(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${getRoutes(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${getMiddleware(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${getLocalisations(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${getTranslations(projectPWD).length}\x1b[0m\n`;
@@ -200,6 +207,9 @@ function makeController() {
 function getRoutes(projectDir) {
   const normalizedPath = `${projectDir}/app/routes`;
   var routes = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return routes;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
@@ -215,6 +225,9 @@ function getRoutes(projectDir) {
 function getControllers(projectDir) {
   const normalizedPath = `${projectDir}/app/controllers`;
   var controllers = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return controllers;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
@@ -229,6 +242,9 @@ function getControllers(projectDir) {
 function getMiddleware(projectDir) {
   const normalizedPath = `${projectDir}/app/middleware`;
   var middleware = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return middleware;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
@@ -243,6 +259,9 @@ function getMiddleware(projectDir) {
 function getLocalisations(projectDir) {
   const normalizedPath = `${projectDir}/app/localisations`;
   var localisations = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return localisations;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
@@ -257,12 +276,17 @@ function getLocalisations(projectDir) {
 function getTranslations(projectDir) {
   const normalizedPath = `${projectDir}/app/localisations`;
   var translations = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return translations;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const translation = JSON.parse(JSON.stringify(require(`${projectDir}/app/localisations/${file}`)));
-        translations.push.apply(translations, translation);
+        const translationSet = JSON.parse(JSON.stringify(require(`${projectDir}/app/localisations/${file}`)));
+        for (const translation of Object.keys(translationSet)) {
+          translations.push(translationSet[translation]);
+        }
       }
     }
   });
@@ -272,6 +296,9 @@ function getTranslations(projectDir) {
 function getModels(projectDir) {
   const normalizedPath = `${projectDir}/app/models`;
   var models = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return models;
+  }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
