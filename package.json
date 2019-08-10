@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Node framework",
   "main": "index.js",
   "author": "Lawrence Bensaid",
@@ -29,6 +29,7 @@
     "express": "^4.16.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "hbs": "^4.0.4",
     "mysql": "^2.16.0",
     "nodemailer": "^6.3.0",
     "nodemailer-express-handlebars": "^3.0.0",
