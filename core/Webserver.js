@@ -26,6 +26,9 @@ class Webserver {
     }
 
     // Setup listener
+    this.stream.on("error", (error) => {
+      console.log("There was an error:", error.message)
+    });
     this.stream = instance.listen(global.environment.port, global.environment.host, () => {
       this.didStart(this);
     });
