@@ -33,7 +33,7 @@ class Router {
             const extensions = file.split(".");
             if (extensions.length = 2) {
                 if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-                    const middleFile = require(`${projectPWD}/app/routes/${file}`);
+                    const middleFile = require(`${projectPWD}/app/middleware/${file}`);
                     middleware[extensions[0]] = middleFile;
                 }
             }
