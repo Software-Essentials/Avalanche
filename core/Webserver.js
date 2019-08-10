@@ -30,7 +30,12 @@ class Webserver {
       this.didStart(this);
     });
     this.stream.on("error", (error) => {
-      console.log("There was an error:", error.message)
+      const knownError = "listen EACCES: permission denied";
+      if(error.message.includes(knownError)) {
+        console.log(`\x1b[31m[AVALANCHE] Unable to start server because port ${global.environment.port} is in use\x1b[0m`);
+      } else {
+        console.log(`\x1b[31m[AVALANCHE] An unknown error occured: \x1b[0m"${error.message}`);
+      }
     });
   }
 
@@ -39,7 +44,7 @@ class Webserver {
   }
 
   didStart(webserver) {
-    console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}`);
+    console.log(`\x1b[32m[AVALANCHE] Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}\x1b[0m`);
     if(global.environment.reloadClientsAfterRestart) {
       webserver.reloadConnectedClients();
     }
