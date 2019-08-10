@@ -20,7 +20,7 @@ npm init
 
 **2. Install Avalanche.**
 ```
-npm install avalanche
+npm install avacore
 ```
 
 **3. Link the Avalanche CLI.**
@@ -31,6 +31,10 @@ npm link
 **4. Initialize Avalanche.**
 ```
 avalanche init
+```
+or to load the example project.
+```
+avalanche init example1
 ```
 
 **5. Run your local webserver.**

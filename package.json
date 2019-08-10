@@ -1,13 +1,17 @@
 {
-  "name": "avalanche-cli",
-  "version": "1.0.0",
+  "name": "avacore",
+  "version": "0.1.0",
   "description": "Node framework",
   "main": "core/CLI.js",
   "author": "Lawrence Bensaid",
   "license": "MIT",
   "homepage": "https://github.com/noriacorp/Avalanche",
   "keywords": [
-    "Framework"
+    "Framework",
+    "Webserver",
+    "Express",
+    "MVC",
+    "CLI"
   ],
   "repository": {
     "type": "git",
