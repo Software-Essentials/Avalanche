@@ -16,12 +16,16 @@ Install [NodeJS](https://nodejs.org/en/) from their [website](https://nodejs.org
 **1. Install Avalanche globally.**
 This allows the CLI to work with a global perspective.
 It also prevents issues while updating Avalanche in the future.
+
+(*NOTE: You might need to use `sudo`*)
 ```
 npm install avacore -g
 ```
 
 **2. Link the Avalanche CLI.**
 This allows the "*avalanche*" and "*ava*" command to be used.
+
+(*NOTE: You might need to use `sudo`*)
 ```
 npm link avacore
 ```
