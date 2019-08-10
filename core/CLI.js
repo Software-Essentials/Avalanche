@@ -5,7 +5,7 @@ const program = require("commander");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const { fix, run, init, info, upgrade } = require("./Operations.js")
+const { fix, run, init, info, routes, upgrade } = require("./Operations.js")
 
 program
   .version("1.2.3")
@@ -76,7 +76,7 @@ if (typeof cmdValue !== "undefined") {
       init(envValue);
       break;
     case "run":
-      run();
+      run(envValue);
       break;
     case "routes":
       routes();

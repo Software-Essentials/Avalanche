@@ -39,9 +39,16 @@ class Environment {
             const environment = environments[environmentKey];
             selectedEnvironment = environment;
             selectedEnvironmentKey = environmentKey;
-            if (environmentKey === packageConfig.avalancheConfig.preferredEnvironment) {
-                this.loadEnvironment(selectedEnvironment);
-                prefferedEnvironmentLoaded = true;
+            if(typeof arguments[0] === "string") {
+                if (environmentKey === arguments[0]) {
+                    this.loadEnvironment(selectedEnvironment);
+                    prefferedEnvironmentLoaded = true;
+                }
+            } else {
+                if (environmentKey === packageConfig.avalancheConfig.preferredEnvironment) {
+                    this.loadEnvironment(selectedEnvironment);
+                    prefferedEnvironmentLoaded = true;
+                }
             }
         }
         if (!prefferedEnvironmentLoaded) {

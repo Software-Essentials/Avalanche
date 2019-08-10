@@ -98,10 +98,16 @@ class Kernel {
 		// Request logger
 		if (global.environment.logHTTPRequestsToConsole) {
 			const now = new Date().toLocaleString();
-			const log = `[${now}]::[${request.method}] >> ${request.url}`;
+			const method = request.method;
+			const log = `[${now}]::[${method}] >> ${request.url}`;
 			const status = response.statusCode;
 			const color = status === 200 ? 32 : status === 304 ? 33 : 31
-			console.log(`[\x1b[1m${now}\x1b[0m]::[\x1b[36m\x1b[1m${request.method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
+			const methodColor =
+				method === "GET" ? 32 :
+				method === "POST" ? 33 :
+				method === "PUT" ? 34 :
+				method === "DELETE" ? 31 : 0
+			console.log(`[\x1b[1m${now}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
 			fs.appendFile(`${projectPWD}/logs/server.log`, `${log}\n`, (error) => { });
 		}
 
