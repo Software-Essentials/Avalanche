@@ -1,5 +1,5 @@
 // Imports
-const Controller = require("../../core/structure/Controller.js");
+const { Controller } = require("avacore");
 
 
 /**
