@@ -11,3 +11,6 @@ module.exports.ViewController = require("./core/structure/ViewController.js");
 module.exports.Controller = require("./core/structure/Controller.js");
 module.exports.Middleware = require("./core/structure/Middleware.js");
 module.exports.Model = require("./core/structure/Model.js");
+
+// Third-party
+module.exports.hbs = require("hbs");
