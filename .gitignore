@@ -56,3 +56,4 @@ typings/
 app
 package-lock.json
 *.code-workspace
+.DS_Store

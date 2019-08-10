@@ -92,6 +92,9 @@ function init() {
       fs.mkdirSync(path);
     }
   }
+  if(typeof example === "string") {
+    console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m...\x1b[0m`);
+  }
   for (const file of files) {
     const src = `${__dirname}/..${file.src}`;
     const dest = `${projectPWD}${file.dest}`;
