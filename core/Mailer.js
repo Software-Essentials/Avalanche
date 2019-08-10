@@ -1,8 +1,9 @@
 // Dependencies
-const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
 const mg = require("nodemailer-mailgun-transport");
 const hbs = require("nodemailer-express-handlebars");
+
+const projectPWD = process.env.PWD;
 
 
 
@@ -15,11 +16,11 @@ class Mailer {
     const options = {
       viewEngine: {
         extName: ".hbs",
-        partialsDir: __dirname + "/../app/templates/partials/",
-        layoutsDir: __dirname + "/../app/templates/layouts",
+        partialsDir: `${projectPWD}/app/templates/partials/`,
+        layoutsDir: `${projectPWD}/app/templates/layouts`,
         defaultLayout: "email.layout.hbs",
       },
-      viewPath: __dirname + "/../app/templates/emails/",
+      viewPath: `${projectPWD}/app/templates/emails/`,
       extName: ".hbs",
     };
 

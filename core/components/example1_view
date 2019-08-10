@@ -1,5 +1,5 @@
 // Imports
-const ViewController = require("../../core/structure/ViewController.js");
+const { ViewController } = require("avacore");
 
 
 

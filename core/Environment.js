@@ -1,7 +1,8 @@
 // Imports
 const fs = require("fs");
 const path = require("path");
-const packageConfig = require("../package.json");
+const projectPWD = process.env.PWD;
+const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 
@@ -12,7 +13,7 @@ class Environment {
 
     constructor() {
 
-        var normalizedPath = path.join(__dirname, "../app/environments");
+        var normalizedPath = `${projectPWD}/app/environments`;
         var environments = [];
         var selectedEnvironment = null;
         var selectedEnvironmentKey = null;
@@ -22,7 +23,7 @@ class Environment {
                 if (extensions.length = 3)
                     if (extensions[extensions.length - 1].toUpperCase() === "JSON")
                         if (extensions[extensions.length - 2].toUpperCase() === "ENVIRONMENT")
-                            environments[extensions[0]] = require("../app/environments/" + file);
+                            environments[extensions[0]] = require(`${projectPWD}/app/environments/${file}`);
             });
         }
         

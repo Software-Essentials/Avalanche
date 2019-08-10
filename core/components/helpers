@@ -1,7 +1,7 @@
 // Dependencies
 const Handlebars = require("hbs");
 const fs = require("fs");
-const Localisation = require("../../core/Localisation.js");
+const { Localisation } = require("avacore");
 const localisation = new Localisation("en_GB");
 
 module.exports = {

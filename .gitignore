@@ -53,6 +53,6 @@ typings/
 
 # custom
 .vscode/
-app/environments/development.environment.json
+app
 package-lock.json
 *.code-workspace

@@ -11,6 +11,8 @@ const Router = require("./Router.js");
 const SocketKernel = require("./SocketKernel.js");
 const Auth = require("./Auth.js");
 
+const projectPWD = process.env.PWD;
+
 
 /**
  * The Kernel is the primary entry point of the system. It acts as a gateway between the listener and the rest of the system.
@@ -29,11 +31,11 @@ class Kernel {
 		}
 
 		// Install helpers
-		const dir = fs.readdirSync(`${__dirname}/../app/helpers`);
+		const dir = fs.readdirSync(`${projectPWD}/app/helpers`);
 		var helpers = {};
 		for (const file of dir) {
-			if(fs.existsSync(`${__dirname}/../app/helpers/${file}`)) {
-				const helpersInFile = require(`${__dirname}/../app/helpers/${file}`);
+			if(fs.existsSync(`${projectPWD}/app/helpers/${file}`)) {
+				const helpersInFile = require(`${projectPWD}/app/helpers/${file}`);
 				const keys = Object.keys(helpersInFile);
 				for (const key of keys) {
 					helpers[key] = helpersInFile[key];
@@ -100,7 +102,7 @@ class Kernel {
 			const status = response.statusCode;
 			const color = status === 200 ? 32 : status === 304 ? 33 : 31
 			console.log(`[\x1b[1m${now}\x1b[0m]::[\x1b[36m\x1b[1m${request.method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
-			fs.appendFile("../logs/server.log", `${log}\n`, (error) => { });
+			fs.appendFile(`${projectPWD}/logs/server.log`, `${log}\n`, (error) => { });
 		}
 
 	}

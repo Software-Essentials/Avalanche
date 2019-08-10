@@ -6,6 +6,7 @@ const url = require("url");
 
 // Setup
 const ExRouter = express.Router();
+const projectPWD = process.env.PWD;
 
 
 
@@ -15,24 +16,24 @@ class Router {
     }
 
     routes() {
-        const normalizedPath = path.join(__dirname, "../app/routes");
+        const normalizedPath = `${projectPWD}/app/routes`;
         var routes = [];
         fs.readdirSync(normalizedPath).forEach(function (file) {
             const extensions = file.split(".");
             if (extensions.length = 2) {
                 if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-                    const route = JSON.parse(JSON.stringify(require("../app/routes/" + file)));
+                    const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
                     routes.push.apply(routes, route);
                 }
             }
         });
-        const normalizedPathB = path.join(__dirname, "../app/middleware");
+        const normalizedPathB = `${projectPWD}/app/middleware`;
         var middleware = [];
         fs.readdirSync(normalizedPathB).forEach(function (file) {
             const extensions = file.split(".");
             if (extensions.length = 2) {
                 if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-                    const middleFile = require("../app/middleware/" + file);
+                    const middleFile = require(`${projectPWD}/app/middleware/${file}`);
                     middleware[extensions[0]] = middleFile;
                 }
             }
@@ -63,7 +64,7 @@ class Router {
                 if (fs.existsSync(path.join(__dirname, `./controllers/${controllerFile}.js`))) {
                     controller = require(`./controllers/${controllerFile}.js`);
                 } else {
-                    controller = require(`../app/controllers/${controllerFile}.js`);
+                    controller = require(`${projectPWD}/app/controllers/${controllerFile}.js`);
                 }
                 routeHandler = new controller()[controllerHandler];
                 if(typeof routeMiddleware === "object") {
@@ -85,7 +86,7 @@ class Router {
                 if (fs.existsSync(path.join(__dirname, `./views/${controllerFile}.js`))) {
                     controller = require(`./views/${controllerFile}.js`);
                 } else {
-                    controller = require(`../app/views/${controllerFile}.js`);
+                    controller = require(`${projectPWD}/app/views/${controllerFile}.js`);
                 }
                 new controller((routeHandler, that) => {
                     if(typeof routeMiddleware === "object") {
