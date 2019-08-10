@@ -164,8 +164,6 @@ if (typeof cmdValue !== "undefined") {
     default:
       console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] Command not recognised!`);
   }
-} else {
-  console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Hello, World! :)`);
 }
 
 function init() {
@@ -195,6 +193,9 @@ function init() {
   console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Project has been initialized successfully!`);
 }
 
+/**
+ * Runs your Avalanche application
+ */
 function run() {
   console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Starting server...`);
   require("./Main.js");
@@ -374,3 +375,5 @@ function getModels(projectDir) {
   });
   return models;
 }
+
+module.exports.run = run;
