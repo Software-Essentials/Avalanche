@@ -92,6 +92,9 @@ function init() {
       fs.mkdirSync(path);
     }
   }
+  if(typeof example === "string") {
+    console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m...\x1b[0m`);
+  }
   for (const file of files) {
     const src = `${__dirname}/..${file.src}`;
     const dest = `${projectPWD}${file.dest}`;
@@ -110,8 +113,9 @@ function init() {
  * Runs your Avalanche application
  */
 function run() {
+  const environment = typeof arguments[0] === "string" ? arguments[0] : null;
   console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Starting server...`);
-  require("./Main.js");
+  require("./Main.js").run(environment);
 }
 
 function routes() {
@@ -120,7 +124,8 @@ function routes() {
     console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Can't show routes because there aren't any routes in the project.");
     return;
   }
-  var string = "\x1b[1m++======================================================================\x1b[0m\n";
+  var string = "\n  \x1b[1m++======================================================================\x1b[0m\n";
+  string += `  \x1b[1m||\x1b[0m\n`;
   for (const route of routes) {
     const path = route.path;
     const method = route.method;
@@ -131,9 +136,10 @@ function routes() {
       method === "POST" ? 33 :
       method === "PUT" ? 34 :
       method === "DELETE" ? 31 : 0
-    string += `\x1b[1m||\x1b[0m [\x1b[${color}m\x1b[1m${method}\x1b[0m] \t \x1b[3m${path}\x1b[0m\t        \x1b[32m${controller}\x1b[0m${handler ? `.\x1b[33m${handler}\x1b[0m()` : ".\x1b[34mconstructor\x1b[0m" }\n`;
+    string += `  \x1b[1m||\x1b[0m  [\x1b[${color}m\x1b[1m${method}\x1b[0m] \t \x1b[3m${path}\x1b[0m\t        \x1b[32m${controller}\x1b[0m${handler ? `.\x1b[33m${handler}\x1b[0m()` : ".\x1b[34mconstructor\x1b[0m" }\n`;
   }
-  string += "\x1b[1m++======================================================================\x1b[0m";
+  string += `  \x1b[1m||\x1b[0m\n`;
+  string += "  \x1b[1m++======================================================================\x1b[0m\n";
   console.log(string);
 }
 
@@ -315,6 +321,7 @@ module.exports = {
   run: run,
   init: init,
   info: info,
+  routes: routes,
   upgrade: upgrade,
   makeController: makeController
 };

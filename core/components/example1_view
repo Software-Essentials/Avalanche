@@ -13,7 +13,6 @@ class MainViewController extends ViewController {
   }
 
   willLoad(request, response, self) {
-    self.layout = "main";
     self.template = "default";
     super.willLoad(request, response, self);
   }
