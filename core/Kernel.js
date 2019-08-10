@@ -11,6 +11,8 @@ const Router = require("./Router.js");
 const SocketKernel = require("./SocketKernel.js");
 const Auth = require("./Auth.js");
 
+const projectPWD = process.env.PWD;
+
 
 /**
  * The Kernel is the primary entry point of the system. It acts as a gateway between the listener and the rest of the system.
