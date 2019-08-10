@@ -1,13 +1,15 @@
 {
   "name": "avacore",
-  "version": "0.1.7",
+  "version": "0.1.17",
   "description": "Node framework",
-  "main": "core/Core.js",
+  "main": "index.js",
   "author": "Lawrence Bensaid",
   "license": "MIT",
   "homepage": "https://github.com/noriacorp/Avalanche",
   "keywords": [
     "Framework",
+    "Avalanche",
+    "Ava",
     "Webserver",
     "Express",
     "MVC",
@@ -31,8 +33,5 @@
     "nodemailer-express-handlebars": "^3.0.0",
     "nodemailer-mailgun-transport": "^1.4.0",
     "socket.io": "^2.2.0"
-  },
-  "avalancheConfig": {
-    "preferredEnvironment": "development"
   }
 }

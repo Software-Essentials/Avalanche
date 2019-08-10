@@ -13,22 +13,27 @@ Install [NodeJS](https://nodejs.org/en/) from their [website](https://nodejs.org
 
 ## Installation
 
-**1. Initialize project.**
+**1. Install Avalanche globally.**
+This allows the CLI to work with a global perspective.
+It also prevents issues while updating Avalanche in the future.
 ```
-npm init
+npm install avacore -g
 ```
 
-**2. Install Avalanche.**
+**2. Link the Avalanche CLI.**
+This allows the "*avalanche*" and "*ava*" command to be used.
+```
+npm link avacore
+```
+
+**3. Install Avalanche in your NPM project.**
+This allows you to access the Avalanche Core Library
 ```
 npm install avacore
 ```
 
-**3. Link the Avalanche CLI.**
-```
-npm link
-```
-
 **4. Initialize Avalanche.**
+This sets up your Avalanche project.
 ```
 avalanche init
 ```
@@ -44,7 +49,7 @@ avalanche run
 
 **6. Navigate to [localhost](http://localhost).**
 
-Done! For more info, browse the Avalanche wiki on GitHub.
+Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/noriacorp/Avalanche/wiki).
 
 
 ## Troubleshooting
