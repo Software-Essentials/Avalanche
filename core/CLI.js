@@ -3,7 +3,7 @@
 const projectPWD = process.env.PWD;
 const program = require("commander");
 const fs = require("fs");
-const package = require(`${projectPWD}/package.json`);
+const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 
 const { COPYFILE_EXCL } = fs.constants;
@@ -135,7 +135,7 @@ program
 
 
 if (typeof cmdValue !== "undefined") {
-  if(typeof package.avalancheConfig === "undefined" && cmdValue !== "init" && cmdValue !== "version") {
+  if(typeof package === "null" && typeof package.avalancheConfig === "undefined" && cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
     console.log("\x1b[31m%s\x1b[0m", `(error) This is not an Avalanche project. use "avalanche init" to initialize.`);
     process.exit();
   }
@@ -157,6 +157,9 @@ if (typeof cmdValue !== "undefined") {
       break;
     case "version":
       console.log(avalanchePackage.version);
+      break;
+    case "info":
+      info();
       break;
     default:
       console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] Command not recognised!`);
@@ -198,17 +201,7 @@ function run() {
 }
 
 function routes() {
-  const normalizedPath = `${projectPWD}/app/routes`;
-  var routes = [];
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-      const extensions = file.split(".");
-      if (extensions.length = 2) {
-          if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-              const route = JSON.parse(JSON.stringify(require("../app/routes/" + file)));
-              routes.push.apply(routes, route);
-          }
-      }
-  });
+  const routes = getRoutes(projectPWD);
   if(routes.length <= 0) {
     console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Can't show routes because there aren't any routes in the project.");
     return;
@@ -234,6 +227,32 @@ function upgrade() {
   // Upgrade patterns not yet implemented.
   console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Checking for update...");
   console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) No upgrade pattern found. Check the GitHub Wiki for more information.");
+}
+
+function info() {
+  const isNodeProject = typeof package === "object";
+  var isAvalancheProject = isNodeProject ? typeof package.avalancheConfig === "object" : false;
+
+  var string = "\n";
+  string += `  \x1b[1m++==============================[Avalanche info]==============================\n`;
+  string += `  \x1b[1m||\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   Version:\t\t\t  ${avalanchePackage.version}\n`;
+  string += `  \x1b[1m||\x1b[0m   CLI Directory:\t\t  ${__dirname}\n`;
+  string += `  \x1b[1m||\x1b[0m\n`;
+  string += `  \x1b[1m++===============================[Project info]===============================\n`;
+  string += `  \x1b[1m||\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   isNodeProject:\t\t  \x1b[33m\x1b[1m${isNodeProject}\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   isAvalancheProject:\t  \x1b[33m\x1b[1m${isAvalancheProject}\x1b[0m\n`;
+  if(isAvalancheProject) {
+    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${getRoutes(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${getControllers(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${getMiddleware(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${getLocalisations(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${getTranslations(projectPWD).length}\x1b[0m\n`;
+  }
+  string += `  \x1b[1m||\x1b[0m\n`;
+  string += `  \x1b[1m++============================================================================\x1b[0m\n`;
+  console.log(string);
 }
 
 function fix() {
@@ -268,4 +287,90 @@ function makeController() {
     fs.copyFileSync(src, dest, COPYFILE_EXCL);
     // var file = require(dest);
   }
+}
+
+function getRoutes(projectDir) {
+  const normalizedPath = `${projectDir}/app/routes`;
+  var routes = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+        const route = JSON.parse(JSON.stringify(require(`${projectDir}/app/routes/${file}`)));
+        routes.push.apply(routes, route);
+      }
+    }
+  });
+  return routes;
+}
+
+function getControllers(projectDir) {
+  const normalizedPath = `${projectDir}/app/controllers`;
+  var controllers = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
+        controllers.push(extensions[0]);
+      }
+    }
+  });
+  return controllers;
+}
+
+function getMiddleware(projectDir) {
+  const normalizedPath = `${projectDir}/app/middleware`;
+  var middleware = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
+        middleware.push(extensions[0]);
+      }
+    }
+  });
+  return middleware;
+}
+
+function getLocalisations(projectDir) {
+  const normalizedPath = `${projectDir}/app/localisations`;
+  var localisations = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+        localisations.push(extensions[0]);
+      }
+    }
+  });
+  return localisations;
+}
+
+function getTranslations(projectDir) {
+  const normalizedPath = `${projectDir}/app/localisations`;
+  var translations = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+        const translation = JSON.parse(JSON.stringify(require(`${projectDir}/app/localisations/${file}`)));
+        translations.push.apply(translations, translation);
+      }
+    }
+  });
+  return translations;
+}
+
+function getModels(projectDir) {
+  const normalizedPath = `${projectDir}/app/models`;
+  var models = [];
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
+        models.push(extensions[0]);
+      }
+    }
+  });
+  return models;
 }
