@@ -1,5 +1,5 @@
 // Imports
-const { AVAController } = require("avacore");
+const { AVAController, AVAStorage } = require("avacore");
 
 
 
@@ -9,13 +9,12 @@ class MainController extends AVAController {
    *
    */
   index(request, response) {
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone("Post");
     response.json({
       success: true,
       message: "Showing all records.",
-      data: [
-        "foo",
-        "bar"
-      ]
+      data: zone.getRecords()
     });
   }
 
@@ -23,10 +22,13 @@ class MainController extends AVAController {
    *
    */
   show(request, response) {
+    const index = request.query.id;
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone("Post");
     response.json({
       success: true,
       message: "Showing record.",
-      data: "foo"
+      data: zone.getRecordAtIndex(index)
     });
   }
 

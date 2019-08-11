@@ -2,6 +2,9 @@
 module.exports.AVALocalisation = require("./core/AVALocalisation.js");
 module.exports.AVANotification = require("./core/AVANotification.js");
 module.exports.AVAEnvironment = require("./core/AVAEnvironment.js");
+module.exports.AVARecordZoneType = require("./core/AVARecordZoneType.js");
+module.exports.AVARecordZone = require("./core/AVARecordZone.js");
+module.exports.AVAStorage = require("./core/AVAStorage.js");
 module.exports.AVAMailer = require("./core/AVAMailer.js");
 module.exports.AVAError = require("./core/AVAError.js");
 module.exports.Util = require("./core/Util.js");

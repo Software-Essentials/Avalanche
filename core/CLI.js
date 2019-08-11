@@ -84,10 +84,10 @@ if (typeof cmdValue !== "undefined") {
     const cliVersion = avalanchePackage.version;
     const cliValue = parseInt(projectVersion.split(".").join(""));
     const projectValue = parseInt(cliVersion.split(".").join(""));
-    if(cliValue < projectValue) {
+    if(cliValue > projectValue) {
       console.log(`\x1b[34m[AVALANCHE] (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
     }
-    if(cliValue > projectValue) {
+    if(projectValue > cliValue) {
       console.log(`\x1b[34m[AVALANCHE] (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
     }
   }
