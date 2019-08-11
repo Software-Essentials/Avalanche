@@ -1,5 +1,5 @@
 // Imports
-const { AVAController, AVAStorage } = require("avacore");
+const { AVAController, AVAStorage, AVARecordZone } = require("avacore");
 
 
 /**
@@ -7,6 +7,14 @@ const { AVAController, AVAStorage } = require("avacore");
  * @description Manages requests regarding Posts.
  */
 class PostController extends AVAController {
+
+  constructor() {
+    super()
+    const storage = new AVAStorage();
+    if(!storage.recordZoneExists("Post")) {
+      storage.addRecordZone(new AVARecordZone("Post", []))
+    }
+  }
 
   /**
    * @description Shows all posts.

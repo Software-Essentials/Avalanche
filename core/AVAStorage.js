@@ -28,6 +28,19 @@ class AVAStorage {
     }
     return null;
   }
+  
+  /**
+   * @description Checks if a RecordZone exists.
+   * @param {String} name Name of the RecordZone
+   * @returns {Boolean}
+   */
+  recordZoneExists(name) {
+    const path = `${projectPWD}/storage/${name}.json`;
+    if(fs.existsSync(path)) {
+      return true
+    }
+    return false;
+  }
 
   /**
    * @description Adds a RecordZone to the Storage.
