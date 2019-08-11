@@ -50,6 +50,22 @@ class AVARecordZone {
   }
 
   /**
+   * @description Updates an existing record in the RecordZone.
+   * @param {Object} data Data to add.
+   * @param {Number} index Index.
+   * @returns {Boolean}
+   */
+  setRecordAtIndex(data, index) {
+    if(this.type === AVARecordZoneType.LIST) {
+      if(typeof this.data[index] !== "undefined") {
+        this.data[index] = data;
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
    * @description Adds record to the RecordZone.
    * @param {Object} data Data to add.
    */
@@ -59,15 +75,30 @@ class AVARecordZone {
     }
   }
 
+  // /**
+  //  * @description Adds record to the RecordZone.
+  //  * @param {String} key Name of the key that the data will be added to.
+  //  * @param {Object} data Data to add.
+  //  */
+  // addRecord(key, data) {
+  //   if(this.type === AVARecordZoneType.OBJECT) {
+  //     this.data[key] = data;
+  //   }
+  // }
+
   /**
-   * @description Adds record to the RecordZone.
-   * @param {String} key Name of the key that the data will be added to.
-   * @param {Object} data Data to add.
+   * @description Deletes a record at a certain index.
+   * @param {Number} index Index.
+   * @returns {Boolean}
    */
-  addRecord(key, data) {
-    if(this.type === AVARecordZoneType.OBJECT) {
-      this.data[key] = data;
+  deleteRecordAtIndex(index) {
+    if(this.type == AVARecordZoneType.LIST) {
+      if(typeof this.data[index] !== "undefined") {
+        this.data.splice(index, 1);
+        return true
+      }
     }
+    return false
   }
 
 }
