@@ -2,11 +2,16 @@
 const { AVAController, AVAStorage } = require("avacore");
 
 
-
-class MainController extends AVAController {
+/**
+ * This Controller was added as a part of 'example1' at initialisation of this Avalanche project.
+ * @description Manages requests regarding Posts.
+ */
+class PostController extends AVAController {
 
   /**
-   *
+   * @description Shows all posts.
+   * @param {Object} request
+   * @param {Object} response
    */
   index(request, response) {
     const storage = new AVAStorage();
@@ -19,23 +24,52 @@ class MainController extends AVAController {
   }
 
   /**
-   *
+   * @description Shows a specific post.
+   * @param {Object} request
+   * @param {Object} response
    */
   show(request, response) {
-    const index = request.query.id;
+    const index = request.query.ID;
     const storage = new AVAStorage();
     const zone = storage.getRecordZone("Post");
+    if(typeof index === "undefined") {
+      response.json({
+        success: false,
+        message: "Missing index."
+      });
+      return;
+    }
+    const record = zone.getRecordAtIndex(index);
+    if(record === null) {
+      response.json({
+        success: false,
+        message: "Record doesn't exist."
+      });
+      return;
+    }
     response.json({
       success: true,
       message: "Showing record.",
-      data: zone.getRecordAtIndex(index)
+      data: record
     });
   }
 
   /**
-   *
+   * @description Creates a new post.
+   * @param {Object} request
+   * @param {Object} response
    */
   store(request, response) {
+    const postName = request.body.postName;
+    const postBody = request.body.postBody;
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone("Post");
+    const data = {
+      post_name: postName,
+      post_body: postBody
+    };
+    zone.addRecord(data);
+    storage.save(zone);
     response.json({
       success: true,
       message: "Record added."
@@ -43,22 +77,56 @@ class MainController extends AVAController {
   }
 
   /**
-   *
+   * @description Updates an existing post.
+   * @param {Object} request
+   * @param {Object} response
    */
   update(request, response) {
+    const postName = request.body.postName;
+    const postBody = request.body.postBody;
+    const index = request.body.ID;
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone("Post");
+    if(typeof index === "undefined") {
+      response.json({
+        success: false,
+        message: "Missing index."
+      });
+      return;
+    }
+    const data = {
+      post_name: postName,
+      post_body: postBody
+    };
+    const updated = zone.setRecordAtIndex(data, index);
+    storage.save(zone);
     response.json({
-      success: true,
-      message: "Record updated."
+      success: updated,
+      message: updated ? "Record updated." : "Record doesn't exist."
     });
   }
 
   /**
-   *
+   * @description Deletes a specific post.
+   * @param {Object} request
+   * @param {Object} response
    */
   destroy(request, response) {
+    const index = request.body.ID;
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone("Post");
+    if(typeof index === "undefined") {
+      response.json({
+        success: false,
+        message: "Missing index."
+      });
+      return;
+    }
+    const deleted = zone.deleteRecordAtIndex(index);
+    storage.save(zone);
     response.json({
-      success: true,
-      message: "Record deleted."
+      success: deleted,
+      message: deleted ? "Record deleted." : "Record doesn't exist."
     });
   }
 
@@ -66,4 +134,4 @@ class MainController extends AVAController {
 
 
 
-module.exports = MainController;
+module.exports = PostController;

@@ -13,7 +13,7 @@
   },
   {
     "src": "example1_controller",
-    "dest": "/app/controllers/MainController.js"
+    "dest": "/app/controllers/PostController.js"
   },
   {
     "src": "example1_view",
