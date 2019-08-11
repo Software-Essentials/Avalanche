@@ -4,7 +4,7 @@ const express = require("express");
 // Imports
 const Kernel = require("./Kernel.js");
 const Webserver = require("./Webserver.js");
-const Environment = require("./AVAEnvironment.js");
+const AVAEnvironment = require("./AVAEnvironment.js");
 
 const app = express();
 var initialised = false;
@@ -14,9 +14,9 @@ function run() {
         return;
     }
     if(typeof arguments[0] === "string") {
-        global.environment = new Environment(arguments[0]);
+        global.environment = new AVAEnvironment(arguments[0]);
     } else {
-        global.environment = new Environment();
+        global.environment = new AVAEnvironment();
     }
     initialised = true;
 }

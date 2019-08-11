@@ -68,9 +68,28 @@ program
 
 
 if (typeof cmdValue !== "undefined") {
-  if(typeof package === "null" && typeof package.avalancheConfig === "undefined" && cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
-    console.log("\x1b[31m%s\x1b[0m", `(error) This is not an Avalanche project. use "avalanche init" to initialize.`);
-    process.exit(AVAError.prototype.NOTANAVAPROJECT);
+  if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
+    if(typeof package === "null" || typeof package.avalancheConfig === "undefined") {
+      console.log(`\x1b[31m[AVALANCHE] (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
+      process.exit(AVAError.prototype.NOTANAVAPROJECT);
+      return;
+    }
+    if(!(package.dependencies && package.dependencies.avacore)) {
+      console.log(`\x1b[33m[AVALANCHE] (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
+    }
+  }
+  if(package.dependencies && package.dependencies.avacore) {
+    const version = package.dependencies.avacore;
+    const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
+    const cliVersion = avalanchePackage.version;
+    const cliValue = parseInt(projectVersion.split(".").join(""));
+    const projectValue = parseInt(cliVersion.split(".").join(""));
+    if(cliValue < projectValue) {
+      console.log(`\x1b[34m[AVALANCHE] (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
+    }
+    if(cliValue > projectValue) {
+      console.log(`\x1b[34m[AVALANCHE] (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
+    }
   }
   switch(cmdValue) {
     case "init":

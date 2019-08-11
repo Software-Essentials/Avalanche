@@ -31,14 +31,17 @@ class Kernel {
 		}
 
 		// Install helpers
-		const dir = fs.readdirSync(`${projectPWD}/app/helpers`);
 		var helpers = {};
-		for (const file of dir) {
-			if(fs.existsSync(`${projectPWD}/app/helpers/${file}`)) {
-				const helpersInFile = require(`${projectPWD}/app/helpers/${file}`);
-				const keys = Object.keys(helpersInFile);
-				for (const key of keys) {
-					helpers[key] = helpersInFile[key];
+		const helpersDirectory = `${projectPWD}/app/helpers`;
+		if(fs.existsSync(helpersDirectory)) {
+			const dir = fs.readdirSync(helpersDirectory);
+			for (const file of dir) {
+				if(fs.existsSync(`${helpersDirectory}/${file}`)) {
+					const helpersInFile = require(`${helpersDirectory}/${file}`);
+					const keys = Object.keys(helpersInFile);
+					for (const key of keys) {
+						helpers[key] = helpersInFile[key];
+					}
 				}
 			}
 		}
@@ -99,8 +102,8 @@ class Kernel {
 		if (global.environment.logHTTPRequestsToConsole) {
 			const now = new Date().toLocaleString();
 			const method = request.method;
-			const log = `[${now}]::[${method}] >> ${request.url}`;
 			const status = response.statusCode;
+			const log = `[${now}]\t[${method}::${status}]\t>> ${request.url}`;
 			const color = status === 200 ? 32 : status === 304 ? 33 : 31
 			const methodColor =
 				method === "GET" ? 32 :
@@ -108,7 +111,10 @@ class Kernel {
 				method === "PUT" ? 34 :
 				method === "DELETE" ? 31 : 0
 			console.log(`[\x1b[1m${now}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
-			fs.appendFile(`${projectPWD}/logs/server.log`, `${log}\n`, (error) => { });
+			if(!fs.existsSync(`${projectPWD}/logs`)) {
+				fs.mkdirSync(`${projectPWD}/logs`);
+			}
+			fs.appendFileSync(`${projectPWD}/logs/server.log`, `${log}\n`);
 		}
 
 	}

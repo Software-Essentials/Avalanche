@@ -146,13 +146,19 @@ function info() {
   var string = "\n";
   string += `  \x1b[1m++==============================[Avalanche info]==============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Version:\t\t\t  ${avalanchePackage.version}\n`;
+  string += `  \x1b[1m||\x1b[0m   CLI Version:\t\t  \x1b[34m\x1b[1mv${avalanchePackage.version}\x1b[0m\n`;
   string += `  \x1b[1m||\x1b[0m   CLI Directory:\t\t  ${__dirname}\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++===============================[Project info]===============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   isNodeProject:\t\t  \x1b[33m\x1b[1m${isNodeProject}\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   isAvalancheProject:\t  \x1b[33m\x1b[1m${isAvalancheProject}\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${isNodeProject}\x1b[0m\n`;
+  if(package.dependencies && package.dependencies.avacore) {
+    const version = package.dependencies.avacore;
+    const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
+    string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[34m\x1b[1mv${projectVersion}\x1b[0m\n`;
+  } else {
+    string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m\n`;
+  }
   if(isAvalancheProject) {
     string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${getModels(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${getControllers(projectPWD).length}\x1b[0m\n`;
@@ -160,6 +166,7 @@ function info() {
     string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${getMiddleware(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${getLocalisations(projectPWD).length}\x1b[0m\n`;
     string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${getTranslations(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(getHelpers(projectPWD)).length}\x1b[0m\n`;
   }
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++============================================================================\x1b[0m\n`;
@@ -282,6 +289,24 @@ function getModels(projectDir) {
     }
   });
   return models;
+}
+
+function getHelpers(projectDir) {
+  var helpers = {};
+  const helpersDirectory = `${projectDir}/app/helpers`;
+  if(fs.existsSync(helpersDirectory)) {
+    const dir = fs.readdirSync(helpersDirectory);
+    for (const file of dir) {
+      if(fs.existsSync(`${helpersDirectory}/${file}`)) {
+        const helpersInFile = require(`${helpersDirectory}/${file}`);
+        const keys = Object.keys(helpersInFile);
+        for (const key of keys) {
+          helpers[key] = helpersInFile[key];
+        }
+      }
+    }
+  }
+  return helpers;
 }
 
 module.exports = {
