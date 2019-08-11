@@ -3,11 +3,13 @@ const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
+const Installer = require("./Installer");
 
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
   "/app",
   "/app/controllers",
+  "/app/models",
   "/app/environments",
   "/app/localisations",
   "/app/middleware",
@@ -27,10 +29,16 @@ const folders = [
  */
 function init() {
   if(typeof package.avalancheConfig === "object") {
-    console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) Project has already been initialized.");
+    console.log(`\x1b[31m[AVALANCHE] (error) Project has already been initialized.\x1b[0m`);
     process.exit(AVAError.prototype.AVAALREADYINIT);
   }
-  console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Initializing project...`);
+  console.log(`\x1b[32m[AVALANCHE] Installing AVACore\x1b[0m`);
+  Installer("avacore", (error) => {
+    if (error) {
+      console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+    }
+  });
+  console.log(`\x1b[32m[AVALANCHE] Building app structure\x1b[0m`);
   const example = typeof arguments[0] === "string" ? arguments[0] : null;
   for (const folder of folders) {
     const path = `${projectPWD}${folder}`;
@@ -41,12 +49,12 @@ function init() {
   var files = [];
   if(typeof example === "string" && fs.existsSync(`${__dirname}/prefabs/${example}.json`)) {
     files = require(`${__dirname}/prefabs/${example}.json`);
-    console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m...\x1b[0m`);
+    console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m prefabs\x1b[0m`);
   } else {
     if(fs.existsSync(`${__dirname}/prefabs/default.json`)) {
       files = require(`${__dirname}/prefabs/default.json`);
     } else {
-      console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.");
+      console.log(`\x1b[31m[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
       process.exit(AVAError.prototype.INCOMPLETECORE);
     }
   }
@@ -58,10 +66,9 @@ function init() {
     }
   }
   var file = package;
-  // file.nodemonConfig = { ignore: ["/app/public/*"] };
   file.avalancheConfig = { preferredEnvironment: "development" };
   fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
-  console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Project has been initialized successfully!`);
+  console.log(`\x1b[32m[AVALANCHE] Project has been initialized successfully!\x1b[0m`);
 }
 
 /**

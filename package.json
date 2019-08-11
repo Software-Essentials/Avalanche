@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.2.10",
+  "version": "0.2.12",
   "description": "Node framework",
   "main": "index.js",
   "author": "Lawrence Bensaid",
@@ -35,5 +35,8 @@
     "nodemailer-express-handlebars": "^3.0.0",
     "nodemailer-mailgun-transport": "^1.4.0",
     "socket.io": "^2.2.0"
+  },
+  "avalancheConfig": {
+    "preferredEnvironment": "development"
   }
 }
