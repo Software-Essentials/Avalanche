@@ -2,6 +2,7 @@ const projectPWD = process.env.PWD;
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
+const { AVAError } = require("../index.js");
 
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
@@ -20,69 +21,14 @@ const folders = [
   "/app/views",
   "/app/helpers"
 ];
-const files = [
-  {
-    src: "/core/components/environment",
-    dest: "/app/environments/development.environment.json",
-    standard: true
-  },
-  {
-    src: "/core/components/helpers",
-    dest: "/app/helpers/util.js",
-    standard: true
-  },
-  {
-    src: "/core/components/example1_status404",
-    dest: "/app/templates/status/404.hbs",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_controller",
-    dest: "/app/controllers/MainController.js",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_view",
-    dest: "/app/views/MainViewController.js",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_routes_api",
-    dest: "/app/routes/api.json",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_routes_web",
-    dest: "/app/routes/web.json",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_template",
-    dest: "/app/templates/default.hbs",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example1_template_layout",
-    dest: "/app/templates/layouts/layout.hbs",
-    template: "example1"
-  },
-  {
-    src: "/core/components/example2_controller",
-    dest: "/app/controllers/PostController.js",
-    template: "example2"
-  },
-  {
-    src: "/core/components/example2_routes",
-    dest: "/app/routes/api.json",
-    template: "example2"
-  }
-];
 
-
+/**
+ * @description Sets up the project structure
+ */
 function init() {
   if(typeof package.avalancheConfig === "object") {
     console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) Project has already been initialized.");
-    process.exit();
+    process.exit(AVAError.prototype.AVAALREADYINIT);
   }
   console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Initializing project...`);
   const example = typeof arguments[0] === "string" ? arguments[0] : null;
@@ -92,13 +38,22 @@ function init() {
       fs.mkdirSync(path);
     }
   }
-  if(typeof example === "string") {
+  var files = [];
+  if(typeof example === "string" && fs.existsSync(`${__dirname}/prefabs/${example}.json`)) {
+    files = require(`${__dirname}/prefabs/${example}.json`);
     console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m...\x1b[0m`);
+  } else {
+    if(fs.existsSync(`${__dirname}/prefabs/default.json`)) {
+      files = require(`${__dirname}/prefabs/default.json`);
+    } else {
+      console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.");
+      process.exit(AVAError.prototype.INCOMPLETECORE);
+    }
   }
   for (const file of files) {
-    const src = `${__dirname}/..${file.src}`;
+    const src = `${__dirname}/templates/${file.src}`;
     const dest = `${projectPWD}${file.dest}`;
-    if(fs.existsSync(src) && !fs.existsSync(dest) && (file.standard === true || file.template === example)) {
+    if(fs.existsSync(src) && !fs.existsSync(dest)) {
       fs.copyFileSync(src, dest, COPYFILE_EXCL);
     }
   }
@@ -110,7 +65,33 @@ function init() {
 }
 
 /**
- * Runs your Avalanche application
+ * @description Fixes the project structure
+ */
+function fix() {
+  console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Fixing project...");
+  var fixedStructure = false;
+  for (const folder of folders) {
+    const path = `${projectPWD}${folder}`;
+    if(!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+      fixedStructure = true;
+    }
+  }
+  for (const file of files) {
+    const src = `${__dirname}/templates/${file.src}`;
+    const dest = `${projectPWD}${file.dest}`;
+    if(fs.existsSync(src) && !fs.existsSync(dest) && file.standard === true) {
+      fs.copyFileSync(src, dest, COPYFILE_EXCL);
+      fixedStructure = true;
+    }
+  }
+  if(fixedStructure) {
+    console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Restored project structure");
+  }
+}
+
+/**
+ * @description Runs your Avalanche application.
  */
 function run() {
   const environment = typeof arguments[0] === "string" ? arguments[0] : null;
@@ -118,6 +99,9 @@ function run() {
   require("./Main.js").run(environment);
 }
 
+/**
+ * @description Prints all the routes of the current project.
+ */
 function routes() {
   const routes = getRoutes(projectPWD);
   if(routes.length <= 0) {
@@ -143,12 +127,18 @@ function routes() {
   console.log(string);
 }
 
+/**
+ * @description Makes all changes nescesary for compatibility with the next Avalanche version.
+ */
 function upgrade() {
   // Upgrade patterns not yet implemented.
   console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Checking for update...");
   console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) No upgrade pattern found. Check the GitHub Wiki for more information.");
 }
 
+/**
+ * @description Prints information about the current Avalanche version and about the project.
+ */
 function info() {
   const isNodeProject = typeof package === "object";
   var isAvalancheProject = isNodeProject ? typeof package.avalancheConfig === "object" : false;
@@ -176,28 +166,6 @@ function info() {
   console.log(string);
 }
 
-function fix() {
-  console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Fixing project...");
-  var fixedStructure = false;
-  for (const folder of folders) {
-    const path = `${projectPWD}${folder}`;
-    if(!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-      fixedStructure = true;
-    }
-  }
-  for (const file of files) {
-    const src = `${__dirname}/..${file.src}`;
-    const dest = `${projectPWD}${file.dest}`;
-    if(fs.existsSync(src) && !fs.existsSync(dest) && file.standard === true) {
-      fs.copyFileSync(src, dest, COPYFILE_EXCL);
-      fixedStructure = true;
-    }
-  }
-  if(fixedStructure) {
-    console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Restored project structure");
-  }
-}
 
 function makeController() {
   const name = "TestController";

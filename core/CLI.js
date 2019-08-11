@@ -5,6 +5,7 @@ const program = require("commander");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
+const { AVAError } = require("../index.js");
 const { fix, run, init, info, routes, upgrade } = require("./Operations.js")
 
 program
@@ -69,7 +70,7 @@ program
 if (typeof cmdValue !== "undefined") {
   if(typeof package === "null" && typeof package.avalancheConfig === "undefined" && cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
     console.log("\x1b[31m%s\x1b[0m", `(error) This is not an Avalanche project. use "avalanche init" to initialize.`);
-    process.exit();
+    process.exit(AVAError.prototype.NOTANAVAPROJECT);
   }
   switch(cmdValue) {
     case "init":

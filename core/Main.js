@@ -4,7 +4,7 @@ const express = require("express");
 // Imports
 const Kernel = require("./Kernel.js");
 const Webserver = require("./Webserver.js");
-const Environment = require("./Environment.js");
+const Environment = require("./AVAEnvironment.js");
 
 const app = express();
 var initialised = false;

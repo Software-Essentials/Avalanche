@@ -4,7 +4,7 @@
 /**
  * Super controller
  */
-class Controller {
+class AVAController {
 
     constructor() {
 
@@ -14,4 +14,4 @@ class Controller {
 
 
 
-module.exports = Controller
+module.exports = AVAController

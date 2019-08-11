@@ -1,9 +1,9 @@
 // Dependencies
 const fs = require("fs");
-const { Localisation, hbs } = require("avacore");
+const { AVALocalisation, hbs } = require("avacore");
 
 // Setup
-const localisation = new Localisation("en_GB");
+const localisation = new AVALocalisation("en_GB");
 
 module.exports = {
     lang: () => {

@@ -1,0 +1,36 @@
+{
+  "title": "Example 2",
+  "network": {
+    "domain": "localhost",
+    "host": "127.0.0.1",
+    "port": 80,
+    "logHTTPRequestsToConsole": true
+  },
+  "auth": {
+    "secret": "SecretKey!",
+    "saltRounds": 0
+  },
+  "capabilities": {
+    "SSL": false,
+    "webSockets": false,
+    "middleware": true,
+    "email": false
+  },
+  "database": {
+    "host": "localhost",
+    "user": "root",
+    "password": "password",
+    "database": "my_database"
+  },
+  "email": {
+    "noreply": {
+      "name": "MyApp",
+      "host": "mail.example.com",
+      "port": 587,
+      "auth": {
+        "user": "noreply@example.com",
+        "pass": "password"
+      }
+    }
+  }
+}

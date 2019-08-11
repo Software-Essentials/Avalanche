@@ -1,9 +1,9 @@
 // Imports
-const { Controller } = require("avacore");
+const { AVAController } = require("avacore");
 
 
 
-class MainController extends Controller {
+class MainController extends AVAController {
 
   /**
    *

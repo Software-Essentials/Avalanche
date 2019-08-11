@@ -1,12 +1,12 @@
 // Imports
-const { ViewController } = require("avacore");
+const { AVAViewController } = require("avacore");
 
 
 
 /**
  *
  */
-class MainViewController extends ViewController {
+class MainViewController extends AVAViewController {
 
   constructor(request, response) {
     super(request, response);

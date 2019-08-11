@@ -1,6 +1,6 @@
 // Imports
 const fs = require("fs");
-const path = require("path");
+const { AVAError } = require("../index.js");
 const projectPWD = process.env.PWD;
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
@@ -9,7 +9,7 @@ const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${p
 /**
  * 
  */
-class Environment {
+class AVAEnvironment {
 
     constructor() {
 
@@ -29,7 +29,7 @@ class Environment {
         
         if(Object.keys(environments).length <= 0) {
             console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment file missing!");
-            process.exit();
+            process.exit(AVAError.prototype.NOENV);
         }
 
         var prefferedEnvironmentLoaded = false;
@@ -170,7 +170,7 @@ class Environment {
         this.mollieAPIKey = typeof environment.mollieAPIKey === "string" ? environment.mollieAPIKey : null;
 
         if(!isValid) {
-            process.exit();
+            process.exit(AVAError.prototype.ENVINVALID);
         }
     }
 
@@ -178,4 +178,4 @@ class Environment {
 
 
 
-module.exports = Environment;
+module.exports = AVAEnvironment;

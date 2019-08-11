@@ -6,7 +6,7 @@ const projectPWD = process.env.PWD;
 /**
  * 
  */
-class Localisation {
+class AVALocalisation {
 
     constructor(locale) {
 
@@ -27,4 +27,4 @@ class Localisation {
 
 }
 
-module.exports = Localisation;
+module.exports = AVALocalisation;
