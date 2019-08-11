@@ -1,11 +1,11 @@
 // Imports
-const { Controller } = require("avacore");
+const { AVAController } = require("avacore");
 
 
 /**
 *   For managing posts.
 */
-class PostController extends Controller {
+class PostController extends AVAController {
 
   /**
   *   Returns all posts.

@@ -7,7 +7,7 @@ const projectPWD = process.env.PWD;
 
 
 
-class Mailer {
+class AVAMailer {
 
   sendMail(recipient, subject, template, context) {
     const callback = typeof arguments[4] === "function" ? arguments[4] : null;
@@ -46,4 +46,4 @@ class Mailer {
 
 
 
-module.exports = Mailer;
+module.exports = AVAMailer;

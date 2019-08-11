@@ -1,0 +1,14 @@
+[
+  {
+    "src": "example2_environment",
+    "dest": "/app/environments/development.environment.json"
+  },
+  {
+    "src": "example2_controller",
+    "dest": "/app/controllers/PostController.js"
+  },
+  {
+    "src": "example2_routes",
+    "dest": "/app/routes/api.json"
+  }
+]

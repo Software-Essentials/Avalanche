@@ -6,7 +6,7 @@ const Auth = require("../Auth.js");
 /**
  * Super model
  */
-class Model {
+class AVAModel {
 
     constructor() {
         this.connection = Auth.getConnection();
@@ -16,4 +16,4 @@ class Model {
 
 
 
-module.exports = Model;
+module.exports = AVAModel;

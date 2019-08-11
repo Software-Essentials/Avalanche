@@ -1,0 +1,38 @@
+[
+  {
+    "src": "example1_environment",
+    "dest": "/app/environments/development.environment.json"
+  },
+  {
+    "src": "example1_helpers",
+    "dest": "/app/helpers/util.js"
+  },
+  {
+    "src": "example1_status404",
+    "dest": "/app/templates/status/404.hbs"
+  },
+  {
+    "src": "example1_controller",
+    "dest": "/app/controllers/MainController.js"
+  },
+  {
+    "src": "example1_view",
+    "dest": "/app/views/MainViewController.js"
+  },
+  {
+    "src": "example1_routes_api",
+    "dest": "/app/routes/api.json"
+  },
+  {
+    "src": "example1_routes_web",
+    "dest": "/app/routes/web.json"
+  },
+  {
+    "src": "example1_template",
+    "dest": "/app/templates/default.hbs"
+  },
+  {
+    "src": "example1_template_layout",
+    "dest": "/app/templates/layouts/layout.hbs"
+  }
+]

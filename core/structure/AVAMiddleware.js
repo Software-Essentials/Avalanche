@@ -4,7 +4,7 @@
 /**
  * Super middleware
  */
-class Middleware {
+class AVAMiddleware {
 
     constructor() {
 
@@ -14,4 +14,4 @@ class Middleware {
 
 
 
-module.exports = Middleware;
+module.exports = AVAMiddleware;

@@ -4,7 +4,7 @@
 /**
  * @author Lawrence Bensaid
  */
-class Notification {
+class AVANotification {
 
     /**
      * 
@@ -34,4 +34,4 @@ class Notification {
 
 
 
-module.exports = Notification;
+module.exports = AVANotification;
