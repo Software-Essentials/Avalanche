@@ -66,6 +66,46 @@ class AVARecordZone {
   }
 
   /**
+   * @description Updates an existing record in the RecordZone.
+   * @param {Object} data Data to add.
+   * @param {Number} index Index.
+   * @returns {Boolean}
+   */
+  setRecordWhere(key, value, data) {
+    var updated = false;
+    for(const recordKey in this.data) {
+      if(this.data[recordKey].hasOwnProperty(key)) {
+        if(this.data[recordKey][key] === value) {
+          this.data[recordKey] = data;
+          updated = true;
+        }
+      }
+    }
+    return updated;
+  }
+
+
+  /**
+   * @description Deletes an existing record from the RecordZone.
+   * @param {String} key Key to find.
+   * @param {any} value value match.
+   * @returns {Boolean}
+   */
+  deleteRecordWhere(key, value) {
+    var deleted = false;
+    for(const recordKey in this.data) {
+      if(this.data[recordKey].hasOwnProperty(key)) {
+        if(this.data[recordKey][key] === value) {
+          this.data.splice(recordKey, 1);
+          deleted = true;
+        }
+      }
+    }
+    return deleted;
+  }
+
+
+  /**
    * @description Adds record to the RecordZone.
    * @param {Object} data Data to add.
    */

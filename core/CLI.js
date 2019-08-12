@@ -6,7 +6,7 @@ const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
-const { fix, run, init, info, routes, upgrade } = require("./Operations.js")
+const { fix, run, init, info, routes, upgrade, migrate } = require("./Operations.js")
 
 program
   .version("1.2.3")
@@ -16,55 +16,6 @@ program
     envValue = env;
   })
   .parse(process.argv)
-
-program
-  .command("init [example]")
-  .description("Initializes your Avalanche project")
-  .action(function() {
-    // console.log("Initialize project");
-    init();
-  })
-  .parse(process.argv);
-  
-program
-  .command("run [environment]")
-  .description("Runs your application")
-  .action(function() {
-    // console.log("Run application");
-  })
-  .parse(process.argv);
-
-program
-  .command("reload")
-  .description("Reloads caches")
-  .action(function() {
-    // console.log("Reload application");
-  })
-  .parse(process.argv);
-
-program
-  .command("upgrade")
-  .description("Upgrades Avalanche your project")
-  .action(function() {
-    // console.log("Upgrade project");
-  })
-  .parse(process.argv);
-
-program
-  .command("install")
-  .description("Installes files in your project")
-  .action(function() {
-    // console.log("Install snippets");
-  })
-  .parse(process.argv);
-
-program
-  .command("make")
-  .description("Creates a component in your project")
-  .action(function() {
-    // console.log("Make component");
-  })
-  .parse(process.argv);
 
 
 if (typeof cmdValue !== "undefined") {
@@ -106,6 +57,9 @@ if (typeof cmdValue !== "undefined") {
       break;
     case "fix":
       fix();
+      break;
+    case "migrate":
+      migrate();
       break;
     case "version":
       console.log(avalanchePackage.version);

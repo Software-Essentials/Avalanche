@@ -2,7 +2,7 @@ const projectPWD = process.env.PWD;
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const { AVAError } = require("../index.js");
+const { AVAError, AVADatabase, Util } = require("../index.js");
 const Installer = require("./Installer");
 
 const { COPYFILE_EXCL } = fs.constants;
@@ -13,6 +13,7 @@ const folders = [
   "/app/environments",
   "/app/localisations",
   "/app/middleware",
+  "/app/migrations",
   "/app/public",
   "/app/routes",
   "/app/templates",
@@ -110,7 +111,7 @@ function run() {
  * @description Prints all the routes of the current project.
  */
 function routes() {
-  const routes = getRoutes(projectPWD);
+  const routes = Util.getRoutes(projectPWD);
   if(routes.length <= 0) {
     console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Can't show routes because there aren't any routes in the project.");
     return;
@@ -168,17 +169,24 @@ function info() {
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m\n`;
   }
   if(isAvalancheProject) {
-    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${getModels(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${getControllers(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${getRoutes(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${getMiddleware(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${getLocalisations(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${getTranslations(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(getHelpers(projectPWD)).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${Util.getModels(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${Util.getControllers(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${Util.getRoutes(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${Util.getMiddleware(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${Util.getLocalisations(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${Util.getTranslations(projectPWD).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(Util.getHelpers(projectPWD)).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Migrations:\t\t  \x1b[32m\x1b[1m${Object.keys(Util.getMigrations(projectPWD)).length}\x1b[0m\n`;
   }
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++============================================================================\x1b[0m\n`;
   console.log(string);
+}
+
+
+function migrate() {
+  const database = new AVADatabase();
+  database.migrate();
 }
 
 
@@ -193,130 +201,6 @@ function makeController() {
   }
 }
 
-function getRoutes(projectDir) {
-  const normalizedPath = `${projectDir}/app/routes`;
-  var routes = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return routes;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const route = JSON.parse(JSON.stringify(require(`${projectDir}/app/routes/${file}`)));
-        routes.push.apply(routes, route);
-      }
-    }
-  });
-  return routes;
-}
-
-function getControllers(projectDir) {
-  const normalizedPath = `${projectDir}/app/controllers`;
-  var controllers = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return controllers;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-        controllers.push(extensions[0]);
-      }
-    }
-  });
-  return controllers;
-}
-
-function getMiddleware(projectDir) {
-  const normalizedPath = `${projectDir}/app/middleware`;
-  var middleware = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return middleware;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-        middleware.push(extensions[0]);
-      }
-    }
-  });
-  return middleware;
-}
-
-function getLocalisations(projectDir) {
-  const normalizedPath = `${projectDir}/app/localisations`;
-  var localisations = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return localisations;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        localisations.push(extensions[0]);
-      }
-    }
-  });
-  return localisations;
-}
-
-function getTranslations(projectDir) {
-  const normalizedPath = `${projectDir}/app/localisations`;
-  var translations = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return translations;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const translationSet = JSON.parse(JSON.stringify(require(`${projectDir}/app/localisations/${file}`)));
-        for (const translation of Object.keys(translationSet)) {
-          translations.push(translationSet[translation]);
-        }
-      }
-    }
-  });
-  return translations;
-}
-
-function getModels(projectDir) {
-  const normalizedPath = `${projectDir}/app/models`;
-  var models = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return models;
-  }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-        models.push(extensions[0]);
-      }
-    }
-  });
-  return models;
-}
-
-function getHelpers(projectDir) {
-  var helpers = {};
-  const helpersDirectory = `${projectDir}/app/helpers`;
-  if(fs.existsSync(helpersDirectory)) {
-    const dir = fs.readdirSync(helpersDirectory);
-    for (const file of dir) {
-      if(fs.existsSync(`${helpersDirectory}/${file}`)) {
-        const helpersInFile = require(`${helpersDirectory}/${file}`);
-        const keys = Object.keys(helpersInFile);
-        for (const key of keys) {
-          helpers[key] = helpersInFile[key];
-        }
-      }
-    }
-  }
-  return helpers;
-}
-
 module.exports = {
   fix: fix,
   run: run,
@@ -324,5 +208,6 @@ module.exports = {
   info: info,
   routes: routes,
   upgrade: upgrade,
+  migrate: migrate,
   makeController: makeController
 };
