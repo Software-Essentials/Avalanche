@@ -69,6 +69,11 @@ function init() {
   var file = package;
   file.avalancheConfig = { preferredEnvironment: "development" };
   fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
+  const path = `${__dirname}/resources/asci`;
+  if(fs.existsSync(path)) {
+    const file = fs.readFileSync(path, { encoding: "utf8" })
+    console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
+  }
   console.log(`\x1b[32m[AVALANCHE] Project has been initialized successfully!\x1b[0m`);
 }
 
