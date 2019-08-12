@@ -1,0 +1,33 @@
+const { AVAModel } = require("avacore");
+
+
+/**
+ * @description Manages posts.
+ */
+class Post extends AVAModel {
+
+  /**
+   * @throws AVAError
+   */
+  constructor() {
+    super();
+    // Model configuration.
+    this.NAME = "Post"; // Name of the Storage Zone / Database Table.
+    this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
+    this.METHOD = "STORAGE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+    this.PROPERTIES = {
+      "ID": "post_id",
+      "name": "post_name",
+      "body": "post_body",
+      "createdAt": "created_at",
+      "updatedAt": "updated_at"
+    }; // Format: "<model key>": "<storage key>"
+    this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
+    // Default values.
+    this.createdAt = new Date().valueOf();
+  }
+
+}
+
+
+module.exports = Post;
