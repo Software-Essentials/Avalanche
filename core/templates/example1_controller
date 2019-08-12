@@ -1,5 +1,6 @@
 // Imports
-const { AVAController, AVAStorage, AVARecordZone } = require("avacore");
+const { AVAController } = require("avacore");
+const Post = require("../models/Post.js");
 
 
 /**
@@ -10,11 +11,8 @@ class PostController extends AVAController {
 
   constructor() {
     super()
-    const storage = new AVAStorage();
-    if(!storage.recordZoneExists("Post")) {
-      storage.addRecordZone(new AVARecordZone("Post", []))
-    }
   }
+
 
   /**
    * @description Shows all posts.
@@ -22,14 +20,19 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   index(request, response) {
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone("Post");
+    const posts = Post.prototype.all();
+    const hasContents = posts.length > 0;
+    var data = [];
+    for (const post of posts) {
+      data.push(post.get());
+    }
     response.json({
-      success: true,
-      message: "Showing all records.",
-      data: zone.getRecords()
+      success: hasContents,
+      message: hasContents ? "Showing all records." : "No records to display",
+      data: data
     });
   }
+
 
   /**
    * @description Shows a specific post.
@@ -37,30 +40,17 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   show(request, response) {
-    const index = request.query.ID;
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone("Post");
-    if(typeof index === "undefined") {
-      response.json({
-        success: false,
-        message: "Missing index."
-      });
-      return;
-    }
-    const record = zone.getRecordAtIndex(index);
-    if(record === null) {
-      response.json({
-        success: false,
-        message: "Record doesn't exist."
-      });
-      return;
-    }
+    const index = request.params.ID;
+    const posts = Post.prototype.where("post_id", parseInt(index));
+    const hasContents = posts.length > 0;
+    const data = hasContents ? posts[0].get() : undefined;
     response.json({
-      success: true,
-      message: "Showing record.",
-      data: record
+      success: hasContents,
+      message: hasContents ? "Showing record." : "Record doesn't exist.",
+      data: data
     });
   }
+
 
   /**
    * @description Creates a new post.
@@ -68,73 +58,72 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   store(request, response) {
-    const postName = request.body.postName;
-    const postBody = request.body.postBody;
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone("Post");
-    const data = {
-      post_name: postName,
-      post_body: postBody
-    };
-    zone.addRecord(data);
-    storage.save(zone);
+    const post = new Post();
+    post.name = request.body.postName;
+    post.body = request.body.postBody
+    const success = post.save();
     response.json({
-      success: true,
-      message: "Record added."
+      success: success,
+      message: success ? "Record added." : "Unable to add record."
     });
   }
 
+
   /**
-   * @description Updates an existing post.
+   * @description Updates all existing posts with a specific ID.
    * @param {Object} request
    * @param {Object} response
    */
   update(request, response) {
-    const postName = request.body.postName;
-    const postBody = request.body.postBody;
     const index = request.body.ID;
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone("Post");
-    if(typeof index === "undefined") {
-      response.json({
-        success: false,
-        message: "Missing index."
-      });
-      return;
+    const posts = Post.prototype.where("post_id", parseInt(index));
+    const hasContents = posts.length > 0;
+    const multiple = posts.length > 1
+    if(hasContents) {
+      if(multiple) {
+        for(const i in posts) {
+          posts[i].name = request.body.postName;
+          posts[i].body = request.body.postBody;
+          posts[i].save()
+        }
+      } else {
+        const i = Object.keys(posts)[0];
+        posts[i].name = request.body.postName;
+        posts[i].body = request.body.postBody;
+        posts[i].save()
+      }
     }
-    const data = {
-      post_name: postName,
-      post_body: postBody
-    };
-    const updated = zone.setRecordAtIndex(data, index);
-    storage.save(zone);
     response.json({
-      success: updated,
-      message: updated ? "Record updated." : "Record doesn't exist."
+      success: hasContents,
+      message: hasContents ? "Record updated." : "Unable to update record."
     });
   }
 
+
   /**
-   * @description Deletes a specific post.
+   * @description Deletes all posts with a specific ID.
    * @param {Object} request
    * @param {Object} response
    */
   destroy(request, response) {
     const index = request.body.ID;
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone("Post");
-    if(typeof index === "undefined") {
-      response.json({
-        success: false,
-        message: "Missing index."
-      });
-      return;
+    const posts = Post.prototype.where("post_id", parseInt(index));
+    const hasContents = posts.length > 0;
+    const multiple = posts.length > 1
+    var success = false;
+    if(hasContents) {
+      if(multiple) {
+        for(const i in posts) {
+          success = posts[i].delete()
+        }
+      } else {
+        const i = Object.keys(posts)[0];
+        success = posts[i].delete()
+      }
     }
-    const deleted = zone.deleteRecordAtIndex(index);
-    storage.save(zone);
     response.json({
-      success: deleted,
-      message: deleted ? "Record deleted." : "Record doesn't exist."
+      success: success,
+      message: success ? "Record deleted." : "Unable to delete record."
     });
   }
 

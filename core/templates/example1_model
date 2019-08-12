@@ -1,0 +1,161 @@
+const { AVAModel, AVAStorage, AVARecordZone, AVAError } = require("avacore");
+
+
+/**
+ * @description Manages posts.
+ */
+class Post extends AVAModel {
+
+  /**
+   * @throws AVAError
+   */
+  constructor() {
+    super();
+    const storage = new AVAStorage();
+    this.keys = {
+      "ID": "post_id",
+      "name": "post_name",
+      "body": "post_body",
+      "createdAt": "created_at",
+      "updatedAt": "updated_at"
+    };
+    this.IDENTIFIER = "ID";
+    this.NAME = Post.name;
+    if(typeof arguments[0] === "object") {
+      const object = arguments[0];
+      for(const key in this.keys) {
+        if(object.hasOwnProperty(this.keys[key]) === false) {
+          throw "Model incomplete";
+        }
+        this[key] = object[this.keys[key]]
+      }
+      this.DRAFT = false;
+      if(!storage.recordZoneExists(this.NAME)) {
+        storage.addRecordZone(new AVARecordZone(this.NAME, []));
+      }
+    } else {
+      for(const key in this.keys) {
+        this[key] = null;
+      }
+      this.createdAt = 13904732; // MODEL SPECIFIC
+      this.DRAFT = true;
+      if(!storage.recordZoneExists(this.NAME)) {
+        storage.addRecordZone(new AVARecordZone(this.NAME, []))
+      }
+      const all = storage.getRecordZone(this.NAME).getRecords()
+      var highest = 0;
+      for(const r in all) {
+        highest = parseInt(all[r][this.keys[this.IDENTIFIER]]);
+      }
+      this[this.IDENTIFIER] = highest + 1;
+    }
+  }
+
+
+  /**
+   * @description Saves changes.
+   * @returns {Boolean}
+   */
+  save() {
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone(this.NAME);
+    const data = {
+      post_id: this.ID,
+      post_name: this.name,
+      post_body: this.body,
+      created_at: this.createdAt,
+      updated_at: this.updatedAt
+    };
+    if(this.DRAFT) {
+      zone.addRecord(data);
+      this.DRAFT = false;
+    } else {
+      zone.setRecordWhere(this.keys[this.IDENTIFIER], this.ID, data)
+    }
+    storage.save(zone);
+    return true;
+  }
+
+
+  /**
+   * @description Deletes post.
+   * @returns {Boolean}
+   */
+  delete() {
+    const storage = new AVAStorage();
+    const zone = storage.getRecordZone(this.NAME);
+    if(!this.DRAFT) {
+      if(zone.deleteRecordWhere(this.keys[this.IDENTIFIER], this.ID)) {
+        storage.save(zone);
+        return true
+      }
+    }
+    return false;
+  }
+
+
+  /**
+   * @description Returns JSON representation of post.
+   * @returns {Object}
+   */
+  get() {
+    return {
+      post_id: this.ID,
+      post_name: this.name,
+      post_body: this.body,
+      created_at: this.createdAt,
+      updated_at: this.updatedAt
+    }
+  }
+
+}
+
+
+/**
+ * @description Returns all posts.
+ * @returns {[Post]}
+ */
+function all() {
+  const name = typeof arguments[0] === "string" ? arguments[0] : Post.name;
+  const storage = new AVAStorage();
+  const zone = storage.getRecordZone(name);
+  const records = zone.getRecords();
+  var results = [];
+  for(const record in records) {
+    const post = new Post(records[record]);
+    results.push(post);
+  }
+  return results;
+}
+
+
+/**
+ * @description Returns all posts matching this key-value condition.
+ * @param {String} key 
+ * @param {any} value 
+ * @returns {[Post]}
+ */
+function where(key, value) {
+  const name = typeof arguments[2] === "string" ? arguments[2] : Post.name;
+  const storage = new AVAStorage();
+  const zone = storage.getRecordZone(name);
+  const records = zone.getRecords();
+  var results = [];
+  for(const record in records) {
+    if(records[record].hasOwnProperty(key)) {
+      const recordValue = records[record][key];
+      if(recordValue === value) {
+        const post = new Post(records[record]);
+        results.push(post);
+      }
+    }
+  }
+  return results;
+}
+
+
+Post.prototype.all = all;
+Post.prototype.where = where;
+
+
+module.exports = Post;

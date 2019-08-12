@@ -6,7 +6,7 @@
     "handler": "index"
   },
   {
-    "path": "/post/show",
+    "path": "/post/show/:ID",
     "method": "GET",
     "controller": "PostController",
     "handler": "show"

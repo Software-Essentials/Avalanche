@@ -1,0 +1,26 @@
+{
+  "post_id": {
+    "datatype": "INT",
+    "length":  10,
+    "autoincrement": true,
+    "null": false
+  },
+  "post_name": {
+    "datatype": "CHAR",
+    "length":  32,
+    "null": false
+  },
+  "post_body": {
+    "datatype": "CHAR",
+    "length":  255
+  },
+  "created_at": {
+    "datatype": "TINYINT",
+    "length":  16,
+    "null": false
+  },
+  "updated_at": {
+    "datatype": "TINYINT",
+    "length":  16
+  }
+}
