@@ -1,5 +1,3 @@
-// Imports
-const Auth = require("../Auth.js");
 
 
 
@@ -9,7 +7,11 @@ const Auth = require("../Auth.js");
 class AVAModel {
 
     constructor() {
-        this.connection = Auth.getConnection();
+        
+    }
+
+    save() {
+        
     }
 
 }
