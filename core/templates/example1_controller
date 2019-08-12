@@ -84,12 +84,14 @@ class PostController extends AVAController {
         for(const i in posts) {
           posts[i].name = request.body.postName;
           posts[i].body = request.body.postBody;
+          posts[i].updatedAt = new Date().valueOf();
           posts[i].save()
         }
       } else {
         const i = Object.keys(posts)[0];
         posts[i].name = request.body.postName;
         posts[i].body = request.body.postBody;
+        posts[i].updatedAt = new Date().valueOf();
         posts[i].save()
       }
     }
@@ -128,7 +130,6 @@ class PostController extends AVAController {
   }
 
 }
-
 
 
 module.exports = PostController;
