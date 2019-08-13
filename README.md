@@ -44,7 +44,7 @@ $ avalanche init example1
 ```
 $ avalanche run
 ```
-Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/noriacorp/Avalanche/wiki).
+Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/noriasoft/Avalanche/wiki).
 
 
 ## Troubleshooting
