@@ -1,0 +1,40 @@
+<div class="container jumbotron">
+    <h1>Posts</h1>
+    <div class="row">
+        <form class="col-12 card p-3 my-1" method="post" action="/post/store" id="createForm" name="createForm">
+            <div class="form-group">
+                <input class="form-control" type="text" name="postName" placeholder="Title" />
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" name="postBody" placeholder="Body" />
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" value="Submit post" />
+            </div>
+        </form>
+    </div>
+    <hr class="my-3" />
+    {{#each posts}}
+        <div class="row">
+            <div class="col-12 card p-3 my-1">
+                <h4>{{this.name}}</h4>
+                <p>{{this.body}}</p>
+                <button class="btn btn-danger" onclick="destroy({{this.ID}});">Delete</button>
+            </div>
+        </div>
+    {{/each}}
+    <script>
+        function destroy(ID) {
+            var origin = window.location.origin;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("DELETE", origin + "/post/destroy", true);
+            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhttp.onreadystatechange = function() {
+                if(xhttp.readyState == 4 && xhttp.status == 200) {
+                    window.location.reload();
+                }
+            }
+            xhttp.send("ID=" + ID);
+        }
+    </script>
+</div>
