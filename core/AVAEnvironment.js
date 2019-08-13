@@ -67,7 +67,6 @@ class AVAEnvironment {
 
         this.network = {};
         if(typeof(environment.network) === "object") {
-            this.logHTTPRequestsToConsole = typeof environment.network.logHTTPRequestsToConsole === "boolean" ? environment.network.logHTTPRequestsToConsole : true;
             if (typeof(environment.network.domain) === "string") {
                 this.domain = environment.network.domain;
             } else {
@@ -90,6 +89,10 @@ class AVAEnvironment {
             isValid = false
             console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing network credentials");
         }
+
+        // Debug section
+        this.logHTTPRequestsToConsole = typeof environment.debug.logHTTPRequestsToConsole === "boolean" ? environment.debug.logHTTPRequestsToConsole : true;
+        this.restartOnFileChange = typeof environment.debug.restartOnFileChange === "boolean" ? environment.debug.restartOnFileChange : true;
         
         this.auth = {};
         if(typeof(environment.auth) === "object") {

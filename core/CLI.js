@@ -25,11 +25,11 @@ if (typeof cmdValue !== "undefined") {
       process.exit(AVAError.prototype.NOTANAVAPROJECT);
       return;
     }
-    if(!(package.dependencies && package.dependencies.avacore)) {
+    if(!(package && package.dependencies && package.dependencies.avacore)) {
       console.log(`\x1b[33m[AVALANCHE] (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
     }
   }
-  if(package.dependencies && package.dependencies.avacore) {
+  if(package && package.dependencies && package.dependencies.avacore) {
     const version = package.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     const cliVersion = avalanchePackage.version;

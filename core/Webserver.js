@@ -30,12 +30,16 @@ class Webserver {
       this.didStart(this);
     });
     this.stream.on("error", (error) => {
-      const knownError = "listen EACCES: permission denied";
-      if(error.message.includes(knownError)) {
-        console.log(`\x1b[31m[AVALANCHE] Unable to start server because port ${global.environment.port} is in use\x1b[0m`);
-      } else {
-        console.log(`\x1b[31m[AVALANCHE] An unknown error occured: \x1b[0m"${error.message}`);
+      const message = error.message;
+      if(message.includes("EACCES")) {
+        console.log(`\x1b[31m[AVALANCHE] Unable to start server because Avalanche doesn't have permission to use port '${global.environment.port}' on IP '${global.environment.host}'.\x1b[0m`);
+        return;
       }
+      if(message.includes("EADDRINUSE")) {
+        console.log(`\x1b[31m[AVALANCHE] Unable to start server because port '${global.environment.port}' on IP '${global.environment.host}' is already in use.\x1b[0m`);
+        return;
+      }
+      console.log(`\x1b[31m[AVALANCHE] An unknown error occured: \x1b[0m${error.message}`);
     });
   }
 

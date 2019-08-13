@@ -1,4 +1,4 @@
-const { AVAStorage } = require("../../index");
+const { AVAStorage, AVARecordZone } = require("../../index");
 
 
 /**
@@ -22,8 +22,8 @@ class AVAModel {
    */
   setupDone() {
     const storage = new AVAStorage();
-    if(typeof arguments[0][0] === "object") {
-      const object = arguments[0][0];
+    if(typeof arguments[0] === "object") {
+      const object = arguments[0];
       for(const key in this.PROPERTIES) {
         if(object.hasOwnProperty(this.PROPERTIES[key]) === false) {
           throw "Model incomplete";

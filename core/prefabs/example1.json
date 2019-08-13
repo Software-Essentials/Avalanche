@@ -44,7 +44,7 @@
     "dest": "/app/templates/layouts/layout.hbs"
   },
   {
-    "src": "example1_migration",
-    "desc": "/app/migrations/Post.json"
+    "src": "example1_model",
+    "dest": "/app/models/Post.js"
   }
 ]
