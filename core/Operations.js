@@ -32,7 +32,7 @@ const folders = [
 function init() {
   if(typeof package.avalancheConfig === "object") {
     console.log(`\x1b[31m[AVALANCHE] (error) Project has already been initialized.\x1b[0m`);
-    process.exit(AVAError.prototype.AVAALREADYINIT);
+    process.exit(AVAError.AVAALREADYINIT);
   }
   console.log(`\x1b[32m[AVALANCHE] Installing AVACore\x1b[0m`);
   try {
@@ -57,7 +57,7 @@ function init() {
       files = require(`${__dirname}/prefabs/default.json`);
     } else {
       console.log(`\x1b[31m[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
-      process.exit(AVAError.prototype.INCOMPLETECORE);
+      process.exit(AVAError.INCOMPLETECORE);
     }
   }
   for (const file of files) {
@@ -259,6 +259,7 @@ function upgrade() {
  * @description Prints information about the current Avalanche version and about the project.
  */
 function info() {
+
   const isNodeProject = typeof package === "object";
   var isAvalancheProject = isNodeProject ? typeof package.avalancheConfig === "object" : false;
 
@@ -307,14 +308,53 @@ function migrate() {
 /**
  * @description Makes controller.
  */
-function makeController() {
-  const name = "TestController";
-  const src = `${__dirname}/../core/components/TEMPLATE_controller`;
-  const dest = `${projectPWD}/app/controllers/${name}.js`;
-
-  if(fs.existsSync(src) && !fs.existsSync(dest)) {
-    fs.copyFileSync(src, dest, COPYFILE_EXCL);
-    // var file = require(dest);
+function make(component, name) {
+  var name = name;
+  if(typeof name !== "string") {
+    console.log(`\x1b[31m[AVALANCHE] (error) Please specify a name!\x1b[0m`);
+    return;
+  }
+  var path = null;
+  var template = null;
+  var variables = {
+    name: name
+  };
+  switch(component) {
+    case "controller":
+      path = "app/controllers";
+      template = "TEMPLATE_controller";
+      break;
+    case "view":
+      path = "app/views";
+      template = "TEMPLATE_view";
+      break;
+    case "model":
+      path = "app/models";
+      template = "TEMPLATE_model";
+      variables["name_lower"] = name.toLowerCase();
+      break;
+    default:
+      console.log(`\x1b[31m[AVALANCHE] (error) Command not recognised!\x1b[0m`);
+      return;
+  }
+  const src = `${__dirname}/templates/${template}`;
+  const dest = `${projectPWD}/${path}/${name}.js`;
+  if(fs.existsSync(src)) {
+    if (!fs.existsSync(dest)) {
+      fs.copyFileSync(src, dest, COPYFILE_EXCL);
+      var content = fs.readFileSync(dest).toString();
+      for(const key in variables) {
+        const variable = variables[key];
+        content = content.split(`<#${key}?>`).join(variable);
+      }
+      fs.writeFileSync(dest, content, { encoding: "utf8" });
+      console.log(`\x1b[32m[AVALANCHE] Done.\x1b[0m`);
+    } else {
+      console.log(`\x1b[31m[AVALANCHE] (error) This file already exists!\x1b[0m`);
+    }
+  } else {
+    console.log(`\x1b[31m[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
+    process.exit(AVAError.INCOMPLETECORE);
   }
 }
 
@@ -324,8 +364,8 @@ module.exports = {
   run: run,
   init: init,
   info: info,
+  make: make,
   routes: routes,
   upgrade: upgrade,
-  migrate: migrate,
-  makeController: makeController
+  migrate: migrate
 };

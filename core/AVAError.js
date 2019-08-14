@@ -10,10 +10,10 @@ class AVAError {
 
 }
 
-AVAError.prototype.NOTANAVAPROJECT = 1;
-AVAError.prototype.NOENV = 2;
-AVAError.prototype.ENVINVALID = 3;
-AVAError.prototype.AVAALREADYINIT = 4;
-AVAError.prototype.INCOMPLETECORE = 5;
+AVAError.NOTANAVAPROJECT = 1;
+AVAError.NOENV = 2;
+AVAError.ENVINVALID = 3;
+AVAError.AVAALREADYINIT = 4;
+AVAError.INCOMPLETECORE = 5;
 
 module.exports = AVAError;

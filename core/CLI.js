@@ -5,7 +5,7 @@ const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
-const { fix, run, init, info, routes, upgrade, migrate } = require("./Operations.js")
+const { fix, run, init, info, make, routes, upgrade, migrate } = require("./Operations.js")
 
 cmdValue = process.argv[2];
 envValue = process.argv[3];
@@ -15,7 +15,7 @@ if (typeof cmdValue !== "undefined") {
   if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
     if(typeof package === "null" || typeof package.avalancheConfig === "undefined") {
       console.log(`\x1b[31m[AVALANCHE] (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
-      process.exit(AVAError.prototype.NOTANAVAPROJECT);
+      process.exit(AVAError.NOTANAVAPROJECT);
       return;
     }
     if(!(package && package.dependencies && package.dependencies.avacore)) {
@@ -37,10 +37,10 @@ if (typeof cmdValue !== "undefined") {
   }
   switch(cmdValue) {
     case "init":
-      init(envValue);
+      init(process.argv[3]);
       break;
     case "run":
-      run(envValue);
+      run(process.argv[3]);
       break;
     case "routes":
       routes();
@@ -54,6 +54,9 @@ if (typeof cmdValue !== "undefined") {
     case "migrate":
       migrate();
       break;
+    case "make":
+      make(process.argv[3], process.argv[4]);
+      break;
     case "version":
       console.log(avalanchePackage.version);
       break;
@@ -61,7 +64,7 @@ if (typeof cmdValue !== "undefined") {
       info();
       break;
     default:
-      console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] Command not recognised!`);
+      console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] (error) Command not recognised!`);
   }
 }
 

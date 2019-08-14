@@ -29,7 +29,7 @@ class AVAEnvironment {
         
         if(Object.keys(environments).length <= 0) {
             console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment file missing!");
-            process.exit(AVAError.prototype.NOENV);
+            process.exit(AVAError.NOENV);
         }
 
         var prefferedEnvironmentLoaded = false;
@@ -173,7 +173,7 @@ class AVAEnvironment {
         this.mollieAPIKey = typeof environment.mollieAPIKey === "string" ? environment.mollieAPIKey : null;
 
         if(!isValid) {
-            process.exit(AVAError.prototype.ENVINVALID);
+            process.exit(AVAError.ENVINVALID);
         }
     }
 

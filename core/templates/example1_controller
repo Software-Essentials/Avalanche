@@ -136,5 +136,4 @@ class PostController extends AVAController {
 }
 
 
-
 module.exports = PostController;
