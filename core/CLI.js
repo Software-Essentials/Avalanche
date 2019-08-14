@@ -1,21 +1,14 @@
 #!/usr/bin/env node
 
 const projectPWD = process.env.PWD;
-const program = require("commander");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
 const { fix, run, init, info, routes, upgrade, migrate } = require("./Operations.js")
 
-program
-  .version("1.2.3")
-  .arguments("<cmd> [env]")
-  .action(function(cmd, env) {
-    cmdValue = cmd;
-    envValue = env;
-  })
-  .parse(process.argv)
+cmdValue = process.argv[2];
+envValue = process.argv[3];
 
 
 if (typeof cmdValue !== "undefined") {
@@ -25,11 +18,11 @@ if (typeof cmdValue !== "undefined") {
       process.exit(AVAError.prototype.NOTANAVAPROJECT);
       return;
     }
-    if(!(package.dependencies && package.dependencies.avacore)) {
+    if(!(package && package.dependencies && package.dependencies.avacore)) {
       console.log(`\x1b[33m[AVALANCHE] (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
     }
   }
-  if(package.dependencies && package.dependencies.avacore) {
+  if(package && package.dependencies && package.dependencies.avacore) {
     const version = package.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     const cliVersion = avalanchePackage.version;

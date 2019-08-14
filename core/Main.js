@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Dependencies
 const express = require("express");
 
@@ -7,23 +9,10 @@ const Webserver = require("./Webserver.js");
 const AVAEnvironment = require("./AVAEnvironment.js");
 
 const app = express();
-var initialised = false;
 
-function run() {
-    if(initialised) {
-        return;
-    }
-    if(typeof arguments[0] === "string") {
-        global.environment = new AVAEnvironment(arguments[0]);
-    } else {
-        global.environment = new AVAEnvironment();
-    }
-    initialised = true;
-}
+console.log(`\x1b[32m[AVALANCHE] Starting server.\x1b[0m`);
 
-module.exports.run = run;
-
-run();
+global.environment = new AVAEnvironment(arguments[0]);
 
 const server = new Webserver(app);
 const stream = server.getStream();

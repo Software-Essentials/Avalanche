@@ -3,8 +3,11 @@
   "network": {
     "domain": "localhost",
     "host": "127.0.0.1",
-    "port": 80,
-    "logHTTPRequestsToConsole": true
+    "port": 80
+  },
+  "debug": {
+    "logHTTPRequestsToConsole": true,
+    "restartOnFileChange": true
   },
   "auth": {
     "secret": "SecretKey!",

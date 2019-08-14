@@ -38,9 +38,6 @@ class Router {
                 }
             }
         });
-        if(routes.length <= 0) {
-            console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice) Your app has no routes. (You might want to add some)");
-        }
         for(var i = 0; i < routes.length; i++) {
             const route = routes[i];
             const method = route.method;

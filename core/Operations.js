@@ -1,10 +1,10 @@
 const projectPWD = process.env.PWD;
 const fs = require("fs");
+const md5 = require("md5");
+const { exec, execSync } = require("child_process");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const { AVAError, AVADatabase, Util } = require("../index.js");
-const Installer = require("./Installer");
-
+const { AVAError, AVADatabase, AVAEnvironment, Util } = require("../index.js");
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
   "/app",
@@ -25,6 +25,7 @@ const folders = [
   "/app/helpers"
 ];
 
+
 /**
  * @description Sets up the project structure
  */
@@ -34,11 +35,11 @@ function init() {
     process.exit(AVAError.prototype.AVAALREADYINIT);
   }
   console.log(`\x1b[32m[AVALANCHE] Installing AVACore\x1b[0m`);
-  Installer("avacore", (error) => {
-    if (error) {
-      console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
-    }
-  });
+  try {
+    execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
+  } catch (error) {
+    console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+  }
   console.log(`\x1b[32m[AVALANCHE] Building app structure\x1b[0m`);
   const example = typeof arguments[0] === "string" ? arguments[0] : null;
   for (const folder of folders) {
@@ -77,6 +78,7 @@ function init() {
   console.log(`\x1b[32m[AVALANCHE] Project has been initialized successfully!\x1b[0m`);
 }
 
+
 /**
  * @description Fixes the project structure
  */
@@ -103,14 +105,116 @@ function fix() {
   }
 }
 
+
 /**
  * @description Runs your Avalanche application.
  */
 function run() {
-  const environment = typeof arguments[0] === "string" ? arguments[0] : null;
-  console.log("\x1b[32m%s\x1b[0m", `[AVALANCHE] Starting server...`);
-  require("./Main.js").run(environment);
+  if(Util.getRoutes().length < 1) {
+    console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice) Your app has no routes. (You might want to add some)");
+  }
+  const environmentName = typeof arguments[0] === "string" ? arguments[0] : null;
+  const environment = new AVAEnvironment(environmentName);
+  var process = start(environmentName);
+  if(environment.restartOnFileChange) {
+    const directory = `${projectPWD}/app`;
+    const folders = directoryLooper(directory, []).children;
+    for(const i in folders) {
+      const folder = folders[i];
+      if(fs.lstatSync(folder).isDirectory()) {
+        const files = fs.readdirSync(folder);
+        for(const i in files) {
+          const file = files[i];
+          const path = `${folder}/${file}`;
+          if(fs.lstatSync(path).isFile()) {
+            startWatchingSession(path, () => {
+              process.kill("SIGINT");
+              process = start(environmentName);
+            });
+          }
+        }
+      }
+    }
+  }
 }
+
+
+/**
+ * @description Loops to map a full directory structure until it is done.
+ * @param {String} filename Name of the directory to map.
+ * @param {Object} previousChildren Collection of the results of the previous scan.
+ * @returns {Object}
+ */
+function directoryLooper(filename, previousChildren) {
+  var children = previousChildren;
+  children.push(filename);
+  var stats = fs.lstatSync(filename),
+  info = {
+    path: filename,
+  };
+  if (stats.isDirectory()) {
+    info.children = fs.readdirSync(filename).map(function(child) {
+      const tree = directoryLooper(filename + "/" + child, children);
+      return tree.info;
+    });
+  }
+
+  return { info: info, children: children };
+}
+
+
+/**
+ * @description Starts up the server.
+ * @param {String} environment 
+ */
+function start(environment) {
+  const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
+  const command = environmentFormatted ? `node ${__dirname}/Main run ${environmentFormatted}` : `node ${__dirname}/Main run`;
+  const process = exec(command, (error, stdout, stderr) => {
+    if(error) {
+      if(error.signal === "SIGINT") {
+        return;
+      }
+      console.log("ERROR:", error);
+    }
+  });
+  process.stdout.on("data", (data) => {
+    console.log(data.toString().trim());
+  });
+  process.stderr.on("data", (data) => {
+    console.log(data.toString().trim());
+  });
+  process.on("exit", (code) => {
+    console.log(`\x1b[31m[AVALANCHE] Server stopped.\x1b[0m`);
+  });
+  return process;
+}
+
+
+/**
+ * @description Will trigger a callback when a change in the given file is detected.
+ * @param {String} path Path of the file to start watching.
+ * @param {Function} callback Will be triggered when a file change is detected.
+ */
+function startWatchingSession(path, callback) {  
+  let md5Previous = null;
+  let fsWait = false;
+  fs.watch(path, (event, filename) => {
+    if (filename) {
+      if (fsWait) return;
+      fsWait = setTimeout(() => {
+        fsWait = false;
+      }, 100);
+      const md5Current = md5(fs.readFileSync(path));
+      if (md5Current === md5Previous) {
+        return;
+      }
+      md5Previous = md5Current;
+      callback();
+    }
+  });
+}
+
 
 /**
  * @description Prints all the routes of the current project.
@@ -118,7 +222,7 @@ function run() {
 function routes() {
   const routes = Util.getRoutes(projectPWD);
   if(routes.length <= 0) {
-    console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Can't show routes because there aren't any routes in the project.");
+    console.log(`\x1b[32m[AVALANCHE] Can't show routes because there aren't any routes in the project.\x1b[0m`);
     return;
   }
   var string = "\n  \x1b[1m++======================================================================\x1b[0m\n";
@@ -140,6 +244,7 @@ function routes() {
   console.log(string);
 }
 
+
 /**
  * @description Makes all changes nescesary for compatibility with the next Avalanche version.
  */
@@ -148,6 +253,7 @@ function upgrade() {
   console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Checking for update...");
   console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) No upgrade pattern found. Check the GitHub Wiki for more information.");
 }
+
 
 /**
  * @description Prints information about the current Avalanche version and about the project.
@@ -189,12 +295,18 @@ function info() {
 }
 
 
+/**
+ * @description Migrate.
+ */
 function migrate() {
   const database = new AVADatabase();
   database.migrate();
 }
 
 
+/**
+ * @description Makes controller.
+ */
 function makeController() {
   const name = "TestController";
   const src = `${__dirname}/../core/components/TEMPLATE_controller`;
@@ -205,6 +317,7 @@ function makeController() {
     // var file = require(dest);
   }
 }
+
 
 module.exports = {
   fix: fix,

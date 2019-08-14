@@ -62,10 +62,14 @@ class PostController extends AVAController {
     post.name = request.body.postName;
     post.body = request.body.postBody
     const success = post.save();
-    response.json({
-      success: success,
-      message: success ? "Record added." : "Unable to add record."
-    });
+    if(typeof request.headers.referer === "string") {
+      response.redirect("/posts");
+    } else {
+      response.json({
+        success: success,
+        message: success ? "Record added." : "Unable to add record."
+      });
+    }
   }
 
 
@@ -130,6 +134,7 @@ class PostController extends AVAController {
   }
 
 }
+
 
 
 module.exports = PostController;

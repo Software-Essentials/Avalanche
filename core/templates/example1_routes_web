@@ -3,5 +3,10 @@
     "path": "/",
     "method": "GET",
     "controller": "MainViewController"
+  },
+  {
+    "path": "/posts",
+    "method": "GET",
+    "controller": "PostViewController"
   }
 ]

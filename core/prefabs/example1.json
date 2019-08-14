@@ -20,6 +20,10 @@
     "dest": "/app/views/MainViewController.js"
   },
   {
+    "src": "example1_view_posts",
+    "dest": "/app/views/PostViewController.js"
+  },
+  {
     "src": "example1_routes_api",
     "dest": "/app/routes/api.json"
   },
@@ -32,11 +36,15 @@
     "dest": "/app/templates/default.hbs"
   },
   {
+    "src": "example1_template_posts",
+    "dest": "/app/templates/posts.hbs"
+  },
+  {
     "src": "example1_template_layout",
     "dest": "/app/templates/layouts/layout.hbs"
   },
   {
-    "src": "example1_migration",
-    "desc": "/app/migrations/Post.json"
+    "src": "example1_model",
+    "dest": "/app/models/Post.js"
   }
 ]
