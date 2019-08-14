@@ -1,5 +1,5 @@
 // Imports
-const Controller = require("./AVAController.js");
+const { Controller } = require("../index.js");
 
 
 

@@ -6,7 +6,6 @@ const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${project
 const avalanchePackage = require("../package.json");
 const { AVAError, AVADatabase, AVAEnvironment, Util } = require("../index.js");
 const Installer = require("./Installer");
-
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
   "/app",
@@ -26,6 +25,7 @@ const folders = [
   "/app/views",
   "/app/helpers"
 ];
+
 
 /**
  * @description Sets up the project structure
@@ -79,6 +79,7 @@ function init() {
   console.log(`\x1b[32m[AVALANCHE] Project has been initialized successfully!\x1b[0m`);
 }
 
+
 /**
  * @description Fixes the project structure
  */
@@ -104,6 +105,7 @@ function fix() {
     console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Restored project structure");
   }
 }
+
 
 /**
  * @description Runs your Avalanche application.
@@ -137,6 +139,13 @@ function run() {
   }
 }
 
+
+/**
+ * @description Loops to map a full directory structure until it is done.
+ * @param {String} filename Name of the directory to map.
+ * @param {Object} previousChildren Collection of the results of the previous scan.
+ * @returns {Object}
+ */
 function directoryLooper(filename, previousChildren) {
   var children = previousChildren;
   children.push(filename);
@@ -154,6 +163,11 @@ function directoryLooper(filename, previousChildren) {
   return { info: info, children: children };
 }
 
+
+/**
+ * @description Starts up the server.
+ * @param {String} environment 
+ */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
   const command = environmentFormatted ? `node core/Main run ${environmentFormatted}` : "node core/Main run";
@@ -177,6 +191,12 @@ function start(environment) {
   return process;
 }
 
+
+/**
+ * @description Will trigger a callback when a change in the given file is detected.
+ * @param {String} path Path of the file to start watching.
+ * @param {Function} callback Will be triggered when a file change is detected.
+ */
 function startWatchingSession(path, callback) {  
   let md5Previous = null;
   let fsWait = false;
@@ -195,6 +215,7 @@ function startWatchingSession(path, callback) {
     }
   });
 }
+
 
 /**
  * @description Prints all the routes of the current project.
@@ -224,6 +245,7 @@ function routes() {
   console.log(string);
 }
 
+
 /**
  * @description Makes all changes nescesary for compatibility with the next Avalanche version.
  */
@@ -232,6 +254,7 @@ function upgrade() {
   console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Checking for update...");
   console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) No upgrade pattern found. Check the GitHub Wiki for more information.");
 }
+
 
 /**
  * @description Prints information about the current Avalanche version and about the project.
@@ -273,12 +296,18 @@ function info() {
 }
 
 
+/**
+ * @description Migrate.
+ */
 function migrate() {
   const database = new AVADatabase();
   database.migrate();
 }
 
 
+/**
+ * @description Makes controller.
+ */
 function makeController() {
   const name = "TestController";
   const src = `${__dirname}/../core/components/TEMPLATE_controller`;
@@ -289,6 +318,7 @@ function makeController() {
     // var file = require(dest);
   }
 }
+
 
 module.exports = {
   fix: fix,

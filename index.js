@@ -12,10 +12,10 @@ module.exports.Util = require("./core/Util.js");
 module.exports.CLI = require("./core/Operations.js");
 
 // Super components
-module.exports.AVAViewController = require("./core/structure/AVAViewController.js");
-module.exports.AVAController = require("./core/structure/AVAController.js");
-module.exports.AVAMiddleware = require("./core/structure/AVAMiddleware.js");
-module.exports.AVAModel = require("./core/structure/AVAModel.js");
+module.exports.AVAViewController = require("./core/AVAViewController.js");
+module.exports.AVAController = require("./core/AVAController.js");
+module.exports.AVAMiddleware = require("./core/AVAMiddleware.js");
+module.exports.AVAModel = require("./core/AVAModel.js");
 
 // Third-party
 module.exports.hbs = require("hbs");
