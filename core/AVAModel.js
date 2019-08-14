@@ -25,10 +25,10 @@ class AVAModel {
     if(typeof arguments[0] === "object") {
       const object = arguments[0];
       for(const key in this.PROPERTIES) {
-        if(object.hasOwnProperty(this.PROPERTIES[key]) === false) {
+        if(object.hasOwnProperty(this.PROPERTIES[key].name) === false) {
           throw "Model incomplete";
         }
-        this[key] = object[this.PROPERTIES[key]]
+        this[key] = object[this.PROPERTIES[key].name]
       }
       if(!storage.recordZoneExists(this.NAME)) {
         storage.addRecordZone(new AVARecordZone(this.NAME, []));
@@ -59,13 +59,13 @@ class AVAModel {
     const zone = storage.getRecordZone(this.NAME);
     var data = {};
     for(const key in this.PROPERTIES) {
-      data[this.PROPERTIES[key]] = this[key];
+      data[this.PROPERTIES[key].name] = this[key];
     }
     if(this.DRAFT) {
       zone.addRecord(data);
       this.DRAFT = false;
     } else {
-      zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER], this.ID, data)
+      zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data)
     }
     storage.save(zone);
     return true;
@@ -79,7 +79,7 @@ class AVAModel {
     const storage = new AVAStorage();
     const zone = storage.getRecordZone(this.NAME);
     if(!this.DRAFT) {
-      if(zone.deleteRecordWhere(this.PROPERTIES[this.IDENTIFIER], this.ID)) {
+      if(zone.deleteRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID)) {
         storage.save(zone);
         return true
       }
@@ -95,7 +95,7 @@ class AVAModel {
   get() {
     var structure = {};
     for(const key in this.PROPERTIES) {
-      structure[this.PROPERTIES[key]] = this[key];
+      structure[this.PROPERTIES[key].name] = this[key];
     }
     return structure;
   }

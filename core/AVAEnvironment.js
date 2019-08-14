@@ -90,9 +90,14 @@ class AVAEnvironment {
             console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing network credentials");
         }
 
-        // Debug section
-        this.logHTTPRequestsToConsole = typeof environment.debug.logHTTPRequestsToConsole === "boolean" ? environment.debug.logHTTPRequestsToConsole : true;
-        this.restartOnFileChange = typeof environment.debug.restartOnFileChange === "boolean" ? environment.debug.restartOnFileChange : true;
+        this.debug = {};
+        if(typeof(environment.debug) === "object") {
+            this.logHTTPRequestsToConsole = typeof environment.debug.logHTTPRequestsToConsole === "boolean" ? environment.debug.logHTTPRequestsToConsole : false;
+            this.restartOnFileChange = typeof environment.debug.restartOnFileChange === "boolean" ? environment.debug.restartOnFileChange : false;
+        } else {
+            this.logHTTPRequestsToConsole = false;
+            this.restartOnFileChange = false;
+        }
         
         this.auth = {};
         if(typeof(environment.auth) === "object") {
@@ -106,6 +111,13 @@ class AVAEnvironment {
         } else {
             isValid = false
             console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing auth credentials");
+        }
+
+        this.security = {};
+        if(typeof(environment.security) === "object") {
+            this.security.csrf = typeof environment.security.csrf === "boolean" ? environment.security.csrf : true;;
+        } else {
+            this.security.csrf = false;
         }
         
         this.capabilities = {};
@@ -163,14 +175,19 @@ class AVAEnvironment {
         this.restrictMapsToDomain = typeof environment.restrictMapsToDomain === "boolean" ? environment.restrictMapsToDomain : true;
         this.reloadClientsAfterRestart = typeof environment.reloadClientsAfterRestart === "boolean" ? environment.reloadClientsAfterRestart : false;
 
-        this.title = typeof environment.title === "string" ? environment.title : packageConfig.name;
-        this.version = typeof environment.version === "string" ? environment.version : packageConfig.version;
-        this.description = typeof environment.description === "string" ? environment.title : packageConfig.description;
+        this.title = typeof environment.info.title === "string" ? environment.info.title : packageConfig.name;
+        this.version = typeof environment.info.version === "string" ? environment.info.version : packageConfig.version;
+        this.description = typeof environment.info.description === "string" ? environment.info.description : packageConfig.description ? packageConfig.description : null;
         this.appleDeveloperTeamID = typeof environment.appleDeveloperTeamID === "string" ? environment.appleDeveloperTeamID : null;
         this.mapKitJSKeyID = typeof environment.mapKitJSKeyID === "string" ? environment.mapKitJSKeyID : null;
         this.APNSKeyID = typeof environment.APNSKeyID === "string" ? environment.APNSKeyID : null;
         this.appBundleID = typeof environment.appBundleID === "string" ? environment.appBundleID : null;
         this.mollieAPIKey = typeof environment.mollieAPIKey === "string" ? environment.mollieAPIKey : null;
+
+        this.info = {};
+        this.info.title = this.title;
+        this.info.version = this.version;
+        this.info.description = this.description;
 
         if(!isValid) {
             process.exit(AVAError.ENVINVALID);

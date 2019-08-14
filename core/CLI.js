@@ -2,23 +2,23 @@
 
 const projectPWD = process.env.PWD;
 const fs = require("fs");
+const CoreUtil = require("./CoreUtil");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
-const { fix, run, init, info, make, routes, upgrade, migrate } = require("./Operations.js")
+const { config, run, init, info, make, routes, upgrade, migrate } = require("./Operations.js")
 
 cmdValue = process.argv[2];
 envValue = process.argv[3];
 
-
 if (typeof cmdValue !== "undefined") {
   if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
-    if(typeof package === "null" || typeof package.avalancheConfig === "undefined") {
+    if(!CoreUtil.isAVAProject()) {
       console.log(`\x1b[31m[AVALANCHE] (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
       process.exit(AVAError.NOTANAVAPROJECT);
       return;
     }
-    if(!(package && package.dependencies && package.dependencies.avacore)) {
+    if(!CoreUtil.isAVACoreInstalled()) {
       console.log(`\x1b[33m[AVALANCHE] (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
     }
   }
@@ -48,8 +48,8 @@ if (typeof cmdValue !== "undefined") {
     case "upgrade":
       upgrade();
       break;
-    case "fix":
-      fix();
+    case "config":
+      config();
       break;
     case "migrate":
       migrate();

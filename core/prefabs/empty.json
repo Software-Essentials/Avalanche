@@ -1,6 +1,6 @@
 [
   {
-    "src": "default_environment",
+    "src": "empty_environment",
     "dest": "/app/environments/development.environment.json"
   }
 ]
