@@ -1,4 +1,4 @@
-const { AVAStorage, AVARecordZone } = require("../../index");
+const { AVAStorage, AVARecordZone } = require("../index");
 
 
 /**

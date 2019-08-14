@@ -1,12 +1,12 @@
 // Imports
-const { Controller } = require("../index.js");
+const AVAController = require("./AVAController");
 
 
 
 /**
  * Super view controller
  */
-class AVAViewController extends Controller {
+class AVAViewController extends AVAController {
 
     constructor(callback) {
         super();
@@ -19,7 +19,6 @@ class AVAViewController extends Controller {
         this.variables = {};
         
         callback(this.willLoad, this);
-        
     }
 
     /**

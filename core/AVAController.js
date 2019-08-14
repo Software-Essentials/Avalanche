@@ -14,4 +14,4 @@ class AVAController {
 
 
 
-module.exports = AVAController
+module.exports = AVAController;

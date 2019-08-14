@@ -1,11 +1,10 @@
 const projectPWD = process.env.PWD;
 const fs = require("fs");
 const md5 = require("md5");
-const { exec } = require("child_process");
+const { exec, execSync } = require("child_process");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError, AVADatabase, AVAEnvironment, Util } = require("../index.js");
-const Installer = require("./Installer");
 const { COPYFILE_EXCL } = fs.constants;
 const folders = [
   "/app",
@@ -36,11 +35,11 @@ function init() {
     process.exit(AVAError.prototype.AVAALREADYINIT);
   }
   console.log(`\x1b[32m[AVALANCHE] Installing AVACore\x1b[0m`);
-  Installer("avacore", (error) => {
-    if (error) {
-      console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
-    }
-  });
+  try {
+    execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
+  } catch (error) {
+    console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+  }
   console.log(`\x1b[32m[AVALANCHE] Building app structure\x1b[0m`);
   const example = typeof arguments[0] === "string" ? arguments[0] : null;
   for (const folder of folders) {
@@ -170,7 +169,7 @@ function directoryLooper(filename, previousChildren) {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const command = environmentFormatted ? `node core/Main run ${environmentFormatted}` : "node core/Main run";
+  const command = environmentFormatted ? `node ${__dirname}/Main run ${environmentFormatted}` : `node ${__dirname}/Main run`;
   const process = exec(command, (error, stdout, stderr) => {
     if(error) {
       if(error.signal === "SIGINT") {
