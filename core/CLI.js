@@ -1,21 +1,14 @@
 #!/usr/bin/env node
 
 const projectPWD = process.env.PWD;
-const program = require("commander");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
 const { fix, run, init, info, routes, upgrade, migrate } = require("./Operations.js")
 
-program
-  .version("1.2.3")
-  .arguments("<cmd> [env]")
-  .action(function(cmd, env) {
-    cmdValue = cmd;
-    envValue = env;
-  })
-  .parse(process.argv)
+cmdValue = process.argv[2];
+envValue = process.argv[3];
 
 
 if (typeof cmdValue !== "undefined") {
