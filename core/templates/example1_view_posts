@@ -15,7 +15,7 @@ class PostViewController extends AVAViewController {
 
   willLoad(request, response, self) {
     self.template = "posts";
-    const posts = new Post().all();
+    const posts = Post.all();
     self.variables.posts = posts;
     super.willLoad(request, response, self);
   }

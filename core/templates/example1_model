@@ -54,4 +54,4 @@ class Post extends AVAModel {
 }
 
 
-module.exports = Post;
+module.exports = AVAModel.register(Post);

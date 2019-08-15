@@ -22,25 +22,13 @@ It also prevents issues while updating Avalanche in the future.
 $ npm install avacore -g
 ```
 
-**2. Link the Avalanche CLI.**
-This allows the "*avalanche*" and "*ava*" command to be used.
-
-(*NOTE: You might need to use `sudo`*)
-```
-$ npm link avacore
-```
-
-**3. Initialize Avalanche.**
+**2. Initialize Avalanche.**
 This sets up your Avalanche project.
 ```
 $ avalanche init
 ```
-or to load the example project.
-```
-$ avalanche init example1
-```
 
-**4. Run your local webserver.**
+**3. Run your local webserver.**
 ```
 $ avalanche run
 ```
