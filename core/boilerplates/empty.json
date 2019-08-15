@@ -1,0 +1,9 @@
+{
+  "folders": [],
+  "files": [
+    {
+      "template": "empty_environment",
+      "path": "/app/environments/development.environment.json"
+    }
+  ]
+}

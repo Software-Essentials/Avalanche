@@ -9,7 +9,7 @@ const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${
  * @returns {Boolean}
  */
 function isAVACoreInstalled() {
-  return (projectPackage && projectPackage.dependencies && projectPackage.dependencies.avacore)
+  return (projectPackage && projectPackage.dependencies && projectPackage.dependencies.avacore);
 }
 
 
@@ -26,6 +26,14 @@ function isAVAProject() {
  */
 function isNodeProject() {
   return (typeof projectPackage === "object");
+}
+
+
+/**
+ * @returns {String}
+ */
+function terminalPrefix() {
+  return "\x1b[36m\x1b[1m[AVALANCHE]\x1b[0m";
 }
 
 
@@ -79,11 +87,10 @@ function startWatchingSession(path, callback) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getRoutes(projectDir) {
-  const normalizedPath = `${projectDir}/app/routes`;
+function getRoutes() {
+  const normalizedPath = `${projectPWD}/app/routes`;
   var routes = [];
   if (!fs.existsSync(normalizedPath)) {
     return routes;
@@ -92,7 +99,7 @@ function getRoutes(projectDir) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const route = JSON.parse(JSON.stringify(require(`${projectDir}/app/routes/${file}`)));
+        const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
         routes.push.apply(routes, route);
       }
     }
@@ -102,11 +109,10 @@ function getRoutes(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getControllers(projectDir) {
-  const normalizedPath = `${projectDir}/app/controllers`;
+function getControllers() {
+  const normalizedPath = `${projectPWD}/app/controllers`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
     return controllers;
@@ -124,11 +130,10 @@ function getControllers(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getMiddleware(projectDir) {
-  const normalizedPath = `${projectDir}/app/middleware`;
+function getMiddleware() {
+  const normalizedPath = `${projectPWD}/app/middleware`;
   var middleware = [];
   if (!fs.existsSync(normalizedPath)) {
     return middleware;
@@ -146,11 +151,10 @@ function getMiddleware(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getLocalisations(projectDir) {
-  const normalizedPath = `${projectDir}/app/localisations`;
+function getLocalisations() {
+  const normalizedPath = `${projectPWD}/app/localisations`;
   var localisations = [];
   if (!fs.existsSync(normalizedPath)) {
     return localisations;
@@ -168,11 +172,10 @@ function getLocalisations(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getTranslations(projectDir) {
-  const normalizedPath = `${projectDir}/app/localisations`;
+function getTranslations() {
+  const normalizedPath = `${projectPWD}/app/localisations`;
   var translations = [];
   if (!fs.existsSync(normalizedPath)) {
     return translations;
@@ -181,7 +184,7 @@ function getTranslations(projectDir) {
     const extensions = file.split(".");
     if (extensions.length = 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const translationSet = JSON.parse(JSON.stringify(require(`${projectDir}/app/localisations/${file}`)));
+        const translationSet = JSON.parse(JSON.stringify(require(`${projectPWD}/app/localisations/${file}`)));
         for (const translation of Object.keys(translationSet)) {
           translations.push(translationSet[translation]);
         }
@@ -193,11 +196,10 @@ function getTranslations(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getModels(projectDir) {
-  const normalizedPath = `${projectDir}/app/models`;
+function getModels() {
+  const normalizedPath = `${projectPWD}/app/models`;
   var models = [];
   if (!fs.existsSync(normalizedPath)) {
     return models;
@@ -215,12 +217,11 @@ function getModels(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getHelpers(projectDir) {
+function getHelpers(projectPWD) {
   var helpers = {};
-  const helpersDirectory = `${projectDir}/app/helpers`;
+  const helpersDirectory = `${projectPWD}/app/helpers`;
   if(fs.existsSync(helpersDirectory)) {
     const dir = fs.readdirSync(helpersDirectory);
     for (const file of dir) {
@@ -238,20 +239,21 @@ function getHelpers(projectDir) {
 
 
 /**
- * @param {String} projectDir 
  * @returns {Object}
  */
-function getMigrations(projectDir) {
-  const normalizedPath = `${projectDir}/app/migrations`;
+function getMigrations() {
+  const normalizedPath = `${projectPWD}/app/migrations`;
   var models = [];
   if (!fs.existsSync(normalizedPath)) {
     return models;
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length = 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        models.push(extensions[0]);
+    if (fs.lstatSync(normalizedPath).isFile()) {
+      const extensions = file.split(".");
+      if (extensions.length = 2) {
+        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+          models.push(extensions[0]);
+        }
       }
     }
   });
@@ -259,10 +261,32 @@ function getMigrations(projectDir) {
 }
 
 
+/**
+ * @returns {Object}
+ */
+function getSeedFilesNames() {
+  const normalizedPath = `${projectPWD}/app/migrations/seeds`;
+  var controllers = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return controllers;
+  }
+  fs.readdirSync(normalizedPath).forEach(function (file) {
+    const extensions = file.split(".");
+    if (extensions.length = 2) {
+      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+        controllers.push(extensions[0]);
+      }
+    }
+  });
+  return controllers;
+}
+
+
 module.exports = {
     isAVACoreInstalled: isAVACoreInstalled,
     isAVAProject: isAVAProject,
     isNodeProject: isNodeProject,
+    terminalPrefix: terminalPrefix,
     directoryLooper: directoryLooper,
     startWatchingSession: startWatchingSession,
     getRoutes: getRoutes,
@@ -272,5 +296,6 @@ module.exports = {
     getTranslations: getTranslations,
     getModels: getModels,
     getHelpers: getHelpers,
-    getMigrations: getMigrations
+    getMigrations: getMigrations,
+    getSeedFilesNames: getSeedFilesNames
 }

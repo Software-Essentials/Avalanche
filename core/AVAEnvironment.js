@@ -28,7 +28,7 @@ class AVAEnvironment {
         }
         
         if(Object.keys(environments).length <= 0) {
-            console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment file missing!");
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment file missing!\x1b[0m`);
             process.exit(AVAError.NOENV);
         }
 
@@ -52,7 +52,7 @@ class AVAEnvironment {
             }
         }
         if (!prefferedEnvironmentLoaded) {
-            console.log("\x1b[34m%s\x1b[0m", `[AVALANCHE] (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}"`);
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
             this.loadEnvironment(selectedEnvironment);
         }
     }
@@ -70,24 +70,24 @@ class AVAEnvironment {
             if (typeof(environment.network.domain) === "string") {
                 this.domain = environment.network.domain;
             } else {
-                console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice): No domain specified; defaulting to localhost");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
                 this.domain = "localhost";
             }
             if (typeof(environment.network.host) === "string") {
                 this.host = environment.network.host;
             } else {
-                console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice): No host specified; defaulting to 127.0.0.1");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
                 this.host = "127.0.0.1";
             }
             if (typeof(environment.network.port) === "number") {
                 this.port = environment.network.port;
             } else {
-                console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice): No port specified; defaulting to port 80");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
                 this.port = 80;
             }
         } else {
             isValid = false
-            console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing network credentials");
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing network credentials.\x1b[0m`);
         }
 
         this.debug = {};
@@ -105,12 +105,12 @@ class AVAEnvironment {
                 this.secret = environment.auth.secret;
             } else {
                 isValid = false;
-                console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing secret value!");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
             }
             this.saltRounds = typeof environment.auth.saltRounds === "number" ? environment.auth.saltRounds : 0;
         } else {
             isValid = false
-            console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing auth credentials");
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
         }
 
         this.security = {};
@@ -132,7 +132,7 @@ class AVAEnvironment {
         if(typeof(environment.email) === "object") {
             this.email = environment.email;
         } else {
-            console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice): Environment is missing mail server credentials");
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): Environment is missing mail server credentials.\x1b[0m`);
         }
 
         this.database = {};
@@ -141,25 +141,25 @@ class AVAEnvironment {
                 this.database.host = environment.database.host;
             } else {
                 isValid = false
-                console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing database host");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database host.\x1b[0m`);
             }
             if(typeof(environment.database.user) === "string") {
                 this.database.user = environment.database.user;
             } else {
                 isValid = false
-                console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing database user");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database user.\x1b[0m`);
             }
             if(typeof(environment.database.password) === "string") {
                 this.database.password = environment.database.password;
             } else {
                 isValid = false
-                console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing database password");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database password.\x1b[0m`);
             }
             if(typeof(environment.database.database) === "string") {
                 this.database.database = environment.database.database;
             } else {
                 isValid = false
-                console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing database name");
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
             }
             if (typeof(environment.database.connectionLimit) === "number")
                 this.database.connectionLimit = environment.database.connectionLimit;
@@ -167,7 +167,7 @@ class AVAEnvironment {
                 this.database.multipleStatements = environment.database.multipleStatements;
         } else {
             isValid = false
-            console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error): Environment is missing database credentials");
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database credentials.\x1b[0m`);
         }
 
         this.useMapKit = typeof environment.useMapKit === "boolean" ? environment.useMapKit : false;

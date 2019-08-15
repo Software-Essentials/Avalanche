@@ -2,10 +2,10 @@
 /**
  * @description Collection of errorcodes.
  */
-class AVAError {
+class AVAError extends Error {
 
     constructor() {
-
+        this.message = typeof arguments[0] === "string" ? arguments[0] : null;
     }
 
 }

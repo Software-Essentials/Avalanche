@@ -2,15 +2,14 @@
 
 // Dependencies
 const express = require("express");
-
-// Imports
+const CoreUtil = require("./CoreUtil");
 const Kernel = require("./Kernel.js");
 const Webserver = require("./Webserver.js");
 const AVAEnvironment = require("./AVAEnvironment.js");
 
 const app = express();
 
-console.log(`\x1b[32m[AVALANCHE] Starting server.\x1b[0m`);
+console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Starting server.\x1b[0m`);
 
 global.environment = new AVAEnvironment(arguments[0]);
 

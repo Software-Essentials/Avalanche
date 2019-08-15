@@ -13,6 +13,7 @@ class AVAModel {
     this.NAME = NAME;
     this.IDENTIFIER = IDENTIFIER;
     this.PROPERTIES = PROPERTIES;
+    this.METHOD = "STORAGE";
     this.DRAFT = false;
   }
 
@@ -41,10 +42,10 @@ class AVAModel {
       if(!storage.recordZoneExists(this.NAME)) {
         storage.addRecordZone(new AVARecordZone(this.NAME, []))
       }
-      const all = storage.getRecordZone(this.NAME).getRecords()
+      const allRecords = storage.getRecordZone(this.NAME).getRecords()
       var highest = 0;
-      for(const r in all) {
-        highest = parseInt(all[r][this.PROPERTIES[this.IDENTIFIER]]);
+      for(const i in allRecords) {
+        highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
       }
       this[this.IDENTIFIER] = highest + 1;
     }
@@ -100,41 +101,51 @@ class AVAModel {
     return structure;
   }
 
+}
+
+AVAModel.register = (Model) => {
+  const dummy = new Model();
+  Model.PROPERTIES = dummy.PROPERTIES;
+  Model.IDENTIFIER = dummy.IDENTIFIER;
+  Model.METHOD = dummy.METHOD;
+  Model.DRAFT = dummy.DRAFT;
+  Model.NAME = dummy.NAME;
 
   /**
-   * @description Returns all posts.
+   * @description Returns all records.
    * @returns {[Post]}
    */
-  all() {
+  function all() {
     const storage = new AVAStorage();
-    const zone = storage.getRecordZone(this.NAME);
+    const zone = storage.getRecordZone(Model.NAME);
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {
-      const model = new AVAModel(this.NAME, this.IDENTIFIER, this.PROPERTIES);
+      const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
       model.setupDone(records[record]);
       results.push(model);
     }
     return results;
   }
+  Model.all = all;
   
   
   /**
-   * @description Returns all posts matching this key-value condition.
+   * @description Returns all records matching this key-value condition.
    * @param {String} key 
    * @param {any} value 
    * @returns {[Post]}
    */
-  where(key, value) {
+  function where(key, value) {
     const storage = new AVAStorage();
-    const zone = storage.getRecordZone(this.NAME);
+    const zone = storage.getRecordZone(Model.NAME);
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {
       if(records[record].hasOwnProperty(key)) {
         const recordValue = records[record][key];
         if(recordValue === value) {
-          const model = new AVAModel(this.NAME, this.IDENTIFIER, this.PROPERTIES);
+          const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
           model.setupDone(records[record]);
           results.push(model);
         }
@@ -142,7 +153,10 @@ class AVAModel {
     }
     return results;
   }
+  Model.where = where;
 
+
+  return Model;
 }
 
 

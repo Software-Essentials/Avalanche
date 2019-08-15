@@ -1,7 +1,7 @@
 {
   "name": "avacore",
-  "version": "0.2.25",
-  "description": "Node framework for APIs & other backend solutions.",
+  "version": "0.2.26",
+  "description": "Node MVC OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
   "homepage": "https://github.com/noriasoft/Avalanche",
@@ -13,14 +13,14 @@
   },
   "keywords": [
     "MVC",
-    "CLI",
     "OOP",
+    "CLI",
     "Framework",
     "Automated",
     "Express",
     "Webserver",
     "Templating",
-    "Prefabs",
+    "Boilerplates",
     "Avalanche",
     "Ava"
   ],
