@@ -1,12 +1,11 @@
 // Imports
 const { AVAViewController } = require("avacore");
-const Post = require("../models/Post");
 
 
 /**
  *
  */
-class PostViewController extends AVAViewController {
+class <#name?> extends AVAViewController {
 
   constructor(request, response) {
     super(request, response);
@@ -14,13 +13,11 @@ class PostViewController extends AVAViewController {
 
 
   willLoad(request, response, self) {
-    self.template = "posts";
-    const posts = Post.all();
-    self.variables.posts = posts;
+    // self.template = "default";
     super.willLoad(request, response, self);
   }
 
 }
 
 
-module.exports = PostViewController;
+module.exports = <#name?>;

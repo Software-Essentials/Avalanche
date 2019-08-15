@@ -16,12 +16,36 @@ class Post extends AVAModel {
     this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
     this.METHOD = "STORAGE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
     this.PROPERTIES = {
-      "ID": "post_id",
-      "name": "post_name",
-      "body": "post_body",
-      "createdAt": "created_at",
-      "updatedAt": "updated_at"
-    }; // Format: "<model key>": "<storage key>"
+      "ID": {
+        name: "post_id",
+        type: "INT",
+        length: 10,
+        required: true
+      },
+      "name": {
+        name: "post_name",
+        type: "CHAR",
+        length: 32,
+        required: true
+      },
+      "body": {
+        name: "post_body",
+        type: "TEXT",
+        length: 255,
+        required: true
+      },
+      "createdAt": {
+        name: "created_at",
+        type: "INT",
+        length: 10,
+        required: true
+      },
+      "updatedAt": {
+        name: "updated_at",
+        type: "INT",
+        length: 10
+      }
+    }; // Format: "<model key>": { <properties> }
     this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
     // Default values.
     this.createdAt = new Date().valueOf();
@@ -30,4 +54,4 @@ class Post extends AVAModel {
 }
 
 
-module.exports = Post;
+module.exports = AVAModel.register(Post);

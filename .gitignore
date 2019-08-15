@@ -54,6 +54,7 @@ typings/
 # custom
 .vscode/
 app
+storage
 package-lock.json
 *.code-workspace
 .DS_Store

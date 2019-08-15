@@ -1,11 +1,14 @@
 const projectPWD = process.env.PWD;
 const fs = require("fs");
-const md5 = require("md5");
+const inquirer = require("inquirer");
 const { exec, execSync } = require("child_process");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError, AVADatabase, AVAEnvironment, Util } = require("../index.js");
 const { COPYFILE_EXCL } = fs.constants;
+const CoreUtil = require("./CoreUtil");
+const Migrator = require("./Migrator");
+const Seeder = require("./Seeder");
 const folders = [
   "/app",
   "/app/controllers",
@@ -14,6 +17,7 @@ const folders = [
   "/app/localisations",
   "/app/middleware",
   "/app/migrations",
+  "/app/migrations/seeds",
   "/app/public",
   "/app/routes",
   "/app/templates",
@@ -30,60 +34,129 @@ const folders = [
  * @description Sets up the project structure
  */
 function init() {
-  if(typeof package.avalancheConfig === "object") {
-    console.log(`\x1b[31m[AVALANCHE] (error) Project has already been initialized.\x1b[0m`);
-    process.exit(AVAError.prototype.AVAALREADYINIT);
+  if(CoreUtil.isAVAProject()) {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Project has already been initialized.\x1b[0m`);
+    process.exit(AVAError.AVAALREADYINIT);
   }
-  console.log(`\x1b[32m[AVALANCHE] Installing AVACore\x1b[0m`);
-  try {
-    execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
-  } catch (error) {
-    console.log(`\x1b[33m[AVALANCHE] (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+  installAVACoreIfNeeded();
+  const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
+  loadBoilerplates(prefab, (boilerplate) => {
+    installBoilerplate(boilerplate);
+  });
+}
+
+
+/**
+ * @param {String|null} example 
+ * @param {Function} callback 
+ */
+function loadBoilerplates(example, callback) {
+  if(example === null) {
+    var choices = [];
+    const prefabs = fs.readdirSync(`${__dirname}/boilerplates`);
+    for(const i in prefabs) {
+      const prefab = prefabs[i];
+      const splitted = prefab.split(".");
+      delete splitted[splitted.length - 1];
+      choices.push(splitted.join(""));
+    }
+    const prompt = {
+      type: "list",
+      name: "boilerplate",
+      message: "Choose your boilerplate:",
+      default: 0,
+      choices: choices,
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m"
+    };
+    inquirer.prompt(prompt).then(answers => {
+      callback(answers.boilerplate);
+    });
+  } else {
+    callback(example);
   }
-  console.log(`\x1b[32m[AVALANCHE] Building app structure\x1b[0m`);
-  const example = typeof arguments[0] === "string" ? arguments[0] : null;
+}
+
+
+/**
+ */
+function installBoilerplate(example) {
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Building app structure\x1b[0m`);
   for (const folder of folders) {
     const path = `${projectPWD}${folder}`;
     if(!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }
   }
-  var files = [];
-  if(typeof example === "string" && fs.existsSync(`${__dirname}/prefabs/${example}.json`)) {
-    files = require(`${__dirname}/prefabs/${example}.json`);
-    console.log(`\x1b[32m[AVALANCHE] Preparing \x1b[3m${example}\x1b[0m\x1b[32m prefabs\x1b[0m`);
+  var boilerplate = {};
+  const path = `${__dirname}/boilerplates/${example}.json`;
+  if(typeof example === "string" && fs.existsSync(path)) {
+    boilerplate = require(path);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Preparing \x1b[3m${example}\x1b[0m\x1b[32m prefabs\x1b[0m`);
   } else {
-    if(fs.existsSync(`${__dirname}/prefabs/default.json`)) {
-      files = require(`${__dirname}/prefabs/default.json`);
+    if(fs.existsSync(`${__dirname}/boilerplates/empty.json`)) {
+      boilerplate = require(`${__dirname}/boilerplates/empty.json`);
     } else {
-      console.log(`\x1b[31m[AVALANCHE] (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
-      process.exit(AVAError.prototype.INCOMPLETECORE);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (fatal error) No boilerplates found. You might need to reinstall Avalanche.\x1b[0m`);
+      process.exit(AVAError.INCOMPLETECORE);
     }
   }
-  for (const file of files) {
-    const src = `${__dirname}/templates/${file.src}`;
-    const dest = `${projectPWD}${file.dest}`;
-    if(fs.existsSync(src) && !fs.existsSync(dest)) {
-      fs.copyFileSync(src, dest, COPYFILE_EXCL);
+  for (const folder of boilerplate.folders) {
+    const path = `${projectPWD}${folder}`;
+    if(!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+  }
+  for (const file of boilerplate.files) {
+    const templatePath = `${__dirname}/templates/${file.template}`;
+    const filePath = `${projectPWD}${file.path}`;
+    if (fs.existsSync(templatePath) && !fs.existsSync(filePath)) {
+      try {
+        fs.copyFileSync(templatePath, filePath, COPYFILE_EXCL);
+      } catch (error) {
+        if (error.code === "ENOENT") {
+          console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
+        }
+      }
     }
   }
   var file = package;
   file.avalancheConfig = { preferredEnvironment: "development" };
   fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
-  const path = `${__dirname}/resources/asci`;
-  if(fs.existsSync(path)) {
-    const file = fs.readFileSync(path, { encoding: "utf8" })
+  const asciiPath = `${__dirname}/resources/asci`;
+  if(fs.existsSync(asciiPath)) {
+    const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
     console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
   }
-  console.log(`\x1b[32m[AVALANCHE] Project has been initialized successfully!\x1b[0m`);
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Project has been initialized successfully!\x1b[0m`);
+}
+
+
+/**
+ * @description Installs the AVACore if it is not yet installed.
+ */
+function installAVACoreIfNeeded() {
+  if(!CoreUtil.isAVACoreInstalled()) {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Installing AVACore\x1b[0m`);
+    try {
+      execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
+      const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/avacore/package.json`));
+      if(!package.dependencies) {
+        package.dependencies = {};
+      }
+      package.dependencies["avacore"] = `^${dependency.version}`;
+    } catch (error) {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+    }
+  }
 }
 
 
 /**
  * @description Fixes the project structure
  */
-function fix() {
-  console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Fixing project...");
+function config() {
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Fixing project...\x1b[0m`);
   var fixedStructure = false;
   for (const folder of folders) {
     const path = `${projectPWD}${folder}`;
@@ -101,7 +174,7 @@ function fix() {
     }
   }
   if(fixedStructure) {
-    console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Restored project structure");
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Restored project structure\x1b[0m`);
   }
 }
 
@@ -110,15 +183,15 @@ function fix() {
  * @description Runs your Avalanche application.
  */
 function run() {
-  if(Util.getRoutes().length < 1) {
-    console.log("\x1b[34m%s\x1b[0m", "[AVALANCHE] (notice) Your app has no routes. (You might want to add some)");
+  if(CoreUtil.getRoutes().length < 1) {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
   const environmentName = typeof arguments[0] === "string" ? arguments[0] : null;
   const environment = new AVAEnvironment(environmentName);
   var process = start(environmentName);
   if(environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
-    const folders = directoryLooper(directory, []).children;
+    const folders = CoreUtil.directoryLooper(directory, []).children;
     for(const i in folders) {
       const folder = folders[i];
       if(fs.lstatSync(folder).isDirectory()) {
@@ -127,7 +200,7 @@ function run() {
           const file = files[i];
           const path = `${folder}/${file}`;
           if(fs.lstatSync(path).isFile()) {
-            startWatchingSession(path, () => {
+            CoreUtil.startWatchingSession(path, () => {
               process.kill("SIGINT");
               process = start(environmentName);
             });
@@ -136,30 +209,6 @@ function run() {
       }
     }
   }
-}
-
-
-/**
- * @description Loops to map a full directory structure until it is done.
- * @param {String} filename Name of the directory to map.
- * @param {Object} previousChildren Collection of the results of the previous scan.
- * @returns {Object}
- */
-function directoryLooper(filename, previousChildren) {
-  var children = previousChildren;
-  children.push(filename);
-  var stats = fs.lstatSync(filename),
-  info = {
-    path: filename,
-  };
-  if (stats.isDirectory()) {
-    info.children = fs.readdirSync(filename).map(function(child) {
-      const tree = directoryLooper(filename + "/" + child, children);
-      return tree.info;
-    });
-  }
-
-  return { info: info, children: children };
 }
 
 
@@ -185,34 +234,9 @@ function start(environment) {
     console.log(data.toString().trim());
   });
   process.on("exit", (code) => {
-    console.log(`\x1b[31m[AVALANCHE] Server stopped.\x1b[0m`);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped.\x1b[0m`);
   });
   return process;
-}
-
-
-/**
- * @description Will trigger a callback when a change in the given file is detected.
- * @param {String} path Path of the file to start watching.
- * @param {Function} callback Will be triggered when a file change is detected.
- */
-function startWatchingSession(path, callback) {  
-  let md5Previous = null;
-  let fsWait = false;
-  fs.watch(path, (event, filename) => {
-    if (filename) {
-      if (fsWait) return;
-      fsWait = setTimeout(() => {
-        fsWait = false;
-      }, 100);
-      const md5Current = md5(fs.readFileSync(path));
-      if (md5Current === md5Previous) {
-        return;
-      }
-      md5Previous = md5Current;
-      callback();
-    }
-  });
 }
 
 
@@ -220,9 +244,9 @@ function startWatchingSession(path, callback) {
  * @description Prints all the routes of the current project.
  */
 function routes() {
-  const routes = Util.getRoutes(projectPWD);
+  const routes = CoreUtil.getRoutes();
   if(routes.length <= 0) {
-    console.log(`\x1b[32m[AVALANCHE] Can't show routes because there aren't any routes in the project.\x1b[0m`);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Can't show routes because there aren't any routes in the project.\x1b[0m`);
     return;
   }
   var string = "\n  \x1b[1m++======================================================================\x1b[0m\n";
@@ -250,8 +274,8 @@ function routes() {
  */
 function upgrade() {
   // Upgrade patterns not yet implemented.
-  console.log("\x1b[32m%s\x1b[0m", "[AVALANCHE] Checking for update...");
-  console.log("\x1b[31m%s\x1b[0m", "[AVALANCHE] (error) No upgrade pattern found. Check the GitHub Wiki for more information.");
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Checking for update...\x1b[0m`);
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) No upgrade pattern found. Check the GitHub Wiki for more information.\x1b[0m`);
 }
 
 
@@ -259,9 +283,6 @@ function upgrade() {
  * @description Prints information about the current Avalanche version and about the project.
  */
 function info() {
-  const isNodeProject = typeof package === "object";
-  var isAvalancheProject = isNodeProject ? typeof package.avalancheConfig === "object" : false;
-
   var string = "\n";
   string += `  \x1b[1m++==============================[Avalanche info]==============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
@@ -270,24 +291,24 @@ function info() {
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++===============================[Project info]===============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${isNodeProject}\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Is Alanche project:\t  \x1b[33m\x1b[1m${isAvalancheProject}\x1b[0m\n`;
-  if(package.dependencies && package.dependencies.avacore) {
+  string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   Is Alanche project:\t  \x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m\n`;
+  if(CoreUtil.isAVACoreInstalled()) {
     const version = package.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[34m\x1b[1mv${projectVersion}\x1b[0m\n`;
   } else {
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m\n`;
   }
-  if(isAvalancheProject) {
-    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${Util.getModels(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${Util.getControllers(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${Util.getRoutes(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${Util.getMiddleware(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${Util.getLocalisations(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${Util.getTranslations(projectPWD).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(Util.getHelpers(projectPWD)).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Migrations:\t\t  \x1b[32m\x1b[1m${Object.keys(Util.getMigrations(projectPWD)).length}\x1b[0m\n`;
+  if(CoreUtil.isAVAProject()) {
+    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${CoreUtil.getModels().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${CoreUtil.getControllers().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${CoreUtil.getRoutes().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${CoreUtil.getMiddleware().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${CoreUtil.getLocalisations().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${CoreUtil.getTranslations().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(CoreUtil.getHelpers()).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Migrations:\t\t  \x1b[32m\x1b[1m${Object.keys(CoreUtil.getMigrations()).length}\x1b[0m\n`;
   }
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++============================================================================\x1b[0m\n`;
@@ -299,33 +320,312 @@ function info() {
  * @description Migrate.
  */
 function migrate() {
-  const database = new AVADatabase();
-  database.migrate();
+  const migrator = new Migrator();
+  const seeder = new Seeder();
+  const choices = [
+    "\x1b[32m\x1b[1mSAFE\x1b[0m \x1b[3m(Only migrates zones/tables or records that don't exist yet)\x1b[0m",
+    "\x1b[33m\x1b[1mOVERWRITE\x1b[0m \x1b[3m(Migrates over your existing zones/tables and records)\x1b[0m",
+    "\x1b[31m\x1b[1mWIPE\x1b[0m \x1b[3m(Wipes your storage/database and then migrates)\x1b[0m"
+  ];
+  const questions = [
+    {
+      type: "list",
+      name: "mode",
+      message: "Choose a migration mode:",
+      default: 0,
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      choices: choices
+    },
+    {
+      type: "confirm",
+      name: "seed",
+      message: "Also seed?",
+      default: true,
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m"
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const mode = ["SAFE", "OVERWRITE", "WIPE"];
+    var options = {};
+    choices.forEach((value, index, array) => {
+      options[value] = index;
+    });
+    const choice = options[answers.mode];
+    if(typeof mode[choice] === "string") {
+      const option = options[answers.mode];
+      migrator.migrate(mode[option]);
+      if (answers.seed) {
+        seeder.seed(mode[option]);
+      }
+      return;
+    }
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
+  });
+}
+
+
+/**
+ * @description Migrate.
+ */
+function seed() {
+  const seeder = new Seeder();
+  const choices = [
+    "\x1b[32m\x1b[1mSAFE\x1b[0m \x1b[3m(Only seeds records that don't exist yet)\x1b[0m",
+    "\x1b[33m\x1b[1mOVERWRITE\x1b[0m \x1b[3m(Seeds over your existing records)\x1b[0m",
+    "\x1b[31m\x1b[1mWIPE\x1b[0m \x1b[3m(Wipes your data and then seeds)\x1b[0m"
+  ];
+  const questions = [
+    {
+      type: "list",
+      name: "mode",
+      message: "Choose a seeding mode:",
+      default: 0,
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      choices: choices
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const mode = ["SAFE", "OVERWRITE", "WIPE"];
+    var options = {};
+    choices.forEach((value, index, array) => {
+      options[value] = index;
+    });
+    const choice = options[answers.mode];
+    if(typeof mode[choice] === "string") {
+      const option = options[answers.mode];
+      seeder.seed(mode[option]);
+      return;
+    }
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
+  });
 }
 
 
 /**
  * @description Makes controller.
  */
-function makeController() {
-  const name = "TestController";
-  const src = `${__dirname}/../core/components/TEMPLATE_controller`;
-  const dest = `${projectPWD}/app/controllers/${name}.js`;
+function make(component) {
+  switch(component) {
+    case "controller":
+      make_controller();
+      return;
+    case "view":
+      make_view();
+      return;
+    case "model":
+      make_model();
+      return;
+    default:
+      make_default();
+      return;
+  }
+}
 
-  if(fs.existsSync(src) && !fs.existsSync(dest)) {
-    fs.copyFileSync(src, dest, COPYFILE_EXCL);
-    // var file = require(dest);
+
+/**
+ * 
+ */
+function make_controller() {
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Name your controller:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(!answer.endsWith("Controller"))
+          return `\x1b[31mA controller name should end with "Controller". For example: "UserController".\x1b[0m`;
+        if(fs.existsSync(`${projectPWD}/app/controllers/${answer}.js`))
+          return "\x1b[31mA controller with this name already exists.\x1b[0m";
+        return true;
+      }
+    }//,
+    // {
+    //   type: "checkbox",
+    //   name: "actions",
+    //   message: "Choose what actions you want:",
+    //   choices: [
+    //     "index",
+    //     "show",
+    //     "store",
+    //     "update",
+    //     "destroy"
+    //   ],
+    //   default: [
+    //     "index",
+    //     "show",
+    //     "store",
+    //     "update",
+    //     "destroy"
+    //   ],
+    //   prefix: "\x1b[32m[AVALANCHE]\x1b[3m",
+    //   suffix: "\x1b[0m"
+    // },
+    // {
+    //   type: "list",
+    //   name: "routes",
+    //   message: "Do you want to automaticly generate routes?",
+    //   choices: ["Add to existing routes file", "Create new routes file", "Don't generate routes"],
+    //   prefix: "\x1b[32m[AVALANCHE]\x1b[3m",
+    //   suffix: "\x1b[0m"
+    // }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/controllers/${answers.name}.js`;
+    const template = "TEMPLATE_controller";
+    const variables = { name: answers.name };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_view() {
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Name your view:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(!answer.endsWith("ViewController"))
+          return `\x1b[31mA voew name should end with "ViewController". For example: "ProfileViewController".\x1b[0m`;
+        if(fs.existsSync(`${projectPWD}/app/views/${answer}.js`))
+          return "\x1b[31mA view with this name already exists.\x1b[0m";
+        return true;
+      }
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/views/${answers.name}.js`;
+    const template = "TEMPLATE_view";
+    const variables = { name: answers.name };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_model() {
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Name your model:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(fs.existsSync(`${projectPWD}/app/models/${answer}.js`))
+          return "\x1b[31mA model with this name already exists.\x1b[0m"
+        return true;
+      }
+    },
+    {
+      type: "input",
+      name: "table",
+      choices: ["AVAStorage", "AVADatabase"],
+      message: "Name your zone/table:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      default: (answers) => {
+        return answers.name;
+      },
+      validate: (answer) => {
+        return answer.length >= 2 ? true : "Model name should be atleast 2 characters";
+      }
+    },
+    {
+      type: "list",
+      name: "method",
+      choices: ["AVAStorage", "AVADatabase"],
+      message: "Choose a storage method:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m"
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/models/${answers.name}.js`;
+    const template = "TEMPLATE_model";
+    const variables = {
+      name: answers.name,
+      name_lower: answers.name.toLowerCase()
+    };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_default() {
+  var choices = [
+    "controller",
+    "model",
+    "view"
+  ];
+  const prompt = {
+    type: "list",
+    name: "component",
+    message: "What would you like to make?",
+    default: 0,
+    choices: choices,
+    prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+    suffix: "\x1b[0m"
+  };
+  inquirer.prompt(prompt).then(answers => {
+    make(answers.component);
+    return;
+  });
+}
+
+
+/**
+ * @description Renders the template file.
+ * @param {Object} variables 
+ * @param {String} template 
+ * @param {String} path 
+ */
+function makeTemplate(variables, template, path) {
+  const src = `${__dirname}/templates/${template}`;
+  const dest = `${projectPWD}/${path}`;
+  if(fs.existsSync(src)) {
+    if (!fs.existsSync(dest)) {
+      fs.copyFileSync(src, dest, COPYFILE_EXCL);
+      var content = fs.readFileSync(dest).toString();
+      for(const key in variables) {
+        const variable = variables[key];
+        content = content.split(`<#${key}?>`).join(variable);
+      }
+      fs.writeFileSync(dest, content, { encoding: "utf8" });
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
+    } else {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
+    }
+  } else {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
+    process.exit(AVAError.INCOMPLETECORE);
   }
 }
 
 
 module.exports = {
-  fix: fix,
+  config: config,
   run: run,
   init: init,
   info: info,
+  make: make,
+  seed: seed,
   routes: routes,
   upgrade: upgrade,
-  migrate: migrate,
-  makeController: makeController
+  migrate: migrate
 };

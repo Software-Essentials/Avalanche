@@ -2,24 +2,24 @@
 
 const projectPWD = process.env.PWD;
 const fs = require("fs");
+const CoreUtil = require("./CoreUtil");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const { AVAError } = require("../index.js");
-const { fix, run, init, info, routes, upgrade, migrate } = require("./Operations.js")
+const { config, run, init, info, make, seed, routes, upgrade, migrate } = require("./Operations.js")
 
-cmdValue = process.argv[2];
-envValue = process.argv[3];
-
+cmdValue = process.argv[0] === "sudo" ? process.argv[3] : process.argv[2];
+envValue = process.argv[0] === "sudo" ? process.argv[4] : process.argv[3];
 
 if (typeof cmdValue !== "undefined") {
   if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
-    if(typeof package === "null" || typeof package.avalancheConfig === "undefined") {
-      console.log(`\x1b[31m[AVALANCHE] (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
-      process.exit(AVAError.prototype.NOTANAVAPROJECT);
+    if(!CoreUtil.isAVAProject()) {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
+      process.exit(AVAError.NOTANAVAPROJECT);
       return;
     }
-    if(!(package && package.dependencies && package.dependencies.avacore)) {
-      console.log(`\x1b[33m[AVALANCHE] (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
+    if(!CoreUtil.isAVACoreInstalled()) {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
     }
   }
   if(package && package.dependencies && package.dependencies.avacore) {
@@ -29,18 +29,18 @@ if (typeof cmdValue !== "undefined") {
     const cliValue = parseInt(projectVersion.split(".").join(""));
     const projectValue = parseInt(cliVersion.split(".").join(""));
     if(cliValue > projectValue) {
-      console.log(`\x1b[34m[AVALANCHE] (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
     }
     if(projectValue > cliValue) {
-      console.log(`\x1b[34m[AVALANCHE] (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
     }
   }
   switch(cmdValue) {
     case "init":
-      init(envValue);
+      init(process.argv[3]);
       break;
     case "run":
-      run(envValue);
+      run(process.argv[3]);
       break;
     case "routes":
       routes();
@@ -48,11 +48,17 @@ if (typeof cmdValue !== "undefined") {
     case "upgrade":
       upgrade();
       break;
-    case "fix":
-      fix();
+    case "config":
+      config();
       break;
     case "migrate":
       migrate();
+      break;
+    case "seed":
+      seed();
+      break;
+    case "make":
+      make(process.argv[3], process.argv[4]);
       break;
     case "version":
       console.log(avalanchePackage.version);
@@ -61,7 +67,7 @@ if (typeof cmdValue !== "undefined") {
       info();
       break;
     default:
-      console.log("\x1b[31m%s\x1b[0m", `[AVALANCHE] Command not recognised!`);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command not recognised!\x1b[0m`);
   }
 }
 

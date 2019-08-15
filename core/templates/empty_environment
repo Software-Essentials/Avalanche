@@ -1,14 +1,22 @@
 {
-  "title": "My Avalanche app",
+  "info": {
+    "title": "My Avalanche app"
+  },
   "network": {
     "domain": "localhost",
     "host": "127.0.0.1",
-    "port": 80,
-    "logHTTPRequestsToConsole": true
+    "port": 80
+  },
+  "debug": {
+    "logHTTPRequestsToConsole": true,
+    "restartOnFileChange": true
   },
   "auth": {
     "secret": "SecretKey!",
     "saltRounds": 0
+  },
+  "security": {
+    "csrf": true
   },
   "capabilities": {
     "SSL": false,

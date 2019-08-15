@@ -5,11 +5,11 @@ const express = require("express");
 const exphbs = require("express-handlebars");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const { AVADatabase } = require("../index");
 
 // Imports
 const Router = require("./Router.js");
 const SocketKernel = require("./SocketKernel.js");
-const Auth = require("./Auth.js");
 
 const projectPWD = process.env.PWD;
 
@@ -62,7 +62,7 @@ class Kernel {
 		// Global sockets
 		global.socket = new SocketKernel(stream);
 		global.cronjobs = {};
-		global.database = Auth.getConnection();
+		global.database = new AVADatabase().connection;
 
 		// Tell express to use Handlebars
 		app.set("view engine", "hbs");

@@ -1,0 +1,17 @@
+{
+  "folders": [],
+  "files": [
+    {
+      "template": "example2_environment",
+      "path": "/app/environments/development.environment.json"
+    },
+    {
+      "template": "example2_controller",
+      "path": "/app/controllers/PostController.js"
+    },
+    {
+      "template": "example2_routes",
+      "path": "/app/routes/api.json"
+    }
+  ]
+}

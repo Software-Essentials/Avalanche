@@ -20,7 +20,7 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   index(request, response) {
-    const posts = new Post().all();
+    const posts = Post.all();
     const hasContents = posts.length > 0;
     var data = [];
     for (const post of posts) {
@@ -41,7 +41,7 @@ class PostController extends AVAController {
    */
   show(request, response) {
     const index = request.params.ID;
-    const posts = new Post().where("post_id", parseInt(index), "Post");
+    const posts = Post.where("post_id", parseInt(index), "Post");
     const hasContents = posts.length > 0;
     const data = hasContents ? posts[0].get() : undefined;
     response.json({
@@ -80,7 +80,7 @@ class PostController extends AVAController {
    */
   update(request, response) {
     const index = request.body.ID;
-    const posts = new Post().where("post_id", parseInt(index), "Post");
+    const posts = Post.where("post_id", parseInt(index), "Post");
     const hasContents = posts.length > 0;
     const multiple = posts.length > 1
     if(hasContents) {
@@ -113,7 +113,7 @@ class PostController extends AVAController {
    */
   destroy(request, response) {
     const index = request.body.ID;
-    const posts = new Post().where("post_id", parseInt(index), "Post");
+    const posts = Post.where("post_id", parseInt(index), "Post");
     const hasContents = posts.length > 0;
     const multiple = posts.length > 1
     var success = false;
@@ -134,7 +134,6 @@ class PostController extends AVAController {
   }
 
 }
-
 
 
 module.exports = PostController;

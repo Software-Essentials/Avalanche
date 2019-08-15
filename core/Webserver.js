@@ -1,6 +1,6 @@
 // Dependencies
 const http = require("http")
-
+const CoreUtil = require("./CoreUtil");
 
 
 /**
@@ -32,14 +32,14 @@ class Webserver {
     this.stream.on("error", (error) => {
       const message = error.message;
       if(message.includes("EACCES")) {
-        console.log(`\x1b[31m[AVALANCHE] Unable to start server because Avalanche doesn't have permission to use port '${global.environment.port}' on IP '${global.environment.host}'.\x1b[0m`);
+        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Unable to start server because Avalanche doesn't have permission to use port '${global.environment.port}' on IP '${global.environment.host}'.\x1b[0m`);
         return;
       }
       if(message.includes("EADDRINUSE")) {
-        console.log(`\x1b[31m[AVALANCHE] Unable to start server because port '${global.environment.port}' on IP '${global.environment.host}' is already in use.\x1b[0m`);
+        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Unable to start server because port '${global.environment.port}' on IP '${global.environment.host}' is already in use.\x1b[0m`);
         return;
       }
-      console.log(`\x1b[31m[AVALANCHE] An unknown error occured: \x1b[0m${error.message}`);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m An unknown error occured: \x1b[0m${error.message}`);
     });
   }
 
@@ -48,7 +48,7 @@ class Webserver {
   }
 
   didStart(webserver) {
-    console.log(`\x1b[32m[AVALANCHE] Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}\x1b[0m`);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}\x1b[0m`);
     if(global.environment.reloadClientsAfterRestart) {
       webserver.reloadConnectedClients();
     }
