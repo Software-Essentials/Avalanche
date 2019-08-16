@@ -5,7 +5,12 @@
 class AVAError extends Error {
 
     constructor() {
-        this.message = typeof arguments[0] === "string" ? arguments[0] : null;
+        const message = typeof arguments[0] === "string" ? arguments[0] : undefined;
+        if (message) {
+            super(message);
+        } else {
+            super();
+        }
     }
 
 }

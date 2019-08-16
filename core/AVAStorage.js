@@ -1,5 +1,6 @@
 const fs = require("fs");
 const { AVARecordZone } = require("../index.js");
+const CoreUtil = require("./CoreUtil");
 const projectPWD = process.env.PWD;
 
 
@@ -82,5 +83,35 @@ class AVAStorage {
   }
 
 }
+
+
+/**
+ * @description Wipes the storage clean.
+ * @throws {Error}
+ */
+function wipe() {
+  const storagePath = `${projectPWD}/storage`;
+  if (fs.existsSync(storagePath)) {
+    const children = CoreUtil.directoryLooper(storagePath, []).children;
+    var paths = [];
+    for (const i in children) {
+      const index = children.length - (1 + parseInt(i));
+      paths.push(children[index]);
+    }
+    for (const i in paths) {
+      const child = paths[i];
+      try {
+        fs.unlinkSync(child);
+      } catch (error) {
+        throw error;
+      }
+    }
+  }
+  if (!fs.existsSync(storagePath)) {
+    fs.mkdirSync(storagePath);
+  }
+}
+AVAStorage.wipe = wipe;
+
 
 module.exports = AVAStorage;

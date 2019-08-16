@@ -8,8 +8,10 @@ module.exports.AVADatabase = require("./core/AVADatabase.js");
 module.exports.AVAStorage = require("./core/AVAStorage.js");
 module.exports.AVAMailer = require("./core/AVAMailer.js");
 module.exports.AVAError = require("./core/AVAError.js");
+
 module.exports.Util = require("./core/Util.js");
 module.exports.CLI = require("./core/Operations.js");
+module.exports._ = require("./core/AVALocalisation.js").translate;
 
 // Super components
 module.exports.AVAViewController = require("./core/AVAViewController.js");

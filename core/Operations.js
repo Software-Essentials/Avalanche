@@ -355,10 +355,17 @@ function migrate() {
     const choice = options[answers.mode];
     if(typeof mode[choice] === "string") {
       const option = options[answers.mode];
-      migrator.migrate(mode[option]);
-      if (answers.seed) {
-        seeder.seed(mode[option]);
-      }
+      migrator.migrate(mode[option], (success) => {
+        if (success) {
+          if(answers.seed) {
+            seeder.seed(mode[option], () => {
+              process.exit(0);
+            });
+          } else {
+            process.exit(0);
+          }
+        }
+      });
       return;
     }
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
@@ -396,7 +403,9 @@ function seed() {
     const choice = options[answers.mode];
     if(typeof mode[choice] === "string") {
       const option = options[answers.mode];
-      seeder.seed(mode[option]);
+      seeder.seed(mode[option], () => {
+        process.exit(0);
+      });
       return;
     }
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
