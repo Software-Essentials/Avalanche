@@ -146,6 +146,9 @@ AVAModel.register = (Model) => {
   function all() {
     const storage = new AVAStorage();
     const zone = storage.getRecordZone(Model.NAME);
+    if(zone === null) {
+      return [];
+    }
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {
@@ -167,6 +170,9 @@ AVAModel.register = (Model) => {
   function where(key, value) {
     const storage = new AVAStorage();
     const zone = storage.getRecordZone(Model.NAME);
+    if(zone === null) {
+      return [];
+    }
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {

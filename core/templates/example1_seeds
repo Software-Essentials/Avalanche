@@ -1,0 +1,10 @@
+[
+  {
+    "zone": "Post",
+    "data": [
+      { "post_id": 1, "post_name": "Post 1", "post_body": "First post.", "created_at": 0, "updated_at": null },
+      { "post_id": 2, "post_name": "Post 2", "post_body": "Second post.", "created_at": 0, "updated_at": null },
+      { "post_id": 3, "post_name": "Post 3", "post_body": "Third post.", "created_at": 0, "updated_at": null }
+    ]
+  }
+]

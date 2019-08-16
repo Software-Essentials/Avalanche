@@ -97,6 +97,10 @@
     {
       "template": "example1_assets_favicon",
       "path": "/app/public/assets/img/favicon.png"
+    },
+    {
+      "template": "example1_seeds",
+      "path": "/app/migrations/seeds/DummyData.json"
     }
   ]
 }

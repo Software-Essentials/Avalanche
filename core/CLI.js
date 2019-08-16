@@ -11,7 +11,9 @@ const { config, run, init, info, make, seed, routes, upgrade, migrate } = requir
 cmdValue = process.argv[0] === "sudo" ? process.argv[3] : process.argv[2];
 envValue = process.argv[0] === "sudo" ? process.argv[4] : process.argv[3];
 
-global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
+if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
+  global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
+}
 
 if (typeof cmdValue !== "undefined") {
   if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {
