@@ -5,11 +5,15 @@ const fs = require("fs");
 const CoreUtil = require("./CoreUtil");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const { AVAError } = require("../index.js");
+const { AVAError, AVAEnvironment } = require("../index.js");
 const { config, run, init, info, make, seed, routes, upgrade, migrate } = require("./Operations.js")
 
 cmdValue = process.argv[0] === "sudo" ? process.argv[3] : process.argv[2];
 envValue = process.argv[0] === "sudo" ? process.argv[4] : process.argv[3];
+
+if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
+  global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
+}
 
 if (typeof cmdValue !== "undefined") {
   if(cmdValue !== "init" && cmdValue !== "version" && cmdValue !== "info") {

@@ -1,4 +1,4 @@
-const { AVAStorage, AVARecordZone } = require("../index");
+const { AVAStorage, AVARecordZone, AVADatabase, AVAError } = require("../index");
 
 
 /**
@@ -22,32 +22,33 @@ class AVAModel {
    * 
    */
   setupDone() {
-    const storage = new AVAStorage();
-    if(typeof arguments[0] === "object") {
-      const object = arguments[0];
-      for(const key in this.PROPERTIES) {
-        if(object.hasOwnProperty(this.PROPERTIES[key].name) === false) {
-          throw "Model incomplete";
-        }
-        this[key] = object[this.PROPERTIES[key].name]
-      }
+    if(this.METHOD === "DATABASE") {
+
+    } else {
+      const storage = new AVAStorage();
       if(!storage.recordZoneExists(this.NAME)) {
         storage.addRecordZone(new AVARecordZone(this.NAME, []));
       }
-    } else {
-      for(const key in this.PROPERTIES) {
-        this[key] = null;
+      if(typeof arguments[0] === "object") {
+        const object = arguments[0];
+        for(const key in this.PROPERTIES) {
+          if(object.hasOwnProperty(this.PROPERTIES[key].name) === false) {
+            throw new AVAError("Model incomplete");
+          }
+          this[key] = object[this.PROPERTIES[key].name]
+        }
+      } else {
+        for(const key in this.PROPERTIES) {
+          this[key] = null;
+        }
+        this.DRAFT = true;
+        const allRecords = storage.getRecordZone(this.NAME).getRecords()
+        var highest = 0;
+        for(const i in allRecords) {
+          highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
+        }
+        this[this.IDENTIFIER] = highest + 1;
       }
-      this.DRAFT = true;
-      if(!storage.recordZoneExists(this.NAME)) {
-        storage.addRecordZone(new AVARecordZone(this.NAME, []))
-      }
-      const allRecords = storage.getRecordZone(this.NAME).getRecords()
-      var highest = 0;
-      for(const i in allRecords) {
-        highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
-      }
-      this[this.IDENTIFIER] = highest + 1;
     }
   }
 
@@ -56,20 +57,47 @@ class AVAModel {
    * 
    */
   save() {
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone(this.NAME);
-    var data = {};
-    for(const key in this.PROPERTIES) {
-      data[this.PROPERTIES[key].name] = this[key];
-    }
-    if(this.DRAFT) {
-      zone.addRecord(data);
-      this.DRAFT = false;
+    if(this.METHOD === "DATABASE") {
+      const database = new AVADatabase();
+      var keys = [];
+      var values = [];
+      for(const key in this.PROPERTIES) {
+        keys.push(this.PROPERTIES[key].name);
+        const value = this[key];
+        switch (typeof value) {
+          case "string":
+            values.push(`'${value}'`);
+            break;
+          case "number":
+            values.push(value);
+            break;
+          case "boolean":
+              values.push(value ? 1 : 0);
+            break;
+          default:
+            values.push("NULL");
+        }
+      }
+      const query = `INSERT INTO ${this.NAME} (${keys.join(", ")}) VALUES (${values.join(", ")})`;
+      database.query(query, [], () => {
+
+      });
     } else {
-      zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data)
+      const storage = new AVAStorage();
+      const zone = storage.getRecordZone(this.NAME);
+      var data = {};
+      for(const key in this.PROPERTIES) {
+        data[this.PROPERTIES[key].name] = this[key];
+      }
+      if(this.DRAFT) {
+        zone.addRecord(data);
+        this.DRAFT = false;
+      } else {
+        zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data)
+      }
+      storage.save(zone);
+      return true;
     }
-    storage.save(zone);
-    return true;
   }
 
 
@@ -118,6 +146,9 @@ AVAModel.register = (Model) => {
   function all() {
     const storage = new AVAStorage();
     const zone = storage.getRecordZone(Model.NAME);
+    if(zone === null) {
+      return [];
+    }
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {
@@ -139,6 +170,9 @@ AVAModel.register = (Model) => {
   function where(key, value) {
     const storage = new AVAStorage();
     const zone = storage.getRecordZone(Model.NAME);
+    if(zone === null) {
+      return [];
+    }
     const records = zone.getRecords();
     var results = [];
     for(const record in records) {

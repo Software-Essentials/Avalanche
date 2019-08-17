@@ -64,6 +64,9 @@ class Kernel {
 		global.cronjobs = {};
 		global.database = new AVADatabase().connection;
 
+		// Tell express to use EJS
+		// app.set('view engine', 'ejs');
+
 		// Tell express to use Handlebars
 		app.set("view engine", "hbs");
 		app.engine("hbs", exphbs(this.templateConfiguration));
@@ -75,8 +78,10 @@ class Kernel {
 		app.use(this.middleware);
 
 		// Upload file size limit
-		app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
-		app.use(bodyParser.json({ limit: "50mb" }));
+		app.use(bodyParser.urlencoded({ extended: false }));
+		app.use(bodyParser.json());
+		// app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
+		// app.use(bodyParser.json({ limit: "50mb" }));
 
 		// Setup static folder
 		app.use(express.static("app/public"));
@@ -89,6 +94,9 @@ class Kernel {
 
 		// Redefine view directory
 		app.set('views', 'app/templates');
+
+		// CSRF middleware
+		// app.use(express.csrf());
 
 		// Utilize router
 		app.use(new Router().routes());
