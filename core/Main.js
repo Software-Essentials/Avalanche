@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+global.projectPWD = process.env.PWD;
+
 // Dependencies
 const express = require("express");
 const CoreUtil = require("./CoreUtil");

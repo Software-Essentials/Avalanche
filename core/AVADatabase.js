@@ -1,7 +1,6 @@
 const fs = require("fs");
 const mysql = require("mysql");
 const CoreUtil = require("./CoreUtil");
-const projectPWD = process.env.PWD;
 
 
 /**

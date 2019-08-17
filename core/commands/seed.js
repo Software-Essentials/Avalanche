@@ -42,4 +42,6 @@ function seed() {
 }
 
 
-module.exports = seed;
+module.exports.execute = seed;
+module.exports.command = "seed";
+module.exports.description = "Seeds your storage or database.";

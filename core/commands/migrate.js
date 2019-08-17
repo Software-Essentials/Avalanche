@@ -60,4 +60,6 @@ function migrate() {
 }
 
 
-module.exports = migrate;
+module.exports.execute = migrate;
+module.exports.command = "migrate";
+module.exports.description = "Migrates.";

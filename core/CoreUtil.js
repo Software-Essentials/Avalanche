@@ -1,4 +1,3 @@
-const projectPWD = process.env.PWD;
 const fs = require("fs");
 const md5 = require("md5");
 const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;

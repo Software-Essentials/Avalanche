@@ -11,7 +11,6 @@ const { AVADatabase } = require("../index");
 const Router = require("./Router.js");
 const SocketKernel = require("./SocketKernel.js");
 
-const projectPWD = process.env.PWD;
 
 
 /**

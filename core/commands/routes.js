@@ -30,4 +30,6 @@ function routes() {
 }
 
 
-module.exports = routes;
+module.exports.execute = routes;
+module.exports.command = "routes";
+module.exports.description = "Prints all the routes in your project.";

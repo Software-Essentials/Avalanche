@@ -41,4 +41,6 @@ function info() {
 }
 
 
-module.exports = info;
+module.exports.execute = info;
+module.exports.command = "info";
+module.exports.description = "Prints information about your Project.";

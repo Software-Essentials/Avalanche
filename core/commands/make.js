@@ -220,4 +220,6 @@ function makeTemplate(variables, template, path) {
 }
 
 
-module.exports = make;
+module.exports.execute = make;
+module.exports.command = "make";
+module.exports.description = "Creates a component.";

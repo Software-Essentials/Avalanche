@@ -6,7 +6,6 @@ const url = require("url");
 
 // Setup
 const ExRouter = express.Router();
-const projectPWD = process.env.PWD;
 
 
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const projectPWD = process.env.PWD;
-global.projectPWD = projectPWD;
+global.projectPWD = process.env.PWD;
 const fs = require("fs");
 const CoreUtil = require("./CoreUtil");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -10,6 +9,7 @@ const { AVAError, AVAEnvironment } = require("../index.js");
 
 cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
+argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
 
 if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
   global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
@@ -39,39 +39,13 @@ if (typeof cmdValue !== "undefined") {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
     }
   }
-  switch(cmdValue) {
-    case "init":
-      const init = require("./commands/init");
-      init(process.argv[3]);
-      break;
-    case "run":
-      const run = require("./commands/run");
-      run(process.argv[3]);
-      break;
-    case "routes":
-      const routes = require("./commands/routes");
-      routes();
-      break;
-    case "migrate":
-      const migrate = require("./commands/migrate");
-      migrate();
-      break;
-    case "seed":
-      const seed = require("./commands/seed");
-      seed();
-      break;
-    case "make":
-      const make = require("./commands/make");
-      make(process.argv[3], process.argv[4]);
-      break;
-    case "version":
-      console.log(avalanchePackage.version);
-      break;
-    case "info":
-      const info = require("./commands/info");
-      info();
-      break;
-    default:
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command not recognised!\x1b[0m`);
+
+  const path = `${__dirname}/commands`;
+  const commands = fs.readdirSync(path);
+  for (const key of commands) {
+    const command = require(`${path}/${key}`);
+    if (cmdValue === command.command) {
+      command.execute(envValue, argValue);
+    }
   }
 }

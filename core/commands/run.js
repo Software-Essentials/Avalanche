@@ -65,4 +65,6 @@ function start(environment) {
 }
 
 
-module.exports = run;
+module.exports.execute = run;
+module.exports.command = "run";
+module.exports.description = "Runs your application.";

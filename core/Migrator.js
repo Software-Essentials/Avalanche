@@ -1,7 +1,6 @@
 const fs = require("fs");
 const CoreUtil = require("./CoreUtil");
 const { AVADatabase, AVAStorage, AVARecordZone } = require("../index");
-const projectPWD = process.env.PWD;
 
 
 class Migrator {

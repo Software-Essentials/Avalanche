@@ -3,7 +3,6 @@ const nodemailer = require('nodemailer');
 const mg = require("nodemailer-mailgun-transport");
 const hbs = require("nodemailer-express-handlebars");
 
-const projectPWD = process.env.PWD;
 
 
 
