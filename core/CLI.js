@@ -46,6 +46,9 @@ if (typeof cmdValue !== "undefined") {
           if (!CoreUtil.isAVACoreInstalled()) {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
           }
+          if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
+            global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
+          }
         }
         command.execute(envValue, argValue);
       } else {
