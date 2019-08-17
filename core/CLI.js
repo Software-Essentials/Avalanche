@@ -11,10 +11,6 @@ cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
 argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
 
-if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
-  global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
-}
-
 if (typeof cmdValue !== "undefined") {
   if (package && package.dependencies && package.dependencies.avacore) {
     const version = package.dependencies.avacore;

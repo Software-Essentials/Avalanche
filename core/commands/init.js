@@ -127,7 +127,7 @@ function installBoilerplate(example) {
     const filePath = `${projectPWD}${file.path}`;
     if (fs.existsSync(templatePath) && !fs.existsSync(filePath)) {
       try {
-        fs.copyFileSync(templatePath, filePath, COPYFILE_EXCL);
+        fs.copyFileSync(templatePath, filePath, fs.COPYFILE_EXCL);
       } catch (error) {
         if (error.code === "ENOENT") {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
