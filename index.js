@@ -10,7 +10,6 @@ module.exports.AVAMailer = require("./core/AVAMailer.js");
 module.exports.AVAError = require("./core/AVAError.js");
 
 module.exports.Util = require("./core/Util.js");
-module.exports.CLI = require("./core/Operations.js");
 module.exports._ = require("./core/AVALocalisation.js").translate;
 
 // Super components
