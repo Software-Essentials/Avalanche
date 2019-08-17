@@ -33,7 +33,16 @@ class Migrator {
           migrate();
         },
         onFailure: ({error}) => {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m ${error.message}`);
+          switch(error.code) {
+            case "ER_NOT_SUPPORTED_AUTH_MODE":
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+              break;
+            case "ER_ACCESS_DENIED_ERROR":
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+              break;
+            default:
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+          }
         }
       });
     } else {

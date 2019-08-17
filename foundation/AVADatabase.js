@@ -14,25 +14,6 @@ class AVADatabase {
 
 
   /**
-   * 
-   */
-  migrate() {
-    const normalizedPath = `${projectPWD}/app/migrations`;
-    var migrations = [];
-    fs.readdirSync(normalizedPath).forEach(function (file) {
-      const extensions = file.split(".");
-      if (extensions.length = 2) {
-        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-          const migration = require(`${projectPWD}/app/migrations/${file}`);
-          migrations.push(migration);
-        }
-      }
-    });
-    console.log(migrations);
-  }
-
-
-  /**
    * @description Does a request to the database.
    * @param {String} query 
    * @param {Object} parameters 
@@ -145,7 +126,6 @@ class AVADatabase {
 
 
   insertInto(name, data, options) {
-    const force = options ? options.force ? true : false : false;
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
     if (!Array.isArray(data) || data.length <= 0) {
@@ -186,11 +166,35 @@ class AVADatabase {
       const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
       that.query(query, [], (error, results, fields) => {
         if (error) {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
           failure({table: name, error: error});
           return;
         }
         success({table: name});
+      });
+    }
+  }
+
+
+  selectFromTable(name, options) {
+    const conditions = options ? typeof options.conditions === "object" ? options.conditions : {} : {};
+    var columns = options ? typeof options.columns === "object" ? options.columns : [] : [];
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    if (!Array.isArray(columns)) {
+      columns = [];
+    }
+    const that = this;
+    var compiledConditions = "1 = 1";
+    select();
+    function select() {
+      const query = `SELECT ${columns.length <= 0 ? "*" : columns.join(", ")} FROM \`${name}\`${Object.keys(conditions).length > 0 ? ` WHERE ${compiledConditions}` : ""};`;
+      that.query(query, [], (error, results, fields) => {
+        if (error) {
+          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
+          failure({table: name, error: error});
+          return;
+        }
+        success({table: name, results: results, fields: fields});
       });
     }
   }

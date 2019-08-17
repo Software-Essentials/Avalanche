@@ -165,23 +165,36 @@ AVAModel.register = (Model) => {
    * @description Returns all records matching this key-value condition.
    * @param {String} key 
    * @param {any} value 
-   * @returns {[Post]}
    */
-  function where(key, value) {
-    const storage = new AVAStorage();
-    const zone = storage.getRecordZone(Model.NAME);
-    if(zone === null) {
-      return [];
-    }
-    const records = zone.getRecords();
+  function where(key, value, options) {
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
     var results = [];
-    for(const record in records) {
-      if(records[record].hasOwnProperty(key)) {
-        const recordValue = records[record][key];
-        if(recordValue === value) {
-          const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
-          model.setupDone(records[record]);
-          results.push(model);
+    if (Model.METHOD === "DATABASE") {
+      const database = new AVADatabase();
+      database.query(query, parameters, (error, fields, results) => {
+        if (error) {
+          failure({error: error})
+        } else {
+          success({results: results})
+        }
+      })
+    }
+    if (Model.METHOD === "STORAGE") {
+      const storage = new AVAStorage();
+      const zone = storage.getRecordZone(Model.NAME);
+      if(zone === null) {
+        return [];
+      }
+      const records = zone.getRecords();
+      for(const record in records) {
+        if(records[record].hasOwnProperty(key)) {
+          const recordValue = records[record][key];
+          if(recordValue === value) {
+            const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
+            model.setupDone(records[record]);
+            results.push(model);
+          }
         }
       }
     }
