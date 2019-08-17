@@ -1,7 +1,6 @@
 // Imports
 const fs = require("fs");
 const { AVAError } = require("../index.js");
-const projectPWD = process.env.PWD;
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 

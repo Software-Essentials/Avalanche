@@ -1,6 +1,5 @@
 // Dependencies
 const fs = require("fs");
-const projectPWD = process.env.PWD;
 
 
 /**
