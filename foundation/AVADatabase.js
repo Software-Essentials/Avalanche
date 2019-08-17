@@ -1,6 +1,6 @@
 const fs = require("fs");
 const mysql = require("mysql");
-const CoreUtil = require("./CoreUtil");
+const CoreUtil = require("../core/CoreUtil");
 
 
 /**

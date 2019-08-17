@@ -61,5 +61,7 @@ function migrate() {
 
 
 module.exports.execute = migrate;
+module.exports.enabled = true;
+module.exports.scope = "PROJECT";
 module.exports.command = "migrate";
-module.exports.description = "Migrates.";
+module.exports.description = "Migrates to your database/storage based on the models in your project.";

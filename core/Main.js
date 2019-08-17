@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 global.projectPWD = process.env.PWD;
+global.CoreUtil = require("./CoreUtil");
 
 // Dependencies
 const express = require("express");
-const CoreUtil = require("./CoreUtil");
 const Kernel = require("./Kernel.js");
 const Webserver = require("./Webserver.js");
-const AVAEnvironment = require("./AVAEnvironment.js");
+const AVAEnvironment = require("../foundation/AVAEnvironment.js");
 
 const app = express();
 

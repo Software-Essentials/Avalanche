@@ -17,7 +17,7 @@ function info() {
   string += `  \x1b[1m++===============================[Project info]===============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Is Alanche project:\t  \x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   Is Avalanche project:\t  \x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m\n`;
   if(CoreUtil.isAVACoreInstalled()) {
     const version = package.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
@@ -42,5 +42,7 @@ function info() {
 
 
 module.exports.execute = info;
+module.exports.enabled = true;
+module.exports.scope = "GLOBAL";
 module.exports.command = "info";
 module.exports.description = "Prints information about your Project.";

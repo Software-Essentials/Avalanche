@@ -148,5 +148,7 @@ function installBoilerplate(example) {
 
 
 module.exports.execute = init;
+module.exports.enabled = true;
+module.exports.scope = "GLOBAL";
 module.exports.command = "init";
 module.exports.description = "Initializes your Project.";

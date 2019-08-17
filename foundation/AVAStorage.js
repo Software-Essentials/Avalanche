@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { AVARecordZone } = require("../index.js");
-const CoreUtil = require("./CoreUtil");
+const CoreUtil = require("../core/CoreUtil");
 
 
 

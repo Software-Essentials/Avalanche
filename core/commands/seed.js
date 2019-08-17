@@ -43,5 +43,7 @@ function seed() {
 
 
 module.exports.execute = seed;
+module.exports.enabled = true;
+module.exports.scope = "PROJECT";
 module.exports.command = "seed";
 module.exports.description = "Seeds your storage or database.";

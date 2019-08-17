@@ -221,5 +221,7 @@ function makeTemplate(variables, template, path) {
 
 
 module.exports.execute = make;
+module.exports.enabled = true;
+module.exports.scope = "PROJECT";
 module.exports.command = "make";
 module.exports.description = "Creates a component.";

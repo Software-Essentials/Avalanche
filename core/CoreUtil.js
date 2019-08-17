@@ -1,6 +1,6 @@
 const fs = require("fs");
 const md5 = require("md5");
-const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 
 
 /**
@@ -8,7 +8,7 @@ const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${
  * @returns {Boolean}
  */
 function isAVACoreInstalled() {
-  return (projectPackage && projectPackage.dependencies && projectPackage.dependencies.avacore);
+  return (!!projectPackage && !!projectPackage.dependencies && !!projectPackage.dependencies.avacore);
 }
 
 
@@ -16,7 +16,7 @@ function isAVACoreInstalled() {
  * @returns {Boolean}
  */
 function isAVAProject() {
-  return (projectPackage && typeof projectPackage.avalancheConfig === "object");
+  return (!!projectPackage && typeof projectPackage.avalancheConfig === "object");
 }
 
 

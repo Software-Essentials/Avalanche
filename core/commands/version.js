@@ -12,5 +12,7 @@ function version() {
 
 
 module.exports.execute = version;
+module.exports.enabled = true;
+module.exports.scope = "GLOBAL";
 module.exports.command = "version";
 module.exports.description = "Prints your current version of Avalanche.";
