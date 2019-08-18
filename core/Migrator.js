@@ -9,6 +9,7 @@ class Migrator {
 
   }
 
+
   migrate(mode, callback) {
     switch (mode) {
       case "SAFE": this.execute({ wipe: false, force: false, onReady: callback }); break;
@@ -16,6 +17,7 @@ class Migrator {
       case "OVERWRITE": this.execute({ wipe: false, force: true, onReady: callback }); break;
     }
   }
+
 
   execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => {} : () => {};
@@ -58,7 +60,9 @@ class Migrator {
           const Model = require(path);
           if (Model.METHOD === "DATABASE") {
             var properties = [];
-            const options = { force: force,
+            const options = {
+              force: force,
+              primaryKey: Model.PROPERTIES[Model.IDENTIFIER].name,
               onSuccess: ({table}) => {
                 migrations[table] = true;
                 update();

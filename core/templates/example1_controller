@@ -20,17 +20,25 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   index(request, response) {
-    const posts = Post.all();
-    const hasContents = posts.length > 0;
-    var data = [];
-    for (const post of posts) {
-      data.push(post.get());
+    const onSuccess = ({results}) => {
+      const isEmpty = results.length <= 0;
+      var data = [];
+      for(const i in results) {
+        data.push(results[i].get());
+      }
+      response.json({
+        success: isEmpty,
+        message: isEmpty ? "No posts to display." : "Showing posts.",
+        data: isEmpty ? undefined : data
+      });
     }
-    response.json({
-      success: hasContents,
-      message: hasContents ? "Showing all records." : "No records to display",
-      data: data
-    });
+    const onFailure = () => {
+      response.json({
+        success: false,
+        message: "Failure."
+      });
+    }
+    Post.all({onSuccess, onFailure});
   }
 
 
@@ -40,15 +48,22 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   show(request, response) {
-    const index = request.params.ID;
-    const posts = Post.where("post_id", parseInt(index), "Post");
-    const hasContents = posts.length > 0;
-    const data = hasContents ? posts[0].get() : undefined;
-    response.json({
-      success: hasContents,
-      message: hasContents ? "Showing record." : "Record doesn't exist.",
-      data: data
-    });
+    const index = parseInt(request.params.ID);
+    const onSuccess = ({results}) => {
+      const isEmpty = results.length <= 0;
+      response.json({
+        success: isEmpty,
+        message: isEmpty ? "Post doesn't exist." : "Showing post.",
+        data: isEmpty ? undefined : results[0].get()
+      });
+    }
+    const onFailure = () => {
+      response.json({
+        success: false,
+        message: "Post doesn't exist."
+      });
+    }
+    Post.where("post_id", index, {onSuccess, onFailure});
   }
 
 
@@ -61,15 +76,27 @@ class PostController extends AVAController {
     const post = new Post();
     post.name = request.body.postName;
     post.body = request.body.postBody
-    const success = post.save();
-    if(typeof request.headers.referer === "string") {
-      response.redirect("/posts");
-    } else {
-      response.json({
-        success: success,
-        message: success ? "Record added." : "Unable to add record."
-      });
+    const onSuccess = () => {
+      if(typeof request.headers.referer === "string") {
+        response.redirect("/posts");
+      } else {
+        response.json({
+          success: true,
+          message: "post created."
+        });
+      }
     }
+    const onFailure = ({error}) => {
+      if(typeof request.headers.referer === "string") {
+        response.redirect("/posts");
+      } else {
+        response.json({
+          success: false,
+          message: "Unable to add post."
+        });
+      }
+    }
+    post.save({onSuccess, onFailure});
   }
 
 
@@ -80,28 +107,27 @@ class PostController extends AVAController {
    */
   update(request, response) {
     const index = request.body.ID;
-    const posts = Post.where("post_id", parseInt(index), "Post");
-    const hasContents = posts.length > 0;
-    const multiple = posts.length > 1
-    if(hasContents) {
-      if(multiple) {
-        for(const i in posts) {
-          posts[i].name = request.body.postName;
-          posts[i].body = request.body.postBody;
-          posts[i].updatedAt = new Date().valueOf();
-          posts[i].save()
-        }
-      } else {
-        const i = Object.keys(posts)[0];
-        posts[i].name = request.body.postName;
-        posts[i].body = request.body.postBody;
-        posts[i].updatedAt = new Date().valueOf();
-        posts[i].save()
-      }
+    const onSuccess = () => {
+      response.json({
+        success: true,
+        message: "post updated."
+      });
     }
-    response.json({
-      success: hasContents,
-      message: hasContents ? "Record updated." : "Unable to update record."
+    const onFailure = ({error}) => {
+      response.json({
+        success: false,
+        message: "Unable to update post."
+      });
+    }
+    new Post().where("post_id", parseInt(index)).fetch(({error, self}) => {
+      if (error) {
+        onFailure({error});
+        return;
+      }
+      self.name = request.body.postName;
+      self.body = request.body.postBody;
+      self.updatedAt = new Date().valueOf();
+      self.save({onSuccess, onFailure});
     });
   }
 
@@ -113,23 +139,24 @@ class PostController extends AVAController {
    */
   destroy(request, response) {
     const index = request.body.ID;
-    const posts = Post.where("post_id", parseInt(index), "Post");
-    const hasContents = posts.length > 0;
-    const multiple = posts.length > 1
-    var success = false;
-    if(hasContents) {
-      if(multiple) {
-        for(const i in posts) {
-          success = posts[i].delete()
-        }
-      } else {
-        const i = Object.keys(posts)[0];
-        success = posts[i].delete()
-      }
+    const onSuccess = () => {
+      response.json({
+        success: true,
+        message: "Post deleted."
+      });
     }
-    response.json({
-      success: success,
-      message: success ? "Record deleted." : "Unable to delete record."
+    const onFailure = ({error}) => {
+      response.json({
+        success: false,
+        message: "Unable to delete post."
+      });
+    }
+    new Post().where("post_id", parseInt(index)).fetch(({error, self}) => {
+      if (error) {
+        onFailure({error});
+        return;
+      }
+      self.delete({onSuccess, onFailure});
     });
   }
 

@@ -20,7 +20,9 @@ class Post extends AVAModel {
         name: "post_id",
         type: "INT",
         length: 10,
-        required: true
+        required: true,
+        relatable: true,
+        autoIncrement: true
       },
       "name": {
         name: "post_name",
@@ -36,14 +38,14 @@ class Post extends AVAModel {
       },
       "createdAt": {
         name: "created_at",
-        type: "INT",
-        length: 10,
+        type: "BIGINT",
+        length: 1,
         required: true
       },
       "updatedAt": {
         name: "updated_at",
-        type: "INT",
-        length: 10
+        type: "BIGINT",
+        length: 1
       }
     }; // Format: "<model key>": { <properties> }
     this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.

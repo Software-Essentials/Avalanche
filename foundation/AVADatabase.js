@@ -77,28 +77,42 @@ class AVADatabase {
    */
   createTable(name, columns, options) {
     const force = options ? options.force ? true : false : false;
+    const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
     const that = this;
     const datatypes = {
-      "INT": { datatype: "int", length: true },
-      "TINYINT": { datatype: "tinyint", length: true },
-      "CHAR": { datatype: "char", length: true },
-      "VARCHAR": { datatype: "varchar", length: true },
-      "DATETIME": { datatype: "varchar", length: false },
-      "DATE": { datatype: "date", length: false },
-      "TIMESTAMP": { datatype: "timestamp", length: false },
-      "TEXT": { datatype: "text", length: false },
-      "TINYTEXT": { datatype: "tinytext", length: false },
-      "LONGTEXT": { datatype: "longtext", length: false }
+      "INT": { type: "int", length: true, unsignable: true, incrementable: true },
+      "TINYINT": { type: "tinyint", length: true, unsignable: true, incrementable: true },
+      "SMALLINT": { type: "smallint", length: true, unsignable: true, incrementable: true },
+      "MEDIUMINT": { type: "mediumint", length: true, unsignable: true, incrementable: true },
+      "BIGINT": { type: "bigint", length: true, unsignable: true, incrementable: true },
+      "FLOAT": { type: "float", unsignable: true, incrementable: true },
+      "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
+      "DOUBLE": { type: "double", unsignable: true, incrementable: true },
+      "BIT": { type: "bit", length: true },
+      "CHAR": { type: "char", length: true },
+      "VARCHAR": { type: "varchar", length: true },
+      "DATETIME": { type: "varchar" },
+      "DATE": { type: "date" },
+      "TIMESTAMP": { type: "timestamp" },
+      "TEXT": { type: "text" },
+      "TINYTEXT": { type: "tinytext" },
+      "MEDIUMTEXT": { type: "mediumtext" },
+      "LONGTEXT": { type: "longtext" }
     };
     var columnStrings = [];
     for (const column of columns) {
-      const type = datatypes[column.type];
-      const datatype = `${type.datatype}${type.length ? `(${column.length}) ` : " "}`;
+      const typeProperty = datatypes[column.type];
+      const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
       const name = column.name;
       const required = column.required;
-      columnStrings.push(`\`${name}\` ${datatype}${false ? "unsigned " : ""}${required ? "NOT NULL " : ""}${false ? "AUTO_INCREMENT " : ""}`.trim());
+      const unsigned = typeProperty.unsignable ? column.relatable : false;
+      const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
+      columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
+    }
+    if (primaryKey) {
+      columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
     }
     if (force) {
       const query = `DROP TABLE IF EXISTS \`${name}\`;`;
