@@ -132,11 +132,13 @@ class AVAModel {
     if (this.METHOD === "STORAGE") {
       const storage = new AVAStorage();
       const allRecords = storage.getRecordZone(this.NAME).getRecords()
-      var highest = 0;
-      for(const i in allRecords) {
-        highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
+      if (this.PROPERTIES[this.IDENTIFIER].autoIncrement) {
+        var highest = 0;
+        for(const i in allRecords) {
+          highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
+        }
+        this[this.IDENTIFIER] = highest + 1;
       }
-      this[this.IDENTIFIER] = highest + 1;
       const zone = storage.getRecordZone(this.NAME);
       var data = {};
       for(const key in this.PROPERTIES) {
@@ -251,13 +253,11 @@ class AVAModel {
   fetch(selfCallback) {
     const onFetch = selfCallback ? typeof selfCallback === "function" ? selfCallback : () => {} : () => {};
     this.PROMISE(({self}) => {
-      console.log("ENDPOINT2");
       if (this.PROMISE !== null) {
         onFetch({self, error: null});
         this.PROMISE = null;
       }
     }, ({error}) => {
-      console.log("FAILURE2");
       if (this.PROMISE !== null) {
         onFetch({self: null, error});
         this.PROMISE = null;

@@ -20,3 +20,4 @@ module.exports.AVAModel = require("./foundation/AVAModel.js");
 
 // Third-party
 module.exports.hbs = require("hbs");
+module.exports.jwt = require("jsonwebtoken");

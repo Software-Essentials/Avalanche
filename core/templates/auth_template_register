@@ -1,0 +1,33 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="text-center">Create an account</h1>
+            <p class="text-center">Registering for an account only takes a minute or two.</p>
+            <hr />
+        </div>
+        <form class="col-md-6 offset-md-3 p-3 my-1" method="post" action="/auth/register" id="createForm" name="createForm">
+            <div class="form-group">
+                <label for="field-userEmail">Email</label>
+                <input id="field-userEmail" class="form-control" type="email" name="userEmail" placeholder="johndoe@icloud.com" required />
+            </div>
+            <div class="form-group">
+                <label for="field-userPassword">Password</label>
+                <input id="field-userPassword" class="form-control" type="password" name="userPassword" placeholder="Password" required />
+            </div>
+            <div class="form-group">
+                <label for="field-userPassword2">Repeat password</label>
+                <input id="field-userPassword2" class="form-control" type="password" name="userPassword2" placeholder="Repeat password" required />
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="customControlInline" required />
+                    <label class="custom-control-label" for="customControlInline">I have read and accept the <a href="#">User Agreement</a> and <a href="#">Privacy Policy</a>.</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-block btn-primary" type="submit" value="Create account" />
+                <p class="text-center mt-2">Already have an account? <a href="/signin">Sign In</a>.</p>
+            </div>
+        </form>
+    </div>
+</div>

@@ -4,7 +4,7 @@ const Post = require("../models/Post.js");
 
 
 /**
- * This Controller was added as a part of 'example1' at initialisation of this Avalanche project.
+ * This Controller was added as a part of the 'WebApp' boilerplate at initialisation of this Avalanche project.
  * @description Manages requests regarding Posts.
  */
 class PostController extends AVAController {

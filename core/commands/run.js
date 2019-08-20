@@ -2,6 +2,7 @@ const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const { exec } = require("child_process");
 const { AVAEnvironment } = require("../../index");
+const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 /**
@@ -11,7 +12,16 @@ function run() {
   if(CoreUtil.getRoutes().length < 1) {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
-  const environmentName = typeof arguments[0] === "string" ? arguments[0] : null;
+  var environmentName = null;
+  if (typeof arguments[0] === "string") {
+    environmentName = arguments[0];
+  } else {
+    if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
+      environmentName = package.avalancheConfig.preferredEnvironment;
+    } else {
+      environmentName = null;
+    }
+  }
   const environment = new AVAEnvironment(environmentName);
   var process = start(environmentName);
   if(environment.restartOnFileChange) {

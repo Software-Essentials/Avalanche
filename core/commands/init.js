@@ -3,6 +3,7 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const { execSync } = require("child_process");
 const { AVAError } = require("../../index");
+const Installer = require("../Installer");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const folders = [
   "/app",
@@ -68,12 +69,16 @@ function installAVACoreIfNeeded() {
 function loadBoilerplates(example, callback) {
   if(example === null) {
     var choices = [];
-    const prefabs = fs.readdirSync(`${__dirname}/../boilerplates`);
+    const path = `${__dirname}/../installs`;
+    const prefabs = fs.readdirSync(path);
     for(const i in prefabs) {
       const prefab = prefabs[i];
       const splitted = prefab.split(".");
       delete splitted[splitted.length - 1];
-      choices.push(splitted.join(""));
+      const content = require(`${path}/${prefab}`);
+      if (content.type === "BOILERPLATE") {
+        choices.push(splitted.join(""));
+      }
     }
     const prompt = {
       type: "list",
@@ -95,7 +100,7 @@ function loadBoilerplates(example, callback) {
 
 /**
  */
-function installBoilerplate(example) {
+function installBoilerplate(packageName) {
   console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Building app structure\x1b[0m`);
   for (const folder of folders) {
     const path = `${projectPWD}${folder}`;
@@ -103,47 +108,23 @@ function installBoilerplate(example) {
       fs.mkdirSync(path);
     }
   }
-  var boilerplate = {};
-  const path = `${__dirname}/../boilerplates/${example}.json`;
-  if(typeof example === "string" && fs.existsSync(path)) {
-    boilerplate = require(path);
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Preparing \x1b[3m${example}\x1b[0m\x1b[32m prefabs\x1b[0m`);
-  } else {
-    if(fs.existsSync(`${__dirname}/../boilerplates/empty.json`)) {
-      boilerplate = require(`${__dirname}/../boilerplates/empty.json`);
-    } else {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (fatal error) No boilerplates found. You might need to reinstall Avalanche.\x1b[0m`);
-      process.exit(AVAError.INCOMPLETECORE);
+  const onSuccess = () => {
+    var file = package;
+    file.avalancheConfig = { preferredEnvironment: "development" };
+    fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
+    const asciiPath = `${__dirname}/../resources/asci`;
+    if(fs.existsSync(asciiPath)) {
+      const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
+      console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
     }
-  }
-  for (const folder of boilerplate.folders) {
-    const path = `${projectPWD}${folder}`;
-    if(!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
-  }
-  for (const file of boilerplate.files) {
-    const templatePath = `${__dirname}/../templates/${file.template}`;
-    const filePath = `${projectPWD}${file.path}`;
-    if (fs.existsSync(templatePath) && !fs.existsSync(filePath)) {
-      try {
-        fs.copyFileSync(templatePath, filePath, fs.COPYFILE_EXCL);
-      } catch (error) {
-        if (error.code === "ENOENT") {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
-        }
-      }
-    }
-  }
-  var file = package;
-  file.avalancheConfig = { preferredEnvironment: "development" };
-  fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
-  const asciiPath = `${__dirname}/../resources/asci`;
-  if(fs.existsSync(asciiPath)) {
-    const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
-    console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
-  }
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Project has been initialized successfully!\x1b[0m`);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Project has been initialized successfully!\x1b[0m`);
+  };
+  const onFailure = ({error, message}) => {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m ${message}\x1b[0m`);
+    process.exit(AVAError.INCOMPLETECORE);
+  };
+  const installer = new Installer();
+  installer.install({package: packageName, onSuccess, onFailure});
 }
 
 

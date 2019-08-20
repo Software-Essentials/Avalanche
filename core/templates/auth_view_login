@@ -1,0 +1,27 @@
+// Imports
+const { AVAViewController } = require("avacore");
+
+
+/**
+ *
+ */
+class AuthViewController extends AVAViewController {
+
+  constructor(request, response) {
+    super(request, response);
+  }
+
+
+  willLoad(request, response, self) {
+    self.template = "login";
+    if (request.session.token) {
+      response.redirect("/");
+      return;
+    }
+    super.willLoad(request, response, self);
+  }
+
+}
+
+
+module.exports = AuthViewController;

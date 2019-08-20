@@ -49,6 +49,27 @@ class AVARecordZone {
     return null
   }
 
+
+  /**
+   * @description Return existing records from the RecordZone.
+   * @param {String} key Key to find.
+   * @param {any} value value match.
+   * @returns {Object}
+   */
+  getRecordsWhere(key, value) {
+    var results = [];
+    for(const recordKey in this.data) {
+      if(this.data[recordKey].hasOwnProperty(key)) {
+        if(this.data[recordKey][key] === value) {
+          const result = this.data[recordKey];
+          results.push(result);
+        }
+      }
+    }
+    return results;
+  }
+
+
   /**
    * @description Updates an existing record in the RecordZone.
    * @param {Object} data Data to add.

@@ -1,0 +1,68 @@
+const url = require("url");
+const { AVAMiddleware, jwt } = require("avacore");
+
+
+/**
+ * 
+ */
+class Auth extends AVAMiddleware {
+
+  constructor() {
+    super();
+  }
+
+
+  /**
+   * Used to verify API calls
+   *
+   * @param {[Object]} request
+   * @param {[Object]} response
+   * @param {[Object]} next
+   */
+  init(request, response, next) {
+    if(typeof request.headers["authorization"] !== "undefined") {
+      const bearerHeader = request.headers["authorization"];
+      if(typeof bearerHeader !== "string") {
+        response.json({
+          success: false,
+          message: "No token",
+          error: ["noToken"]
+        });
+        return;
+      }
+      const bearer = bearerHeader.split(" ");
+      request.token = bearer[1];
+      jwt.verify(request.token, global.environment.secret, (error, authData) => {
+        if(error) {
+          response.json({
+            success: false,
+            message: "Access denied",
+            error: ["invalidToken"]
+          });
+          return;
+        } else {
+          request.auth = authData;
+          next();
+        }
+      });
+    } else {
+      const token = request.session.token;
+      jwt.verify(token, global.environment.secret, (error, authData) => {
+        if(error) {
+          response.redirect(url.format({
+            pathname: "/signin"
+          }));
+          return;
+        } else {
+          request.auth = authData;
+          next();
+          return;
+        }
+      });
+    }
+  }
+
+}
+
+
+module.exports = Auth;

@@ -1,2 +1,4 @@
-<h1>Hello, World!</h1>
-<p>Avalanche app working</p>
+<div class="container jumbotron">
+  <img class="mx-auto d-block" src="assets/img/darthvader.svg" alt="" />
+  <h1 class="text-center text-muted">Your Avalanche app is fully operational,<br />my lord.</h1>
+</div>
