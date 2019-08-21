@@ -74,11 +74,13 @@ function startWatchingSession(path, callback) {
       fsWait = setTimeout(() => {
         fsWait = false;
       }, 100);
-      const md5Current = md5(fs.readFileSync(path));
-      if (md5Current === md5Previous) {
-        return;
+      if (fs.existsSync(path)) {
+        const md5Current = md5(fs.readFileSync(path));
+        if (md5Current === md5Previous) {
+          return;
+        }
+        md5Previous = md5Current;
       }
-      md5Previous = md5Current;
       callback();
     }
   });
