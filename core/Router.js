@@ -103,7 +103,7 @@ class Router {
             }
         }
         ExRouter.use((request, response) => {
-            const layout = !!request.session.user ? "app.layout.hbs" : "layout.hbs"
+            const layout = "layout.hbs";
             response.status(404);
             response.render("status/404.hbs", {
                 layout: layout

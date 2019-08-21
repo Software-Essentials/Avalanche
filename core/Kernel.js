@@ -9,6 +9,7 @@ const { AVADatabase } = require("../index");
 const MySQLStore = require("connect-mysql")(session);
 const Router = require("./Router");
 const SocketKernel = require("./SocketKernel");
+const csrf = require("csurf");
 
 
 /**
@@ -107,7 +108,18 @@ class Kernel {
 		app.set('views', 'app/templates');
 
 		// CSRF middleware
-		// app.use(express.csrf());
+		if (environment.security.csrf) {
+			app.use(csrf({ cookie: true }));
+			app.use((error, request, response, next) => {
+				if (error.code === "EBADCSRFTOKEN") {
+					response.status(403);
+					response.json({
+						success: false,
+						message: "Invalid CSRF token!"
+					});
+				}
+			});
+		}
 
 		// Utilize router
 		app.use(new Router().routes());
