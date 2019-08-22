@@ -132,7 +132,7 @@ class AVAModel {
     if (this.METHOD === "STORAGE") {
       const storage = new AVAStorage();
       const allRecords = storage.getRecordZone(this.NAME).getRecords()
-      if (this.PROPERTIES[this.IDENTIFIER].autoIncrement) {
+      if (this.PROPERTIES[this.IDENTIFIER].autoIncrement && this.DRAFT === true) {
         var highest = 0;
         for(const i in allRecords) {
           highest = parseInt(allRecords[i][this.PROPERTIES[this.IDENTIFIER].name]);
@@ -148,7 +148,7 @@ class AVAModel {
         zone.addRecord(data);
         this.DRAFT = false;
       } else {
-        zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data)
+        zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data);
       }
       storage.save(zone);
       success({});

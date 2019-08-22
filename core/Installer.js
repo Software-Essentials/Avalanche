@@ -21,19 +21,6 @@ class Installer {
     } else {
       onFailure({message: "Package not found."});
       return;
-      // if(fs.existsSync(`${__dirname}/installs/empty.json`)) {
-      //   boilerplate = require(`${__dirname}/installs/empty.json`);
-      // } else {
-      //   onFailure({ error: new Error("No installs found"), message: "(fatal error) No installs found. You might need to reinstall Avalanche." })
-      //   return;
-      // }
-    }
-    onOutput("Building directory structure.");
-    for (const folder of boilerplate.folders) {
-      const path = `${projectPWD}${folder}`;
-      if(!fs.existsSync(path)) {
-        fs.mkdirSync(path);
-      }
     }
     onOutput("Copying files.");
     for (const file of boilerplate.files) {
@@ -41,6 +28,18 @@ class Installer {
       const filePath = `${projectPWD}${file.path}`;
       if (fs.existsSync(templatePath)) {
         try {
+          const folders = file.path.split("/");
+          folders.pop();
+          var branch = projectPWD;
+          for (const i in folders) {
+            const folder = folders[i];
+            if (folder !== "") {
+              branch = `${branch}/${folder}`;
+              if (!fs.existsSync(branch)) {
+                fs.mkdirSync(branch);
+              }
+            }
+          }
           if (fs.existsSync(filePath)) {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) "${file.path}" overwritten.\x1b[0m`);
           }

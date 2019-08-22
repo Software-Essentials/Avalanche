@@ -1,29 +1,10 @@
 const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const inquirer = require("inquirer");
-const { execSync } = require("child_process");
+const { exec } = require("child_process");
 const { AVAError } = require("../../index");
 const Installer = require("../Installer");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
-const folders = [
-  "/app",
-  "/app/controllers",
-  "/app/models",
-  "/app/environments",
-  "/app/localisations",
-  "/app/middleware",
-  "/app/migrations",
-  "/app/migrations/seeds",
-  "/app/public",
-  "/app/routes",
-  "/app/templates",
-  "/app/templates/emails",
-  "/app/templates/layouts",
-  "/app/templates/partials",
-  "/app/templates/status",
-  "/app/views",
-  "/app/helpers"
-];
 
 
 /**
@@ -33,12 +14,14 @@ function init() {
   if(CoreUtil.isAVAProject()) {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Project has already been initialized.\x1b[0m`);
     process.exit(AVAError.AVAALREADYINIT);
+  } else {
+    installAVACoreIfNeeded(() => {
+      const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
+      loadBoilerplates(prefab, (boilerplate) => {
+        installBoilerplate(boilerplate);
+      });
+    });
   }
-  installAVACoreIfNeeded();
-  const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
-  loadBoilerplates(prefab, (boilerplate) => {
-    installBoilerplate(boilerplate);
-  });
 }
 
 
@@ -46,18 +29,36 @@ function init() {
  * @description Installs the AVACore if it is not yet installed.
  */
 function installAVACoreIfNeeded() {
+  const ready = typeof arguments[0] === "function" ? arguments[0] : () => {};
   if(!CoreUtil.isAVACoreInstalled()) {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Installing AVACore\x1b[0m`);
-    try {
-      execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
+    process.stdout.clearLine();
+    var i = 0, total = 10;
+    const animation = setInterval(() => {
+      process.stdout.clearLine();
+      i = (i + 1) % total;
+      const r = total - i;
+      var dots = "{ " + new Array(i + 1).join("=") + ">" + (new Array(r).join(" ")) + " [=] }";
+      process.stdout.write(`${CoreUtil.terminalPrefix()}\x1b[32m Downloading AVACore ${dots}\x1b[0m`)
+      process.stdout.cursorTo(0);
+    }, 50);
+    const iProcess = exec("npm install avacore", (error, stout, sterr) => {});
+    iProcess.on("error", (error) => {
+      clearInterval(animation);
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
+    });
+    iProcess.on("exit", (code, signal) => {
+      clearInterval(animation);
+      process.stdout.clearLine();
+      process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m AVACore Installed!\x1b[0m`)
       const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/avacore/package.json`));
       if(!package.dependencies) {
         package.dependencies = {};
       }
       package.dependencies["avacore"] = `^${dependency.version}`;
-    } catch (error) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
-    }
+      ready();
+    });
+  } else {
+    ready();
   }
 }
 
@@ -101,13 +102,6 @@ function loadBoilerplates(example, callback) {
 /**
  */
 function installBoilerplate(packageName) {
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Building app structure\x1b[0m`);
-  for (const folder of folders) {
-    const path = `${projectPWD}${folder}`;
-    if(!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
-  }
   const onSuccess = () => {
     var file = package;
     file.avalancheConfig = { preferredEnvironment: "development" };

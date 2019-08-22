@@ -26,6 +26,7 @@ class AVARecordZone {
     this.data = data;
   }
 
+
   /**
    * @description Returns all records in the RecordZone.
    * @returns {Object}
@@ -33,6 +34,7 @@ class AVARecordZone {
   getRecords() {
     return this.data;
   }
+  
 
   /**
    * @description Returns the record at a certain index.

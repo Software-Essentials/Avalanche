@@ -28,15 +28,17 @@ class Router {
         });
         const normalizedPathB = `${projectPWD}/app/middleware`;
         var middleware = [];
-        fs.readdirSync(normalizedPathB).forEach(function (file) {
-            const extensions = file.split(".");
-            if (extensions.length = 2) {
-                if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-                    const middleFile = require(`${projectPWD}/app/middleware/${file}`);
-                    middleware[extensions[0]] = middleFile;
+        if (fs.existsSync(normalizedPathB)) {
+            fs.readdirSync(normalizedPathB).forEach(function (file) {
+                const extensions = file.split(".");
+                if (extensions.length = 2) {
+                    if (extensions[extensions.length - 1].toUpperCase() === "JS") {
+                        const middleFile = require(`${projectPWD}/app/middleware/${file}`);
+                        middleware[extensions[0]] = middleFile;
+                    }
                 }
-            }
-        });
+            });
+        }
         for(var i = 0; i < routes.length; i++) {
             const route = routes[i];
             const method = route.method;
