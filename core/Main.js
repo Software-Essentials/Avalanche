@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-global.projectPWD = process.env.PWD;
+global.projectPWD = process.cwd();
 global.CoreUtil = require("./CoreUtil");
 
 const { AVAEnvironment } = require("../index");

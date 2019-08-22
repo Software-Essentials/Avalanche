@@ -1,4 +1,3 @@
-const projectPWD = process.env.PWD;
 const fs = require("fs");
 const inquirer = require("inquirer");
 const { AVAError } = require("../../index.js");
