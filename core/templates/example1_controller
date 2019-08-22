@@ -27,7 +27,7 @@ class PostController extends AVAController {
         data.push(results[i].get());
       }
       response.json({
-        success: isEmpty,
+        success: !isEmpty,
         message: isEmpty ? "No posts to display." : "Showing posts.",
         data: isEmpty ? undefined : data
       });
@@ -48,11 +48,11 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   show(request, response) {
-    const index = parseInt(request.params.ID);
+    const ID = parseInt(request.params.ID);
     const onSuccess = ({results}) => {
       const isEmpty = results.length <= 0;
       response.json({
-        success: isEmpty,
+        success: !isEmpty,
         message: isEmpty ? "Post doesn't exist." : "Showing post.",
         data: isEmpty ? undefined : results[0].get()
       });
@@ -63,7 +63,7 @@ class PostController extends AVAController {
         message: "Post doesn't exist."
       });
     }
-    Post.where("post_id", index, {onSuccess, onFailure});
+    Post.where("post_id", ID, {onSuccess, onFailure});
   }
 
 
@@ -106,7 +106,7 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   update(request, response) {
-    const index = request.body.ID;
+    const ID = request.body.ID;
     const onSuccess = () => {
       response.json({
         success: true,
@@ -119,7 +119,7 @@ class PostController extends AVAController {
         message: "Unable to update post."
       });
     }
-    new Post().where("post_id", parseInt(index)).fetch(({error, self}) => {
+    new Post().where("post_id", parseInt(ID)).fetch(({error, self}) => {
       if (error) {
         onFailure({error});
         return;
@@ -138,7 +138,7 @@ class PostController extends AVAController {
    * @param {Object} response
    */
   destroy(request, response) {
-    const index = request.body.ID;
+    const ID = request.body.ID;
     const onSuccess = () => {
       response.json({
         success: true,
@@ -151,7 +151,7 @@ class PostController extends AVAController {
         message: "Unable to delete post."
       });
     }
-    new Post().where("post_id", parseInt(index)).fetch(({error, self}) => {
+    new Post().where("post_id", parseInt(ID)).fetch(({error, self}) => {
       if (error) {
         onFailure({error});
         return;

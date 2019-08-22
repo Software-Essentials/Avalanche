@@ -6,11 +6,8 @@
     "webapp",
     "example1"
   ],
-  "folders": [
-    "/app/public/assets",
-    "/app/public/assets/js",
-    "/app/public/assets/css",
-    "/app/public/assets/img"
+  "modules": [
+    "hbs@4.0.4"
   ],
   "files": [
     {
@@ -30,7 +27,7 @@
       "path": "/app/controllers/PostController.js"
     },
     {
-      "template": "example1_view",
+      "template": "example1_view_landing",
       "path": "/app/views/MainViewController.js"
     },
     {
@@ -46,8 +43,8 @@
       "path": "/app/routes/web.json"
     },
     {
-      "template": "example1_template",
-      "path": "/app/templates/default.hbs"
+      "template": "example1_template_landing",
+      "path": "/app/templates/landing.hbs"
     },
     {
       "template": "example1_template_posts",
@@ -84,6 +81,10 @@
     {
       "template": "example1_asset_img_darthvader",
       "path": "/app/public/assets/img/darthvader.svg"
+    },
+    {
+      "template": "example1_assets_js_htmlessentials",
+      "path": "/app/public/assets/js/htmlessentials.js"
     },
     {
       "template": "asset_bootstrapcss",

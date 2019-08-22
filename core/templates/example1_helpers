@@ -1,6 +1,7 @@
 // Dependencies
 const fs = require("fs");
-const { AVALocalisation, hbs } = require("avacore");
+const hbs = require("hbs");
+const { AVALocalisation } = require("avacore");
 
 // Setup
 const localisation = new AVALocalisation("en_GB");

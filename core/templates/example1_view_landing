@@ -13,7 +13,7 @@ class MainViewController extends AVAViewController {
 
 
   willLoad(request, response, self) {
-    self.template = "default";
+    self.template = "landing";
     super.willLoad(request, response, self);
   }
 

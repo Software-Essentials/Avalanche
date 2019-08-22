@@ -1,0 +1,59 @@
+$(function() {
+  var forms = $("form");
+  for (let i = 0; i < forms.length; i++) {
+    var form = forms[i];
+    var methodAttr = $(form).attr("method");
+    if (typeof methodAttr === "string") {
+      $(form).attr("method", methodAttr.toUpperCase()); 
+      if (
+        methodAttr !== "POST" &&
+        methodAttr !== "GET" &&
+        methodAttr !== "PUT" &&
+        methodAttr !== "DELETE"
+      ) {
+        $(form).attr("method", "POST");
+      }
+    }
+  }
+  $("form").submit(function (event) {
+    event.preventDefault();
+    var method = $(this).attr("method").toUpperCase();
+    var action = $(this).attr("action");
+    switch (method) {
+      case "POST":
+        submitForm("POST", action, this);
+        break;
+      case "GET":
+        submitForm("GET", action, this);
+        break;
+      case "PUT":
+        submitForm("PUT", action, this);
+        break;
+      case "DELETE":
+        submitForm("DELETE", action, this);
+        break;
+    }
+  });
+})
+
+function submitForm(method, action, element) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open(method, action, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.onreadystatechange = function(arg) {
+    if(xhttp.status == 200) {
+      if (method === "POST" || method === "GET") {
+        window.location.href = arg.target.responseURL;
+      } else {
+        window.location.reload();
+      }
+    }
+  }
+  var string = "_csrf=" + csrf;
+  var inputs = $(element).find("input");
+  for (let i = 0; i < inputs.length; i++) {
+    var input = inputs[i];
+    string = string + "&" + $(input).attr("name") + "=" + $(input).val();
+  }
+  xhttp.send(string);
+}

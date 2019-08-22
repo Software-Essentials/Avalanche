@@ -14,18 +14,29 @@ class PostViewController extends AVAViewController {
 
 
   willLoad(request, response, self) {
-    self.template = "posts";
-    const options = {
-      onSuccess: ({results}) => {
+    const path = request.url.substring(0, 7);
+    const onFailure = ({error}) => {
+      self.variables.posts = [];
+      super.willLoad(request, response, self);
+    };
+    if (path === "/posts/") {
+      self.template = "posts.view";
+      const ID = parseInt(request.params.ID);
+      const onSuccess = ({results}) => {
+        if (results.length === 1) {
+          self.variables.post = results[0];
+        }
+        super.willLoad(request, response, self);
+      };
+      Post.where("post_id", ID, {onSuccess, onFailure});
+    } else {
+      self.template = "posts";
+      const onSuccess = ({results}) => {
         self.variables.posts = results;
         super.willLoad(request, response, self);
-      },
-      onFailure: ({error}) => {
-        self.variables.posts = [];
-        super.willLoad(request, response, self);
-      }
-    };
-    Post.all(options);
+      };
+      Post.all({onSuccess, onFailure});
+    }
   }
 
 }

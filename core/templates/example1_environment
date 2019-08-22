@@ -17,7 +17,7 @@
     "sessionStore": null
   },
   "security": {
-    "csrf": true
+    "csrf": false
   },
   "capabilities": {
     "SSL": false,
