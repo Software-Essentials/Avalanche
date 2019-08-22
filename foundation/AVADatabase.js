@@ -1,4 +1,3 @@
-const fs = require("fs");
 const mysql = require("mysql");
 const CoreUtil = require("../core/CoreUtil");
 
@@ -25,26 +24,26 @@ class AVADatabase {
 
 
   wipeAllTables(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
     const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
     this.query(query, [], (error, results, fields) => {
       if (error) {
-        failure({error});
+        failure({ error });
         return;
       }
-      if(results.length <= 0) {
+      if (results.length <= 0) {
         update();
       }
-      for(const i in results) {
+      for (const i in results) {
         const table = results[i].table_name;
         wipes[table] = null;
         const query = `DROP TABLE IF EXISTS \`${results[i].table_name}\`;`;
         this.query(query, [], (error, results, fields) => {
           if (error) {
             wipes[table] = false;
-            failure({error});
+            failure({ error });
           } else {
             wipes[table] = true;
             update();
@@ -55,7 +54,7 @@ class AVADatabase {
     function update() {
       var completed = 0;
       var successful = 0;
-      for(const key in wipes) {
+      for (const key in wipes) {
         if (wipes[key] !== null) completed++;
         if (wipes[key]) successful++;
       }
@@ -78,8 +77,8 @@ class AVADatabase {
   createTable(name, columns, options) {
     const force = options ? options.force ? true : false : false;
     const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     const that = this;
     const datatypes = {
       "INT": { type: "int", length: true, unsignable: true, incrementable: true },
@@ -118,7 +117,7 @@ class AVADatabase {
       const query = `DROP TABLE IF EXISTS \`${name}\`;`;
       this.query(query, [], (error, results, fields) => {
         if (error) {
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
         create();
@@ -130,20 +129,20 @@ class AVADatabase {
       const query = `CREATE TABLE \`${name}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
       that.query(query, [], (error, results, fields) => {
         if (error) {
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
-        success({table: name});
+        success({ table: name });
       });
     }
   }
 
 
   insertInto(name, data, options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (!Array.isArray(data) || data.length <= 0) {
-      failure({table: name, error: new Error("No data given.")});
+      failure({ table: name, error: new Error("No data given.") });
       return;
     }
     var columns = Object.keys(data[0]);
@@ -180,10 +179,10 @@ class AVADatabase {
       const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
       that.query(query, [], (error, results, fields) => {
         if (error) {
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
-        success({table: name});
+        success({ table: name });
       });
     }
   }
@@ -192,8 +191,8 @@ class AVADatabase {
   selectFromTable(name, options) {
     const conditions = options ? typeof options.conditions === "object" ? options.conditions : {} : {};
     var columns = options ? typeof options.columns === "object" ? options.columns : [] : [];
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (!Array.isArray(columns)) {
       columns = [];
     }
@@ -205,10 +204,10 @@ class AVADatabase {
       that.query(query, [], (error, results, fields) => {
         if (error) {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
-        success({table: name, results: results, fields: fields});
+        success({ table: name, results: results, fields: fields });
       });
     }
   }

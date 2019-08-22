@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { execSync } = require("child_process");
-const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const { getProjectPackage } = require("./CoreUtil");
 
 
 class Installer {
@@ -55,6 +55,7 @@ class Installer {
       const moduleNaming = boilerplate.modules[i].split("@");
       const moduleVersion = moduleNaming[moduleNaming.length - 1];
       const moduleName = moduleNaming[moduleNaming.length - 2];
+      const projectPackage = getProjectPackage();
       if (!projectPackage.dependencies.hasOwnProperty(moduleName) || projectPackage.dependencies[moduleName] !== `^${moduleVersion}`) {
         try {
           onOutput(`Installing module '${moduleNaming.join("@")}'.`);
@@ -63,7 +64,7 @@ class Installer {
           if(!projectPackage.dependencies) {
             projectPackage.dependencies = {};
           }
-          projectPackage.dependencies["avacore"] = `^${dependency.version}`;
+          projectPackage.dependencies[moduleName] = `^${dependency.version}`;
         } catch (error) {
           onFailure({error, message: `Failed to install '${moduleName}'.`})
         }

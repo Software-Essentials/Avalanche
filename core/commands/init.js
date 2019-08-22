@@ -1,10 +1,10 @@
 const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const inquirer = require("inquirer");
-const { exec } = require("child_process");
+const { exec, execSync } = require("child_process");
 const { AVAError } = require("../../index");
 const Installer = require("../Installer");
-const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 /**
@@ -15,6 +15,8 @@ function init() {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Project has already been initialized.\x1b[0m`);
     process.exit(AVAError.AVAALREADYINIT);
   } else {
+    initNPMIfNeeded();
+    npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
     installAVACoreIfNeeded(() => {
       const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
       loadBoilerplates(prefab, (boilerplate) => {
@@ -24,6 +26,17 @@ function init() {
   }
 }
 
+function initNPMIfNeeded() {
+  if (!fs.existsSync(`${projectPWD}/package.json`)) {
+    process.stdout.write(`${CoreUtil.terminalPrefix()}\x1b[32m NPM setup...\x1b[0m`);
+    process.stdout.clearLine();
+    try {
+      execSync("npm init -y", { windowsHide: true, stdio: "ignore" });
+    } catch(error) {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (fatal error) Failed to setup NPM project. Is NPM not installed on your machine? Do you need to update NPM? is NPM broken? What's going on?!? :O\x1b[0m`);
+    }
+  }
+}
 
 /**
  * @description Installs the AVACore if it is not yet installed.
@@ -49,12 +62,12 @@ function installAVACoreIfNeeded() {
     iProcess.on("exit", (code, signal) => {
       clearInterval(animation);
       process.stdout.clearLine();
-      process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m AVACore Installed!\x1b[0m`)
+      process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m AVACore Installed!\n\x1b[0m`)
       const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/avacore/package.json`));
-      if(!package.dependencies) {
-        package.dependencies = {};
+      if (!npmPackage.dependencies) {
+        npmPackage.dependencies = {};
       }
-      package.dependencies["avacore"] = `^${dependency.version}`;
+      npmPackage.dependencies["avacore"] = `^${dependency.version}`;
       ready();
     });
   } else {
@@ -103,7 +116,7 @@ function loadBoilerplates(example, callback) {
  */
 function installBoilerplate(packageName) {
   const onSuccess = () => {
-    var file = package;
+    var file = npmPackage;
     file.avalancheConfig = { preferredEnvironment: "development" };
     fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
     const asciiPath = `${__dirname}/../resources/asci`;
@@ -126,4 +139,4 @@ module.exports.execute = init;
 module.exports.enabled = true;
 module.exports.scope = "GLOBAL";
 module.exports.command = "init";
-module.exports.description = "Initializes your Project.";
+module.exports.description = "Initializes your Avalanche Project.";

@@ -1,5 +1,6 @@
 const url = require("url");
-const { AVAMiddleware, jwt } = require("avacore");
+const { AVAMiddleware } = require("avacore");
+const jwt = require("jsonwebtoken");
 
 
 /**

@@ -1,6 +1,5 @@
 const fs = require("fs");
 const md5 = require("md5");
-const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 
 
 /**
@@ -8,6 +7,7 @@ const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${
  * @returns {Boolean}
  */
 function isAVACoreInstalled() {
+  const projectPackage = getProjectPackage();
   return (!!projectPackage && !!projectPackage.dependencies && !!projectPackage.dependencies.avacore);
 }
 
@@ -16,6 +16,7 @@ function isAVACoreInstalled() {
  * @returns {Boolean}
  */
 function isAVAProject() {
+  const projectPackage = getProjectPackage();
   return (!!projectPackage && typeof projectPackage.avalancheConfig === "object");
 }
 
@@ -24,7 +25,7 @@ function isAVAProject() {
  * @returns {Boolean}
  */
 function isNodeProject() {
-  return (typeof projectPackage === "object");
+  return fs.existsSync(`${projectPWD}/package.json`);
 }
 
 
@@ -33,6 +34,15 @@ function isNodeProject() {
  */
 function terminalPrefix() {
   return "\x1b[36m\x1b[1m[AVALANCHE]\x1b[0m";
+}
+
+
+/**
+ * @description Returns the package.json if it exsists.
+ * @returns {Object|null}
+ */
+function getProjectPackage() {
+  return fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 }
 
 
@@ -288,6 +298,7 @@ module.exports = {
     isAVAProject: isAVAProject,
     isNodeProject: isNodeProject,
     terminalPrefix: terminalPrefix,
+    getProjectPackage: getProjectPackage,
     directoryLooper: directoryLooper,
     startWatchingSession: startWatchingSession,
     getRoutes: getRoutes,
