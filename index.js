@@ -17,7 +17,3 @@ module.exports.AVAViewController = require("./foundation/AVAViewController.js");
 module.exports.AVAController = require("./foundation/AVAController.js");
 module.exports.AVAMiddleware = require("./foundation/AVAMiddleware.js");
 module.exports.AVAModel = require("./foundation/AVAModel.js");
-
-// Third-party
-module.exports.hbs = require("hbs");
-module.exports.jwt = require("jsonwebtoken");
