@@ -17,15 +17,17 @@ class Router {
     routes() {
         const normalizedPath = `${projectPWD}/app/routes`;
         var routes = [];
-        fs.readdirSync(normalizedPath).forEach(function (file) {
-            const extensions = file.split(".");
-            if (extensions.length === 2) {
-                if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-                    const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
-                    routes.push.apply(routes, route);
+        if (fs.existsSync(normalizedPath)) {
+            fs.readdirSync(normalizedPath).forEach((file) => {
+                const extensions = file.split(".");
+                if (extensions.length === 2) {
+                    if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+                        const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
+                        routes.push.apply(routes, route);
+                    }
                 }
-            }
-        });
+            });
+        }
         const normalizedPathB = `${projectPWD}/app/middleware`;
         var middleware = [];
         if (fs.existsSync(normalizedPathB)) {
@@ -64,7 +66,7 @@ class Router {
                 } else {
                     controller = require(`${projectPWD}/app/controllers/${controllerFile}.js`);
                 }
-                routeHandler = new controller()[controllerHandler];
+                routeHandler = new controller();
                 if(typeof routeMiddleware === "object") {
                     const filteredMiddlewareKeys = Object.keys(middleware).filter(function(i) {
                         return routeMiddleware.includes(i);
@@ -72,12 +74,13 @@ class Router {
                     var filteredMiddleware = [];
                     for (let i = 0; i < filteredMiddlewareKeys.length; i++) {
                         const key = filteredMiddlewareKeys[i];
-                        const ob = middleware[key];
-                        filteredMiddleware[i] = new ob().init;
+                        const mw = middleware[key];
+                        const mwo = new mw();
+                        filteredMiddleware[i] = (request, response, next) => { mwo.init(request, response, next); };
                     }
-                    ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler);
+                    ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
                 } else {
-                    ExRouter[method.toLowerCase()](routePath, routeHandler);
+                    ExRouter[method.toLowerCase()](routePath, routeHandler[controllerHandler]);
                 }
             } else {
                 // ViewController handler
@@ -86,7 +89,7 @@ class Router {
                 } else {
                     controller = require(`${projectPWD}/app/views/${controllerFile}.js`);
                 }
-                new controller((routeHandler, that) => {
+                const cntrlr = new controller((routeHandler, that) => {
                     if(typeof routeMiddleware === "object") {
                         const filteredMiddlewareKeys = Object.keys(middleware).filter(function(i) {
                             return routeMiddleware.includes(i);
@@ -94,8 +97,9 @@ class Router {
                         var filteredMiddleware = [];
                         for (let i = 0; i < filteredMiddlewareKeys.length; i++) {
                             const key = filteredMiddlewareKeys[i];
-                            const ob = middleware[key];
-                            filteredMiddleware[i] = new ob().init;
+                            const mw = middleware[key];
+                            const mwo = new mw();
+                            filteredMiddleware[i] = (request, response, next) => { mwo.init(request, response, next, cntrlr); };;
                         }
                         ExRouter[method.toLowerCase()](routePath, filteredMiddleware, (request, response) => { routeHandler(request, response, that); });
                     } else {
