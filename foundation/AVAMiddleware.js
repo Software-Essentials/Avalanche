@@ -7,7 +7,7 @@
 class AVAMiddleware {
 
     constructor() {
-
+        this.controller = null;
     }
 
 }
