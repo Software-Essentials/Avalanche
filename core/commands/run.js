@@ -5,7 +5,6 @@ const { exec } = require("child_process");
 const { AVAEnvironment } = require("../../index");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
-
 /**
  * @description Runs your Avalanche application.
  */
@@ -24,7 +23,7 @@ function run() {
     }
   }
   const environment = new AVAEnvironment(environmentName);
-  var process = start(environmentName);
+  var cProcess = start(environmentName);
   if(environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
     const folders = CoreUtil.directoryLooper(directory, []).children;
@@ -37,8 +36,8 @@ function run() {
           const path = `${folder}/${file}`;
           if(fs.lstatSync(path).isFile()) {
             CoreUtil.startWatchingSession(path, () => {
-              process.kill("SIGINT");
-              process = start(environmentName);
+              cProcess.kill("SIGQUIT")
+              cProcess = start(environmentName);
             });
           }
         }
@@ -56,23 +55,23 @@ function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
   const mainPath = path.normalize(`${__dirname}/../Main`);
   const command = environmentFormatted ? `node "${mainPath}" run ${environmentFormatted}` : `node "${mainPath}" run`;
-  const process = exec(command, (error, stdout, stderr) => {
+  const cProcess = exec(command, (error, stdout, stderr) => {
     if(error) {
       if(error.signal === "SIGINT") {
         return;
       }
     }
   });
-  process.stdout.on("data", (data) => {
+  cProcess.stdout.on("data", (data) => {
     console.log(data.toString().trim());
   });
-  process.stderr.on("data", (data) => {
+  cProcess.stderr.on("data", (data) => {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (FAILURE) \n\n\n\x1b[33m${data.toString().trim()}\n\n\x1b[0m`);
   });
-  process.on("exit", (code) => {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped.\x1b[0m`);
+  cProcess.on("close", (code, signal) => {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped. \x1b[1m(${signal})\x1b[0m`);
   });
-  return process;
+  return cProcess;
 }
 
 
