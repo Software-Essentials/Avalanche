@@ -9,11 +9,8 @@ class AVAViewController extends AVAController {
   constructor(callback) {
     super();
     
-    this.permission = null;
     this.layout = null;
     this.template = "viewControllerView";
-    this.tabs = [];
-    this.modals = [];
     this.variables = {};
     
     callback(this.willLoad, this);
