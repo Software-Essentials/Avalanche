@@ -19,7 +19,7 @@ class Router {
         var routes = [];
         fs.readdirSync(normalizedPath).forEach(function (file) {
             const extensions = file.split(".");
-            if (extensions.length = 2) {
+            if (extensions.length === 2) {
                 if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
                     const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
                     routes.push.apply(routes, route);
@@ -31,7 +31,7 @@ class Router {
         if (fs.existsSync(normalizedPathB)) {
             fs.readdirSync(normalizedPathB).forEach(function (file) {
                 const extensions = file.split(".");
-                if (extensions.length = 2) {
+                if (extensions.length === 2) {
                     if (extensions[extensions.length - 1].toUpperCase() === "JS") {
                         const middleFile = require(`${projectPWD}/app/middleware/${file}`);
                         middleware[extensions[0]] = middleFile;

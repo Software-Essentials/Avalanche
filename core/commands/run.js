@@ -1,5 +1,6 @@
 const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
+const path = require("path");
 const { exec } = require("child_process");
 const { AVAEnvironment } = require("../../index");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -53,20 +54,20 @@ function run() {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const command = environmentFormatted ? `node ${__dirname}/../Main run ${environmentFormatted}` : `node ${__dirname}/../Main run`;
+  const mainPath = path.normalize(`${__dirname}/../Main`);
+  const command = environmentFormatted ? `node "${mainPath}" run ${environmentFormatted}` : `node "${mainPath}" run`;
   const process = exec(command, (error, stdout, stderr) => {
     if(error) {
       if(error.signal === "SIGINT") {
         return;
       }
-      console.log("ERROR:", error);
     }
   });
   process.stdout.on("data", (data) => {
     console.log(data.toString().trim());
   });
   process.stderr.on("data", (data) => {
-    console.log(data.toString().trim());
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (FAILURE) \n\n\n\x1b[33m${data.toString().trim()}\n\n\x1b[0m`);
   });
   process.on("exit", (code) => {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped.\x1b[0m`);

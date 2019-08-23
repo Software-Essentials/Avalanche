@@ -108,7 +108,7 @@ function getRoutes() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
         routes.push.apply(routes, route);
@@ -130,7 +130,7 @@ function getControllers() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         controllers.push(extensions[0]);
       }
@@ -151,7 +151,7 @@ function getMiddleware() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         middleware.push(extensions[0]);
       }
@@ -172,7 +172,7 @@ function getLocalisations() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         localisations.push(extensions[0]);
       }
@@ -193,7 +193,7 @@ function getTranslations() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         const translationSet = JSON.parse(JSON.stringify(require(`${projectPWD}/app/localisations/${file}`)));
         for (const translation of Object.keys(translationSet)) {
@@ -217,7 +217,7 @@ function getModels() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         models.push(extensions[0]);
       }
@@ -261,7 +261,7 @@ function getMigrations() {
   fs.readdirSync(normalizedPath).forEach(function (file) {
     if (fs.lstatSync(normalizedPath).isFile()) {
       const extensions = file.split(".");
-      if (extensions.length = 2) {
+      if (extensions.length === 2) {
         if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
           models.push(extensions[0]);
         }
@@ -283,7 +283,7 @@ function getSeedFilesNames() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         controllers.push(extensions[0]);
       }
