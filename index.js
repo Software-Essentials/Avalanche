@@ -4,6 +4,7 @@ module.exports.AVANotification = require("./foundation/AVANotification.js");
 module.exports.AVAEnvironment = require("./foundation/AVAEnvironment.js");
 module.exports.AVARecordZoneType = require("./foundation/AVARecordZoneType.js");
 module.exports.AVARecordZone = require("./foundation/AVARecordZone.js");
+module.exports.AVAValidator = require("./foundation/AVAValidator.js");
 module.exports.AVADatabase = require("./foundation/AVADatabase.js");
 module.exports.AVAStorage = require("./foundation/AVAStorage.js");
 module.exports.AVAMailer = require("./foundation/AVAMailer.js");
