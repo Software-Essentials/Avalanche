@@ -27,11 +27,7 @@ function update() {
     clearInterval(animation);
     process.stdout.clearLine();
     const currentVersion = require(`${__dirname}/../../package.json`).version;
-    if(version === currentVersion) {
-        process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[34m Already up-to-date (${currentVersion}).\n\x1b[0m`);
-    } else {
-        process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m The Avalanche CLI has been updated to the latest stable version (${currentVersion}).\n\x1b[0m`);
-    }
+    process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m The Avalanche CLI has been updated to the latest stable version (${currentVersion}).\n\x1b[0m`);
     ready();
   });
 }
