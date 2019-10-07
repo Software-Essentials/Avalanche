@@ -133,7 +133,6 @@ function make_model() {
     {
       type: "input",
       name: "table",
-      choices: ["AVAStorage", "AVADatabase"],
       message: "Name your zone/table:",
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
@@ -158,7 +157,9 @@ function make_model() {
     const template = "TEMPLATE_model";
     const variables = {
       name: answers.name,
-      name_lower: answers.name.toLowerCase()
+      name_lower: answers.name.toLowerCase(),
+      method: answers.method,
+      method_key: answers.method === "AVAStorage" ? "STORAGE" : "DATABASE"
     };
     makeTemplate(variables, template, path);
   });
