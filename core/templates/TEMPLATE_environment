@@ -1,0 +1,49 @@
+{
+  "info": {
+    "title": "<#name?>"
+  },
+  "network": {
+    "domain": "localhost",
+    "host": "0.0.0.0",
+    "port": 80
+  },
+  "debug": {
+    "logHTTPRequestsToConsole": true,
+    "restartOnFileChange": true
+  },
+  "auth": {
+    "secret": "sEcreT5",
+    "saltRounds": 10,
+    "sessionStore": "MYSQL"
+  },
+  "security": {
+    "csrf": false
+  },
+  "capabilities": {
+    "SSL": false,
+    "webSockets": false,
+    "middleware": true,
+    "email": true
+  },
+  "database": {
+    "connectionLimit": 10,
+    "multipleStatements": true,
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": ""
+  },
+  "email": {
+    "noreply": {
+      "name": "noreply@example.com",
+      "host": "mail.example.com",
+      "port": 587,
+      "secure": true,
+      "auth": {
+        "user": "noreply@example.com",
+        "pass": ""
+      }
+    }
+  },
+  "allowRegister": true
+}

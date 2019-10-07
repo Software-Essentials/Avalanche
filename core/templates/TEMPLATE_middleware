@@ -1,0 +1,26 @@
+const { AVAMiddleware } = require("avacore");
+
+
+/**
+ * 
+ */
+class <#name?> extends AVAMiddleware {
+
+  constructor() {
+    super();
+  }
+
+  /**
+   * @param {[Object]} request
+   * @param {[Object]} response
+   * @param {[Object]} next
+   */
+  init(request, response, next) {
+    next();
+    return;
+  }
+
+}
+
+
+module.exports = <#name?>;
