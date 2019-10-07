@@ -105,10 +105,14 @@ class AVADatabase {
       const typeProperty = datatypes[column.type];
       const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
       const name = column.name;
-      const required = column.required;
+      const required = !!column.required;
+      const unique = !!column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
       const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
       columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
+      if (unique) {
+        columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
+      }
     }
     if (primaryKey) {
       columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
