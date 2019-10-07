@@ -128,7 +128,7 @@ class AVAModel {
           failure({ error: error });
         } else {
           this.DRAFT = false;
-          success({});
+          success({result: this});
         }
       });
     }
@@ -154,7 +154,7 @@ class AVAModel {
         zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data);
       }
       storage.save(zone);
-      success({});
+      success({result: this});
     }
   }
 
