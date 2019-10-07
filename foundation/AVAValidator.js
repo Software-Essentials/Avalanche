@@ -20,10 +20,10 @@ class AVAValidator {
       this.value = request.query[key];
       return this;
     }
-    request.param.validate = (key) => {
+    request.params.validate = (key) => {
       this.key = key
       this.scope = "param";
-      this.value = request.param[key];
+      this.value = request.params[key];
       return this;
     }
     request.validate = ({onFailure}) => {
