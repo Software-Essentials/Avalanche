@@ -3,6 +3,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
+const { AVAValidator } = require("../index");
 
 // Setup
 const ExRouter = express.Router();
@@ -78,7 +79,10 @@ class Router {
                             const key = filteredMiddlewareKeys[i];
                             const mw = middleware[key];
                             const mwo = new mw();
-                            filteredMiddleware[i] = (request, response, next) => { mwo.init(request, response, next); };
+                            filteredMiddleware[i] = (request, response, next) => {
+                                new AVAValidator(request);
+                                mwo.init(request, response, next);
+                            };
                         }
                         ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
                     } else {
