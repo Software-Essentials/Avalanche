@@ -1,0 +1,28 @@
+<nav class="navbar navbar-dark navbar-expand-lg fixed-top bg-dark">
+  <a class="navbar-brand" href="/">
+    <img src="/assets/img/logo.svg" width="30" height="30" class="d-inline-block align-top" alt="" />
+    Example1
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/posts">Posts</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav my-2 my-lg-0">
+      <li class="nav-item">
+        {{#if isSignedIn}}
+          <form action="/auth/logout" method="post">
+            <button class="btn btn-info my-2 my-sm-0" type="submit">Sign Out</button>
+          </form>
+        {{else}}
+          <a class="btn btn-outline-info my-2 my-sm-0" href="/signin">Sign In</a>
+        {{/if}}
+      </li>
+    </ul>
+  </div>
+</nav>

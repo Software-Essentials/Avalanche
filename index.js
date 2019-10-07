@@ -4,6 +4,7 @@ module.exports.AVANotification = require("./foundation/AVANotification.js");
 module.exports.AVAEnvironment = require("./foundation/AVAEnvironment.js");
 module.exports.AVARecordZoneType = require("./foundation/AVARecordZoneType.js");
 module.exports.AVARecordZone = require("./foundation/AVARecordZone.js");
+module.exports.AVAValidator = require("./foundation/AVAValidator.js");
 module.exports.AVADatabase = require("./foundation/AVADatabase.js");
 module.exports.AVAStorage = require("./foundation/AVAStorage.js");
 module.exports.AVAMailer = require("./foundation/AVAMailer.js");
@@ -17,6 +18,3 @@ module.exports.AVAViewController = require("./foundation/AVAViewController.js");
 module.exports.AVAController = require("./foundation/AVAController.js");
 module.exports.AVAMiddleware = require("./foundation/AVAMiddleware.js");
 module.exports.AVAModel = require("./foundation/AVAModel.js");
-
-// Third-party
-module.exports.hbs = require("hbs");

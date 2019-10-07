@@ -1,28 +1,10 @@
 const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const inquirer = require("inquirer");
-const { execSync } = require("child_process");
+const { exec, execSync } = require("child_process");
 const { AVAError } = require("../../index");
-const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
-const folders = [
-  "/app",
-  "/app/controllers",
-  "/app/models",
-  "/app/environments",
-  "/app/localisations",
-  "/app/middleware",
-  "/app/migrations",
-  "/app/migrations/seeds",
-  "/app/public",
-  "/app/routes",
-  "/app/templates",
-  "/app/templates/emails",
-  "/app/templates/layouts",
-  "/app/templates/partials",
-  "/app/templates/status",
-  "/app/views",
-  "/app/helpers"
-];
+const Installer = require("../Installer");
+var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 /**
@@ -32,31 +14,64 @@ function init() {
   if(CoreUtil.isAVAProject()) {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Project has already been initialized.\x1b[0m`);
     process.exit(AVAError.AVAALREADYINIT);
+  } else {
+    initNPMIfNeeded();
+    npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+    installAVACoreIfNeeded(() => {
+      const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
+      loadBoilerplates(prefab, (boilerplate) => {
+        installBoilerplate(boilerplate);
+      });
+    });
   }
-  installAVACoreIfNeeded();
-  const prefab = typeof arguments[0] === "string" ? arguments[0] : null;
-  loadBoilerplates(prefab, (boilerplate) => {
-    installBoilerplate(boilerplate);
-  });
 }
 
+function initNPMIfNeeded() {
+  if (!fs.existsSync(`${projectPWD}/package.json`)) {
+    process.stdout.write(`${CoreUtil.terminalPrefix()}\x1b[32m NPM setup...\x1b[0m`);
+    process.stdout.clearLine();
+    try {
+      execSync("npm init -y", { windowsHide: true, stdio: "ignore" });
+    } catch(error) {
+      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (fatal error) Failed to setup NPM project. Is NPM not installed on your machine? Do you need to update NPM? is NPM broken? What's going on?!? :O\x1b[0m`);
+    }
+  }
+}
 
 /**
  * @description Installs the AVACore if it is not yet installed.
  */
 function installAVACoreIfNeeded() {
+  const ready = typeof arguments[0] === "function" ? arguments[0] : () => {};
   if(!CoreUtil.isAVACoreInstalled()) {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Installing AVACore\x1b[0m`);
-    try {
-      execSync("npm install avacore", { windowsHide: true, stdio: "ignore" });
-      const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/avacore/package.json`));
-      if(!package.dependencies) {
-        package.dependencies = {};
-      }
-      package.dependencies["avacore"] = `^${dependency.version}`;
-    } catch (error) {
+    process.stdout.clearLine();
+    var i = 0, total = 10;
+    const animation = setInterval(() => {
+      process.stdout.clearLine();
+      i = (i + 1) % total;
+      const r = total - i;
+      var dots = "{ " + new Array(i + 1).join("=") + ">" + (new Array(r).join(" ")) + " [=] }";
+      process.stdout.write(`${CoreUtil.terminalPrefix()}\x1b[32m Downloading AVACore ${dots}\x1b[0m`)
+      process.stdout.cursorTo(0);
+    }, 50);
+    const iProcess = exec("npm install avacore", (error, stout, sterr) => {});
+    iProcess.on("error", (error) => {
+      clearInterval(animation);
       console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Failed to install avacore. Please install it manually: 'npm install avacore'\x1b[0m`);
-    }
+    });
+    iProcess.on("exit", (code, signal) => {
+      clearInterval(animation);
+      process.stdout.clearLine();
+      process.stdout.write(`\n${CoreUtil.terminalPrefix()}\x1b[32m AVACore Installed!\n\x1b[0m`)
+      const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/avacore/package.json`));
+      if (!npmPackage.dependencies) {
+        npmPackage.dependencies = {};
+      }
+      npmPackage.dependencies["avacore"] = `^${dependency.version}`;
+      ready();
+    });
+  } else {
+    ready();
   }
 }
 
@@ -68,12 +83,16 @@ function installAVACoreIfNeeded() {
 function loadBoilerplates(example, callback) {
   if(example === null) {
     var choices = [];
-    const prefabs = fs.readdirSync(`${__dirname}/../boilerplates`);
+    const path = `${__dirname}/../installs`;
+    const prefabs = fs.readdirSync(path);
     for(const i in prefabs) {
       const prefab = prefabs[i];
       const splitted = prefab.split(".");
       delete splitted[splitted.length - 1];
-      choices.push(splitted.join(""));
+      const content = require(`${path}/${prefab}`);
+      if (content.type === "BOILERPLATE") {
+        choices.push(splitted.join(""));
+      }
     }
     const prompt = {
       type: "list",
@@ -95,55 +114,24 @@ function loadBoilerplates(example, callback) {
 
 /**
  */
-function installBoilerplate(example) {
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Building app structure\x1b[0m`);
-  for (const folder of folders) {
-    const path = `${projectPWD}${folder}`;
-    if(!fs.existsSync(path)) {
-      fs.mkdirSync(path);
+function installBoilerplate(packageName) {
+  const onSuccess = () => {
+    var file = npmPackage;
+    file.avalancheConfig = { preferredEnvironment: "development" };
+    fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
+    const asciiPath = `${__dirname}/../resources/asci`;
+    if(fs.existsSync(asciiPath)) {
+      const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
+      console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
     }
-  }
-  var boilerplate = {};
-  const path = `${__dirname}/../boilerplates/${example}.json`;
-  if(typeof example === "string" && fs.existsSync(path)) {
-    boilerplate = require(path);
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Preparing \x1b[3m${example}\x1b[0m\x1b[32m prefabs\x1b[0m`);
-  } else {
-    if(fs.existsSync(`${__dirname}/../boilerplates/empty.json`)) {
-      boilerplate = require(`${__dirname}/../boilerplates/empty.json`);
-    } else {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (fatal error) No boilerplates found. You might need to reinstall Avalanche.\x1b[0m`);
-      process.exit(AVAError.INCOMPLETECORE);
-    }
-  }
-  for (const folder of boilerplate.folders) {
-    const path = `${projectPWD}${folder}`;
-    if(!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
-  }
-  for (const file of boilerplate.files) {
-    const templatePath = `${__dirname}/../templates/${file.template}`;
-    const filePath = `${projectPWD}${file.path}`;
-    if (fs.existsSync(templatePath) && !fs.existsSync(filePath)) {
-      try {
-        fs.copyFileSync(templatePath, filePath, fs.COPYFILE_EXCL);
-      } catch (error) {
-        if (error.code === "ENOENT") {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
-        }
-      }
-    }
-  }
-  var file = package;
-  file.avalancheConfig = { preferredEnvironment: "development" };
-  fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
-  const asciiPath = `${__dirname}/../resources/asci`;
-  if(fs.existsSync(asciiPath)) {
-    const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
-    console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);
-  }
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Project has been initialized successfully!\x1b[0m`);
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Project has been initialized successfully!\x1b[0m`);
+  };
+  const onFailure = ({error, message}) => {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m ${message}\x1b[0m`);
+    process.exit(AVAError.INCOMPLETECORE);
+  };
+  const installer = new Installer();
+  installer.install({package: packageName, onSuccess, onFailure});
 }
 
 
@@ -151,4 +139,4 @@ module.exports.execute = init;
 module.exports.enabled = true;
 module.exports.scope = "GLOBAL";
 module.exports.command = "init";
-module.exports.description = "Initializes your Project.";
+module.exports.description = "Initializes your Avalanche Project.";

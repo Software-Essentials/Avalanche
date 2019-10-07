@@ -13,10 +13,11 @@
   },
   "auth": {
     "secret": "SecretKey!",
-    "saltRounds": 0
+    "saltRounds": 0,
+    "sessionStore": null
   },
   "security": {
-    "csrf": true
+    "csrf": false
   },
   "capabilities": {
     "SSL": false,

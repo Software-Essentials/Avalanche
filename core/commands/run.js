@@ -1,8 +1,9 @@
 const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
+const path = require("path");
 const { exec } = require("child_process");
 const { AVAEnvironment } = require("../../index");
-
+const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 /**
  * @description Runs your Avalanche application.
@@ -11,9 +12,18 @@ function run() {
   if(CoreUtil.getRoutes().length < 1) {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
-  const environmentName = typeof arguments[0] === "string" ? arguments[0] : null;
+  var environmentName = null;
+  if (typeof arguments[0] === "string") {
+    environmentName = arguments[0];
+  } else {
+    if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
+      environmentName = package.avalancheConfig.preferredEnvironment;
+    } else {
+      environmentName = null;
+    }
+  }
   const environment = new AVAEnvironment(environmentName);
-  var process = start(environmentName);
+  var cProcess = start(environmentName);
   if(environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
     const folders = CoreUtil.directoryLooper(directory, []).children;
@@ -26,8 +36,8 @@ function run() {
           const path = `${folder}/${file}`;
           if(fs.lstatSync(path).isFile()) {
             CoreUtil.startWatchingSession(path, () => {
-              process.kill("SIGINT");
-              process = start(environmentName);
+              cProcess.kill("SIGQUIT")
+              cProcess = start(environmentName);
             });
           }
         }
@@ -43,25 +53,25 @@ function run() {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const command = environmentFormatted ? `node ${__dirname}/../Main run ${environmentFormatted}` : `node ${__dirname}/../Main run`;
-  const process = exec(command, (error, stdout, stderr) => {
+  const mainPath = path.normalize(`${__dirname}/../Main`);
+  const command = environmentFormatted ? `node "${mainPath}" run ${environmentFormatted}` : `node "${mainPath}" run`;
+  const cProcess = exec(command, (error, stdout, stderr) => {
     if(error) {
       if(error.signal === "SIGINT") {
         return;
       }
-      console.log("ERROR:", error);
     }
   });
-  process.stdout.on("data", (data) => {
+  cProcess.stdout.on("data", (data) => {
     console.log(data.toString().trim());
   });
-  process.stderr.on("data", (data) => {
-    console.log(data.toString().trim());
+  cProcess.stderr.on("data", (data) => {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (FAILURE) \n\n\n\x1b[33m${data.toString().trim()}\n\n\x1b[0m`);
   });
-  process.on("exit", (code) => {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped.\x1b[0m`);
+  cProcess.on("close", (code, signal) => {
+    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped. \x1b[1m(${signal})\x1b[0m`);
   });
-  return process;
+  return cProcess;
 }
 
 

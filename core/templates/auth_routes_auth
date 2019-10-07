@@ -1,0 +1,30 @@
+[
+  {
+    "path": "/auth/login",
+    "method": "POST",
+    "controller": "AuthController",
+    "handler": "login"
+  },
+  {
+    "path": "/auth/logout",
+    "method": "POST",
+    "controller": "AuthController",
+    "handler": "logout"
+  },
+  {
+    "path": "/auth/register",
+    "method": "POST",
+    "controller": "AuthController",
+    "handler": "register"
+  },
+  {
+    "path": "/signin",
+    "method": "GET",
+    "controller": "LoginViewController"
+  },
+  {
+    "path": "/signup",
+    "method": "GET",
+    "controller": "RegisterViewController"
+  }
+]

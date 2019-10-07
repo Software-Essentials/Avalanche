@@ -102,11 +102,14 @@ class AVAEnvironment {
         if(typeof(environment.auth) === "object") {
             if(typeof(environment.auth.secret) === "string") {
                 this.secret = environment.auth.secret;
+                this.auth.secret = environment.auth.secret;
             } else {
                 isValid = false;
                 console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
             }
             this.saltRounds = typeof environment.auth.saltRounds === "number" ? environment.auth.saltRounds : 0;
+            this.auth.saltRounds = typeof environment.auth.saltRounds === "number" ? environment.auth.saltRounds : 0;
+            this.auth.sessionStore = typeof environment.auth.sessionStore === "string" ? environment.auth.sessionStore : null;
         } else {
             isValid = false
             console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
@@ -121,10 +124,10 @@ class AVAEnvironment {
         
         this.capabilities = {};
         if(typeof(environment.capabilities) === "object") {
-            this.isUsingSSL = typeof environment.capabilities.isUsingSSL === "boolean" ? environment.capabilities.isUsingSSL : true;
-            this.useWebSockets = typeof environment.capabilities.useWebSockets === "boolean" ? environment.capabilities.useWebSockets : false;
-            this.useMiddleware = typeof environment.capabilities.useMiddleware === "boolean" ? environment.capabilities.useMiddleware : true;
-            this.useEmail = typeof environment.capabilities.useEmail === "boolean" ? environment.capabilities.useEmail : false;
+            this.capabilities.isUsingSSL = typeof environment.capabilities.isUsingSSL === "boolean" ? environment.capabilities.isUsingSSL : true;
+            this.capabilities.useWebSockets = typeof environment.capabilities.useWebSockets === "boolean" ? environment.capabilities.useWebSockets : false;
+            this.capabilities.useMiddleware = typeof environment.capabilities.useMiddleware === "boolean" ? environment.capabilities.useMiddleware : true;
+            this.capabilities.useEmail = typeof environment.capabilities.useEmail === "boolean" ? environment.capabilities.useEmail : false;
         }
         
         this.email = {};

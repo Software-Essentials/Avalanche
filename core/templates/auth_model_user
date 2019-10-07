@@ -2,9 +2,9 @@ const { AVAModel } = require("avacore");
 
 
 /**
- * @description Manages posts.
+ * @description Manages users.
  */
-class Post extends AVAModel {
+class User extends AVAModel {
 
   /**
    * @throws AVAError
@@ -12,27 +12,27 @@ class Post extends AVAModel {
   constructor() {
     super();
     // Model configuration.
-    this.NAME = "Post"; // Name of the Storage Zone / Database Table.
+    this.NAME = "User"; // Name of the Storage Zone / Database Table.
     this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
-    this.METHOD = "STORAGE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+    this.METHOD = "DATABASE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
     this.PROPERTIES = {
       "ID": {
-        name: "post_id",
+        name: "user_id",
         type: "INT",
         length: 10,
         required: true,
         relatable: true,
         autoIncrement: true
       },
-      "name": {
-        name: "post_name",
+      "email": {
+        name: "user_email",
         type: "CHAR",
-        length: 32,
+        length: 255,
         required: true
       },
-      "body": {
-        name: "post_body",
-        type: "TEXT",
+      "password": {
+        name: "user_password",
+        type: "CHAR",
         length: 255,
         required: true
       },
@@ -56,4 +56,4 @@ class Post extends AVAModel {
 }
 
 
-module.exports = AVAModel.register(Post);
+module.exports = AVAModel.register(User);

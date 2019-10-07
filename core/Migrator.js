@@ -9,6 +9,7 @@ class Migrator {
 
   }
 
+
   migrate(mode, callback) {
     switch (mode) {
       case "SAFE": this.execute({ wipe: false, force: false, onReady: callback }); break;
@@ -16,6 +17,7 @@ class Migrator {
       case "OVERWRITE": this.execute({ wipe: false, force: true, onReady: callback }); break;
     }
   }
+
 
   execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => {} : () => {};
@@ -33,7 +35,16 @@ class Migrator {
           migrate();
         },
         onFailure: ({error}) => {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m ${error.message}`);
+          switch(error.code) {
+            case "ER_NOT_SUPPORTED_AUTH_MODE":
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+              break;
+            case "ER_ACCESS_DENIED_ERROR":
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+              break;
+            default:
+              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+          }
         }
       });
     } else {
@@ -49,7 +60,9 @@ class Migrator {
           const Model = require(path);
           if (Model.METHOD === "DATABASE") {
             var properties = [];
-            const options = { force: force,
+            const options = {
+              force: force,
+              primaryKey: Model.PROPERTIES[Model.IDENTIFIER].name,
               onSuccess: ({table}) => {
                 migrations[table] = true;
                 update();

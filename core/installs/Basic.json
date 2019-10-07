@@ -1,5 +1,11 @@
 {
-  "folders": [],
+  "name": "Example 2",
+  "type": "BOILERPLATE",
+  "description": "This is a boilerplate that installs the most minimal files into Avalanche project to get started.",
+  "aliases": [
+    "basic",
+    "example2"
+  ],
   "files": [
     {
       "template": "example2_environment",

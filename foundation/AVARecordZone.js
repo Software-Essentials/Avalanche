@@ -26,6 +26,7 @@ class AVARecordZone {
     this.data = data;
   }
 
+
   /**
    * @description Returns all records in the RecordZone.
    * @returns {Object}
@@ -33,6 +34,7 @@ class AVARecordZone {
   getRecords() {
     return this.data;
   }
+  
 
   /**
    * @description Returns the record at a certain index.
@@ -48,6 +50,27 @@ class AVARecordZone {
     }
     return null
   }
+
+
+  /**
+   * @description Return existing records from the RecordZone.
+   * @param {String} key Key to find.
+   * @param {any} value value match.
+   * @returns {Object}
+   */
+  getRecordsWhere(key, value) {
+    var results = [];
+    for(const recordKey in this.data) {
+      if(this.data[recordKey].hasOwnProperty(key)) {
+        if(this.data[recordKey][key] === value) {
+          const result = this.data[recordKey];
+          results.push(result);
+        }
+      }
+    }
+    return results;
+  }
+
 
   /**
    * @description Updates an existing record in the RecordZone.

@@ -8,5 +8,10 @@
     "path": "/posts",
     "method": "GET",
     "controller": "PostViewController"
+  },
+  {
+    "path": "/posts/:ID",
+    "method": "GET",
+    "controller": "PostViewController"
   }
 ]

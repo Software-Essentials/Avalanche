@@ -68,8 +68,21 @@ class Seeder {
             seedStats[table] = true;
             update();
           },
-          onFailure: ({table}) => {
+          onFailure: ({table, error}) => {
             seedStats[table] = false;
+            switch(error.code) {
+              case "ER_NOT_SUPPORTED_AUTH_MODE":
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+                break;
+              case "ER_ACCESS_DENIED_ERROR":
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+                break;
+              case "ER_NO_SUCH_TABLE":
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
+                break;
+              default:
+                console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+            }
             update();
           }
         };

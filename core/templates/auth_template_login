@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="text-center">Sign in to the platform</h1>
+            <hr />
+        </div>
+        <form class="col-md-6 offset-md-3 p-3 my-1" method="post" action="/auth/login" id="createForm" name="createForm">
+            <div class="form-group">
+                <input id="field-userEmail" class="form-control" type="email" name="userEmail" placeholder="johndoe@icloud.com" required />
+            </div>
+            <div class="form-group">
+                <input id="field-userPassword" class="form-control" type="password" name="userPassword" placeholder="Password" required />
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="customControlInline" />
+                    <label class="custom-control-label" for="customControlInline">Keep me signed in.</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-block btn-primary" type="submit" value="Sign In" />
+                <p class="text-center mt-2"><a href="/forgotpassword">Forgot your password?</a> Or don't have an account yet? <a href="/signup">Sign Up</a>.</p>
+            </div>
+        </form>
+    </div>
+</div>

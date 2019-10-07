@@ -1,6 +1,5 @@
 const fs = require("fs");
 const md5 = require("md5");
-const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 
 
 /**
@@ -8,6 +7,7 @@ const projectPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${
  * @returns {Boolean}
  */
 function isAVACoreInstalled() {
+  const projectPackage = getProjectPackage();
   return (!!projectPackage && !!projectPackage.dependencies && !!projectPackage.dependencies.avacore);
 }
 
@@ -16,6 +16,7 @@ function isAVACoreInstalled() {
  * @returns {Boolean}
  */
 function isAVAProject() {
+  const projectPackage = getProjectPackage();
   return (!!projectPackage && typeof projectPackage.avalancheConfig === "object");
 }
 
@@ -24,7 +25,7 @@ function isAVAProject() {
  * @returns {Boolean}
  */
 function isNodeProject() {
-  return (typeof projectPackage === "object");
+  return fs.existsSync(`${projectPWD}/package.json`);
 }
 
 
@@ -33,6 +34,15 @@ function isNodeProject() {
  */
 function terminalPrefix() {
   return "\x1b[36m\x1b[1m[AVALANCHE]\x1b[0m";
+}
+
+
+/**
+ * @description Returns the package.json if it exsists.
+ * @returns {Object|null}
+ */
+function getProjectPackage() {
+  return fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 }
 
 
@@ -74,11 +84,13 @@ function startWatchingSession(path, callback) {
       fsWait = setTimeout(() => {
         fsWait = false;
       }, 100);
-      const md5Current = md5(fs.readFileSync(path));
-      if (md5Current === md5Previous) {
-        return;
+      if (fs.existsSync(path)) {
+        const md5Current = md5(fs.readFileSync(path));
+        if (md5Current === md5Previous) {
+          return;
+        }
+        md5Previous = md5Current;
       }
-      md5Previous = md5Current;
       callback();
     }
   });
@@ -96,7 +108,7 @@ function getRoutes() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
         routes.push.apply(routes, route);
@@ -118,7 +130,7 @@ function getControllers() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         controllers.push(extensions[0]);
       }
@@ -139,7 +151,7 @@ function getMiddleware() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         middleware.push(extensions[0]);
       }
@@ -160,7 +172,7 @@ function getLocalisations() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         localisations.push(extensions[0]);
       }
@@ -181,7 +193,7 @@ function getTranslations() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         const translationSet = JSON.parse(JSON.stringify(require(`${projectPWD}/app/localisations/${file}`)));
         for (const translation of Object.keys(translationSet)) {
@@ -205,7 +217,7 @@ function getModels() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
         models.push(extensions[0]);
       }
@@ -249,7 +261,7 @@ function getMigrations() {
   fs.readdirSync(normalizedPath).forEach(function (file) {
     if (fs.lstatSync(normalizedPath).isFile()) {
       const extensions = file.split(".");
-      if (extensions.length = 2) {
+      if (extensions.length === 2) {
         if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
           models.push(extensions[0]);
         }
@@ -271,7 +283,7 @@ function getSeedFilesNames() {
   }
   fs.readdirSync(normalizedPath).forEach(function (file) {
     const extensions = file.split(".");
-    if (extensions.length = 2) {
+    if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
         controllers.push(extensions[0]);
       }
@@ -286,6 +298,7 @@ module.exports = {
     isAVAProject: isAVAProject,
     isNodeProject: isNodeProject,
     terminalPrefix: terminalPrefix,
+    getProjectPackage: getProjectPackage,
     directoryLooper: directoryLooper,
     startWatchingSession: startWatchingSession,
     getRoutes: getRoutes,

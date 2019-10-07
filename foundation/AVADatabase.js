@@ -1,4 +1,3 @@
-const fs = require("fs");
 const mysql = require("mysql");
 const CoreUtil = require("../core/CoreUtil");
 
@@ -14,25 +13,6 @@ class AVADatabase {
 
 
   /**
-   * 
-   */
-  migrate() {
-    const normalizedPath = `${projectPWD}/app/migrations`;
-    var migrations = [];
-    fs.readdirSync(normalizedPath).forEach(function (file) {
-      const extensions = file.split(".");
-      if (extensions.length = 2) {
-        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-          const migration = require(`${projectPWD}/app/migrations/${file}`);
-          migrations.push(migration);
-        }
-      }
-    });
-    console.log(migrations);
-  }
-
-
-  /**
    * @description Does a request to the database.
    * @param {String} query 
    * @param {Object} parameters 
@@ -44,26 +24,26 @@ class AVADatabase {
 
 
   wipeAllTables(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
     const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
     this.query(query, [], (error, results, fields) => {
       if (error) {
-        failure({error});
+        failure({ error });
         return;
       }
-      if(results.length <= 0) {
+      if (results.length <= 0) {
         update();
       }
-      for(const i in results) {
+      for (const i in results) {
         const table = results[i].table_name;
         wipes[table] = null;
         const query = `DROP TABLE IF EXISTS \`${results[i].table_name}\`;`;
         this.query(query, [], (error, results, fields) => {
           if (error) {
             wipes[table] = false;
-            failure({error});
+            failure({ error });
           } else {
             wipes[table] = true;
             update();
@@ -74,7 +54,7 @@ class AVADatabase {
     function update() {
       var completed = 0;
       var successful = 0;
-      for(const key in wipes) {
+      for (const key in wipes) {
         if (wipes[key] !== null) completed++;
         if (wipes[key]) successful++;
       }
@@ -96,34 +76,48 @@ class AVADatabase {
    */
   createTable(name, columns, options) {
     const force = options ? options.force ? true : false : false;
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     const that = this;
     const datatypes = {
-      "INT": { datatype: "int", length: true },
-      "TINYINT": { datatype: "tinyint", length: true },
-      "CHAR": { datatype: "char", length: true },
-      "VARCHAR": { datatype: "varchar", length: true },
-      "DATETIME": { datatype: "varchar", length: false },
-      "DATE": { datatype: "date", length: false },
-      "TIMESTAMP": { datatype: "timestamp", length: false },
-      "TEXT": { datatype: "text", length: false },
-      "TINYTEXT": { datatype: "tinytext", length: false },
-      "LONGTEXT": { datatype: "longtext", length: false }
+      "INT": { type: "int", length: true, unsignable: true, incrementable: true },
+      "TINYINT": { type: "tinyint", length: true, unsignable: true, incrementable: true },
+      "SMALLINT": { type: "smallint", length: true, unsignable: true, incrementable: true },
+      "MEDIUMINT": { type: "mediumint", length: true, unsignable: true, incrementable: true },
+      "BIGINT": { type: "bigint", length: true, unsignable: true, incrementable: true },
+      "FLOAT": { type: "float", unsignable: true, incrementable: true },
+      "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
+      "DOUBLE": { type: "double", unsignable: true, incrementable: true },
+      "BIT": { type: "bit", length: true },
+      "CHAR": { type: "char", length: true },
+      "VARCHAR": { type: "varchar", length: true },
+      "DATETIME": { type: "varchar" },
+      "DATE": { type: "date" },
+      "TIMESTAMP": { type: "timestamp" },
+      "TEXT": { type: "text" },
+      "TINYTEXT": { type: "tinytext" },
+      "MEDIUMTEXT": { type: "mediumtext" },
+      "LONGTEXT": { type: "longtext" }
     };
     var columnStrings = [];
     for (const column of columns) {
-      const type = datatypes[column.type];
-      const datatype = `${type.datatype}${type.length ? `(${column.length}) ` : " "}`;
+      const typeProperty = datatypes[column.type];
+      const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
       const name = column.name;
       const required = column.required;
-      columnStrings.push(`\`${name}\` ${datatype}${false ? "unsigned " : ""}${required ? "NOT NULL " : ""}${false ? "AUTO_INCREMENT " : ""}`.trim());
+      const unsigned = typeProperty.unsignable ? column.relatable : false;
+      const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
+      columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
+    }
+    if (primaryKey) {
+      columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
     }
     if (force) {
       const query = `DROP TABLE IF EXISTS \`${name}\`;`;
       this.query(query, [], (error, results, fields) => {
         if (error) {
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
         create();
@@ -135,21 +129,20 @@ class AVADatabase {
       const query = `CREATE TABLE \`${name}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
       that.query(query, [], (error, results, fields) => {
         if (error) {
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
-        success({table: name});
+        success({ table: name });
       });
     }
   }
 
 
   insertInto(name, data, options) {
-    const force = options ? options.force ? true : false : false;
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (!Array.isArray(data) || data.length <= 0) {
-      failure({table: name, error: new Error("No data given.")});
+      failure({ table: name, error: new Error("No data given.") });
       return;
     }
     var columns = Object.keys(data[0]);
@@ -186,11 +179,35 @@ class AVADatabase {
       const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
       that.query(query, [], (error, results, fields) => {
         if (error) {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
-          failure({table: name, error: error});
+          failure({ table: name, error: error });
           return;
         }
-        success({table: name});
+        success({ table: name });
+      });
+    }
+  }
+
+
+  selectFromTable(name, options) {
+    const conditions = options ? typeof options.conditions === "object" ? options.conditions : {} : {};
+    var columns = options ? typeof options.columns === "object" ? options.columns : [] : [];
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+    if (!Array.isArray(columns)) {
+      columns = [];
+    }
+    const that = this;
+    var compiledConditions = "1 = 1";
+    select();
+    function select() {
+      const query = `SELECT ${columns.length <= 0 ? "*" : columns.join(", ")} FROM \`${name}\`${Object.keys(conditions).length > 0 ? ` WHERE ${compiledConditions}` : ""};`;
+      that.query(query, [], (error, results, fields) => {
+        if (error) {
+          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
+          failure({ table: name, error: error });
+          return;
+        }
+        success({ table: name, results: results, fields: fields });
       });
     }
   }

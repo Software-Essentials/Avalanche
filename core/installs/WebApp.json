@@ -1,0 +1,118 @@
+{
+  "name": "WebApp",
+  "type": "BOILERPLATE",
+  "description": "This is a boilerplate that installs a basic webapp into your Avalanche project.",
+  "aliases": [
+    "webapp",
+    "example1"
+  ],
+  "modules": [
+    "hbs@4.0.4"
+  ],
+  "files": [
+    {
+      "template": "example1_environment",
+      "path": "/app/environments/development.environment.json"
+    },
+    {
+      "template": "example1_helpers",
+      "path": "/app/helpers/util.js"
+    },
+    {
+      "template": "example1_status404",
+      "path": "/app/templates/status/404.hbs"
+    },
+    {
+      "template": "example1_controller",
+      "path": "/app/controllers/PostController.js"
+    },
+    {
+      "template": "example1_view_landing",
+      "path": "/app/views/MainViewController.js"
+    },
+    {
+      "template": "example1_view_posts",
+      "path": "/app/views/PostViewController.js"
+    },
+    {
+      "template": "example1_routes_api",
+      "path": "/app/routes/api.json"
+    },
+    {
+      "template": "example1_routes_web",
+      "path": "/app/routes/web.json"
+    },
+    {
+      "template": "example1_template_landing",
+      "path": "/app/templates/landing.hbs"
+    },
+    {
+      "template": "example1_template_posts",
+      "path": "/app/templates/posts.hbs"
+    },
+    {
+      "template": "example1_template_posts_view",
+      "path": "/app/templates/posts.view.hbs"
+    },
+    {
+      "template": "example1_template_layout",
+      "path": "/app/templates/layouts/layout.hbs"
+    },
+    {
+      "template": "example1_model",
+      "path": "/app/models/Post.js"
+    },
+    {
+      "template": "example1_template_partial_navbar",
+      "path": "/app/templates/partials/navbar.hbs"
+    },
+    {
+      "template": "example1_seeds",
+      "path": "/app/migrations/seeds/DummyData.json"
+    },
+    {
+      "template": "example1_assets_logo",
+      "path": "/app/public/assets/img/logo.svg"
+    },
+    {
+      "template": "example1_assets_favicon",
+      "path": "/app/public/assets/img/favicon.png"
+    },
+    {
+      "template": "example1_asset_img_darthvader",
+      "path": "/app/public/assets/img/darthvader.svg"
+    },
+    {
+      "template": "example1_assets_js_htmlessentials",
+      "path": "/app/public/assets/js/htmlessentials.js"
+    },
+    {
+      "template": "asset_bootstrapcss",
+      "path": "/app/public/assets/css/bootstrap.min.css"
+    },
+    {
+      "template": "asset_bootstrapcssmap",
+      "path": "/app/public/assets/css/bootstrap.min.css.map"
+    },
+    {
+      "template": "asset_bootstrapjs",
+      "path": "/app/public/assets/js/bootstrap.min.js"
+    },
+    {
+      "template": "asset_bootstrapjsmap",
+      "path": "/app/public/assets/js/bootstrap.min.js.map"
+    },
+    {
+      "template": "asset_jquery",
+      "path": "/app/public/assets/js/jquery-3.3.1.min.js"
+    },
+    {
+      "template": "asset_popper",
+      "path": "/app/public/assets/js/popper.min.js"
+    },
+    {
+      "template": "asset_poppermap",
+      "path": "/app/public/assets/js/popper.min.js.map"
+    }
+  ]
+}

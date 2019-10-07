@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-global.projectPWD = process.env.PWD;
+global.projectPWD = process.cwd();
 global.CoreUtil = require("./CoreUtil");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;

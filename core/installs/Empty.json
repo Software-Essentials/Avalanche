@@ -1,0 +1,14 @@
+{
+  "name": "Empty",
+  "type": "BOILERPLATE",
+  "description": "This is a boilerplate that installs nothing at all except for an environment file.",
+  "aliases": [
+    "empty"
+  ],
+  "files": [
+    {
+      "template": "empty_environment",
+      "path": "/app/environments/development.environment.json"
+    }
+  ]
+}

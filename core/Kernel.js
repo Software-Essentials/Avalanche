@@ -1,16 +1,15 @@
 // Dependencies
 const fs = require("fs");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const express = require("express");
 const exphbs = require("express-handlebars");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const { AVADatabase } = require("../index");
-
-// Imports
-const Router = require("./Router.js");
-const SocketKernel = require("./SocketKernel.js");
-
+const MySQLStore = require("connect-mysql")(session);
+const Router = require("./Router");
+const SocketKernel = require("./SocketKernel");
+const csrf = require("csurf");
 
 
 /**
@@ -50,13 +49,27 @@ class Kernel {
 		this.sessionConfiguration = {
 			name: "Auth",
 			secret: global.environment.secret,
-			resave: true,
+			resave: false,
 			saveUninitialized: true,
 			cookie: {
+				httpOnly: false,
 				secure: false,
-				maxAge: Infinity
+				maxAge: 1000 * 60 * 60 * 24 * 3,
+				expires: 1000 * 60 * 60 * 24 * 3
 			}
 		};
+		try {
+			const sessionStore = environment.auth.sessionStore;
+			if (typeof sessionStore === "string") {
+				switch (sessionStore) {
+					case "MYSQL":
+						this.sessionConfiguration.store = new MySQLStore({ config: environment.database, table: "_AVASession" });
+						break;
+					}
+			}
+		} catch(error) {
+			console.log("ERRCHECKPOINT", error);
+		}
 
 		// Global sockets
 		global.socket = new SocketKernel(stream);
@@ -95,7 +108,18 @@ class Kernel {
 		app.set('views', 'app/templates');
 
 		// CSRF middleware
-		// app.use(express.csrf());
+		if (environment.security.csrf) {
+			app.use(csrf({ cookie: true }));
+			app.use((error, request, response, next) => {
+				if (error.code === "EBADCSRFTOKEN") {
+					response.status(403);
+					response.json({
+						success: false,
+						message: "Invalid CSRF token!"
+					});
+				}
+			});
+		}
 
 		// Utilize router
 		app.use(new Router().routes());

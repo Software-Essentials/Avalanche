@@ -1,8 +1,5 @@
-// Dependencies
 const socketIO = require("socket.io");
-
-// Imports
-const UUID = require("./Util.js").UUID;
+const { UUID } = require("./Util");
 
 
 
@@ -12,12 +9,13 @@ class SocketKernel {
     this.instance = socketIO(server);
     this.connections = [];
 
-    if(global.environment.useWebSockets) {
+    if (environment.capabilities.useWebSockets) {
       this.setup();
-      console.log("\x1b[32m%s\x1b[0m", `[WEBNODE] Sockermanager initialized`)
+      console.log(`\x1b[32m[AVALANCHE] Sockermanager initialized.\x1b[0m`)
     }
   }
   
+
   /**
    * Setsup the socket kernel
    */
@@ -33,6 +31,7 @@ class SocketKernel {
     });
   }
 
+
   /**
    * Returns the socket instance
    */
@@ -41,7 +40,6 @@ class SocketKernel {
   }
 
 }
-
 
 
 module.exports = SocketKernel;
