@@ -125,7 +125,11 @@ class AVAModel {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
-          failure({ error: error });
+          if (error.code === "ER_DUP_ENTRY") {
+            failure({ errors: [{ error: "duplicateEntry", message: "Record already exists." }] });
+            return;
+          }
+          failure({ errors: [{ error: "databaseError" }] });
         } else {
           this.DRAFT = false;
           success({result: this});
@@ -174,7 +178,7 @@ class AVAModel {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
-          failure({ error: error });
+          failure({ errors: [{ error: "databaseError" }] });
         } else {
           success({});
         }
@@ -329,7 +333,7 @@ AVAModel.register = (Model) => {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
-          failure({ error: error });
+          failure({ errors: [{ error: "databaseError" }] });
         } else {
           var data = [];
           for (const result of results) {
@@ -377,7 +381,7 @@ AVAModel.register = (Model) => {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
-          failure({ error: error });
+          failure({ errors: [{ error: "databaseError" }] });
         } else {
           var data = [];
           for (const result of results) {
