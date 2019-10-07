@@ -282,7 +282,7 @@ class AVAModel {
   get() {
     var structure = {};
     for (const key in this.PROPERTIES) {
-      structure[this.PROPERTIES[key].name] = this[key];
+      structure[key] = this[key];
     }
     return structure;
   }
@@ -297,6 +297,22 @@ AVAModel.register = (Model) => {
   Model.METHOD = dummy.METHOD;
   Model.DRAFT = dummy.DRAFT;
   Model.NAME = dummy.NAME;
+
+
+  /**
+   * @description Returns JSON representation.
+   * @param {[AVAModel]}
+   * @returns {Object}
+   */
+  function get(array) {
+    var data = [];
+    for (const row of array) {
+      data.push(row.get());
+    }
+    return data
+  }
+  Model.get = get;
+
 
   /**
    * @description Returns all records.
@@ -401,4 +417,4 @@ AVAModel.register = (Model) => {
 }
 
 
-module.exports = AVAModel;
+module.exports = AVAModel.register(AVAModel);
