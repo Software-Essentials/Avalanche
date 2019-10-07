@@ -6,23 +6,63 @@ const CoreUtil = require("../CoreUtil");
 
 
 /**
- * @description Makes controller.
+ * @description Makes template.
  */
 function make(component) {
   switch(component) {
     case "controller":
       make_controller();
       return;
-    case "view":
-      make_view();
+    case "environment":
+      make_environment();
+      return;
+    case "middleware":
+      make_middleware();
       return;
     case "model":
       make_model();
+      return;
+    case "routes":
+      make_routes();
+      return;
+    case "seeds":
+      make_seeds();
+      return;
+    case "view (DEPRECATED)":
+      make_view();
       return;
     default:
       make_default();
       return;
   }
+}
+
+
+/**
+ * 
+ */
+function make_default() {
+  var choices = [
+    "controller",
+    "environment",
+    "middleware",
+    "model",
+    "routes",
+    "seeds",
+    "view (DEPRECATED)"
+  ];
+  const prompt = {
+    type: "list",
+    name: "component",
+    message: "What would you like to make?",
+    choices: choices,
+    prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+    suffix: "\x1b[0m"
+  };
+  inquirer.prompt(prompt).then(answers => {
+    make(answers.component);
+    return;
+  });
 }
 
 
@@ -87,27 +127,57 @@ function make_controller() {
 /**
  * 
  */
-function make_view() {
+function make_environment() {
   const questions = [
     {
       type: "input",
       name: "name",
-      message: "Name your view:",
+      message: "Name your environment:",
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
+      default: "development",
       validate: (answer) => {
-        if(!answer.endsWith("ViewController"))
-          return `\x1b[31mA voew name should end with "ViewController". For example: "ProfileViewController".\x1b[0m`;
-        if(fs.existsSync(`${projectPWD}/app/views/${answer}.js`))
-          return "\x1b[31mA view with this name already exists.\x1b[0m";
+        if(fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
+          return "\x1b[31mAn environment file with this name already exists.\x1b[0m"
         return true;
       }
     }
   ];
   inquirer.prompt(questions).then(answers => {
-    const path = `app/views/${answers.name}.js`;
-    const template = "TEMPLATE_view";
-    const variables = { name: answers.name };
+    const path = `app/environments/${answers.name}.environment.json`;
+    const template = "TEMPLATE_environment";
+    const variables = {
+      name: answers.name
+    };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_middleware() {
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Name your environment:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(fs.existsSync(`${projectPWD}/app/middleware/${answer}.js`))
+          return "\x1b[31mA middleware file with this name already exists.\x1b[0m"
+        return true;
+      }
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/middleware/${answers.name}.js`;
+    const template = "TEMPLATE_middleware";
+    const variables = {
+      name: answers.name
+    };
     makeTemplate(variables, template, path);
   });
 }
@@ -133,7 +203,6 @@ function make_model() {
     {
       type: "input",
       name: "table",
-      choices: ["AVAStorage", "AVADatabase"],
       message: "Name your zone/table:",
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
@@ -158,7 +227,9 @@ function make_model() {
     const template = "TEMPLATE_model";
     const variables = {
       name: answers.name,
-      name_lower: answers.name.toLowerCase()
+      name_lower: answers.name.toLowerCase(),
+      method: answers.method,
+      method_key: answers.method === "AVAStorage" ? "STORAGE" : "DATABASE"
     };
     makeTemplate(variables, template, path);
   });
@@ -168,24 +239,94 @@ function make_model() {
 /**
  * 
  */
-function make_default() {
-  var choices = [
-    "controller",
-    "model",
-    "view"
+function make_routes() {
+  const questions = [
+    {
+      type: "input",
+      name: "filename",
+      message: "Name your routes file:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(fs.existsSync(`${projectPWD}/app/routes/${answer}.json`))
+          return "\x1b[31mA routes file with this name already exists.\x1b[0m"
+        return true;
+      }
+    }
   ];
-  const prompt = {
-    type: "list",
-    name: "component",
-    message: "What would you like to make?",
-    default: 0,
-    choices: choices,
-    prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
-    suffix: "\x1b[0m"
-  };
-  inquirer.prompt(prompt).then(answers => {
-    make(answers.component);
-    return;
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/routes/${answers.filename}.json`;
+    const template = "TEMPLATE_routes";
+    const variables = {};
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_seeds() {
+  const questions = [
+    {
+      type: "input",
+      name: "filename",
+      message: "Name your seeds file:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(fs.existsSync(`${projectPWD}/app/migrations/seeds/${answer}.json`))
+          return "\x1b[31mA seeds file with this name already exists.\x1b[0m"
+        return true;
+      }
+    },
+    {
+      type: "list",
+      name: "model",
+      choices: CoreUtil.getModels(),
+      message: "Choose a model:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m"
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/migrations/seeds/${answers.filename}.json`;
+    const template = "TEMPLATE_seeds";
+    const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`);
+    const variables = {
+      model: answers.model,
+      method: new DummyClass().METHOD === "DATABASE" ? "table": "zone"
+    };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * @deprecated
+ */
+function make_view() {
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Name your view:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if(!answer.endsWith("ViewController"))
+          return `\x1b[31mA voew name should end with "ViewController". For example: "ProfileViewController".\x1b[0m`;
+        if(fs.existsSync(`${projectPWD}/app/views/${answer}.js`))
+          return "\x1b[31mA view with this name already exists.\x1b[0m";
+        return true;
+      }
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/views/${answers.name}.js`;
+    const template = "TEMPLATE_view";
+    const variables = { name: answers.name };
+    makeTemplate(variables, template, path);
   });
 }
 

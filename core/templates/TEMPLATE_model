@@ -1,8 +1,8 @@
-const { AVAModel } = require("avacore");
+const { AVAModel, Util: { UUID } } = require("avacore");
 
 
 /**
- * @description Manages '<#name?>' resource.
+ * @description Manages '<#name?>' entity.
  */
 class <#name?> extends AVAModel {
 
@@ -11,21 +11,42 @@ class <#name?> extends AVAModel {
    */
   constructor() {
     super();
-    // Model configuration.
     this.NAME = "<#name?>"; // Name of the Storage Zone / Database Table.
     this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
-    this.METHOD = "STORAGE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+    this.METHOD = "<#method_key?>"; // Lets the model know we want to use the <#method?> as storage method. Options are "DATABASE" or "STORAGE".
     this.PROPERTIES = {
-      "ID": "<#name_lower?>_id",
-      "createdAt": "created_at",
-      "updatedAt": "updated_at"
-    }; // Format: "<model key>": "<storage key>"
+      "ID": {
+        name: "<#name_lower?>_id",
+        type: "CHAR",
+        length: 36,
+        required: true,
+        relatable: true
+      },
+      "name": {
+        name: "<#name_lower?>_name",
+        type: "CHAR",
+        length: 255,
+        required: true
+      },
+      "createdAt": {
+        name: "created_at",
+        type: "BIGINT",
+        length: 1,
+        required: true
+      },
+      "updatedAt": {
+        name: "updated_at",
+        type: "BIGINT",
+        length: 1
+      }
+    };
     this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
     // Default values.
+    this.ID = new UUID().string;
     this.createdAt = new Date().valueOf();
   }
 
 }
 
 
-module.exports = <#name?>;
+module.exports = AVAModel.register(<#name?>);

@@ -34,20 +34,20 @@ class AVAValidator {
             const conditionValue = this.invalid[method][key][condition];
             switch(condition) {
               case "type":
-                failures.push({error: "invalidType", message: `Type of '${key}' must be '${conditionValue}'.`});
+                failures.push({field: key, scope: method, error: "invalidType", message: `Type of '${key}' must be '${conditionValue}'.`});
                 break;
               case "length":
-                failures.push({error: "invalidLength", message: `Length of '${key}' must be ${conditionValue}.`});
+                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be ${conditionValue}.`});
                 break;
               case "range":
-                failures.push({error: "invalidLength", message: `Length of '${key}' must be in range ${conditionValue}`});
+                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be in range ${conditionValue}.`});
                 break;
               case "greaterThan":
-                failures.push({error: "invalidLength", message: `Length of '${key}' must be greater than ${conditionValue}.`});
+                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be greater than ${conditionValue}.`});
                 break;
               case "LessThan":
                 errors.push()
-                failures.push({error: "invalidLength", message: `Length of '${key}' must be less than ${conditionValue}.`});
+                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be less than ${conditionValue}.`});
                 break;
             }
           }
