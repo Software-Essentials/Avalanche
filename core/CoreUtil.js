@@ -3,6 +3,27 @@ const md5 = require("md5");
 
 
 /**
+ * @description Removes a directory recursively.
+ * @param {String} path
+ */
+function rmdirSyncRecursive(path) {
+  var files = [];
+  if( fs.existsSync(path) ) {
+    files = fs.readdirSync(path);
+    files.forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) {
+        rmdirSyncRecursive(curPath);
+      } else {
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
+
+
+/**
  * @description Checks if the AVACore is installed.
  * @returns {Boolean}
  */
@@ -294,6 +315,7 @@ function getSeedFilesNames() {
 
 
 module.exports = {
+    rmdirSyncRecursive: rmdirSyncRecursive,
     isAVACoreInstalled: isAVACoreInstalled,
     isAVAProject: isAVAProject,
     isNodeProject: isNodeProject,
