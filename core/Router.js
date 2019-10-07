@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const url = require("url");
 const { AVAValidator } = require("../index");
+const CoreUtil = require("../core/CoreUtil");
 
 // Setup
 const ExRouter = express.Router();
@@ -64,12 +65,17 @@ class Router {
             if (typeof(controllerFile) === "string") {
                 if(typeof(controllerHandler) === "string") {
                     // Controller handler
-                    if (fs.existsSync(path.join(__dirname, `./controllers/${controllerFile}.js`))) {
-                        controller = require(`./controllers/${controllerFile}.js`);
-                    } else {
+                    if (fs.existsSync(`${projectPWD}/app/controllers/${controllerFile}.js`)) {
                         controller = require(`${projectPWD}/app/controllers/${controllerFile}.js`);
+                    } else {
+                        console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Endpoint '${routePath}' leads to a controller that doesn't exist: '${controllerFile}'.\x1b[0m`);
+                        continue;
                     }
                     routeHandler = new controller();
+                    if (typeof routeHandler[controllerHandler] !== "function") {
+                        console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warn) Endpoint '${routePath}' leads to a handler/method that doesn't exist: '${controllerHandler}'.\x1b[0m`);
+                        continue;
+                    }
                     if(typeof routeMiddleware === "object") {
                         const filteredMiddlewareKeys = Object.keys(middleware).filter(function(i) {
                             return routeMiddleware.includes(i);
