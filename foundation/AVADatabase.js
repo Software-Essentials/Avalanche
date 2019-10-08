@@ -8,7 +8,7 @@ const CoreUtil = require("../core/CoreUtil");
 class AVADatabase {
 
   constructor() {
-    this.connection = mysql.createPool(global.environment.database);
+    this.connection = mysql.createPool(environment.database);
   }
 
 

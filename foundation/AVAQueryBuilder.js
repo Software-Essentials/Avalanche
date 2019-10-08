@@ -1,28 +1,28 @@
 const Knex = require("knex");
-const settings = {
-  client: "mysql",
-  version: "5.7",
-  connection: {
-    host : environment.database.host,
-    user : environment.database.user,
-    password : environment.database.password,
-    database : environment.database.database
-  },
-  pool: {
-    min: 0,
-    max: 10
-  }
-};
 
 
 class AVAQueryBuilder {
   
   constructor() {
+    this.kConfig = {
+      client: "mysql",
+      version: "5.7",
+      connection: {
+        host : environment.database.host,
+        user : environment.database.user,
+        password : environment.database.password,
+        database : environment.database.database
+      },
+      pool: {
+        min: 0,
+        max: 10
+      }
+    };
     this.SELECTED = false;
   }
 
   init() {
-    const knexInstance = Knex(settings);
+    const knexInstance = Knex(kConfig);
     this.chain = knexInstance(this.NAME);
   }
 
