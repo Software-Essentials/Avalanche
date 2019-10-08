@@ -3,7 +3,11 @@ const Knex = require("knex");
 
 class AVAQueryBuilder {
   
+  /**
+   * @param {Object} options Optional object containing options.
+   */
   constructor() {
+    const options = arguments[0] ? arguments[0] : null;
     this.kConfig = {
       client: "mysql",
       version: "5.7",
@@ -19,6 +23,9 @@ class AVAQueryBuilder {
       }
     };
     this.SELECTED = false;
+    this.finished = false;
+    this.onSuccess = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    this.onFailure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
   }
 
   init() {
@@ -70,21 +77,62 @@ class AVAQueryBuilder {
   }
 
   then() {
-    this.chain = this.chain.then(...arguments);
+    if (typeof arguments[0] === "object" && "onSuccess" in arguments[0]) {
+      this.chain = this.chain.then((value) => {
+        this.onSuccess = arguments[0] ? typeof arguments[0].onSuccess === "function" ? arguments[0].onSuccess : () => { } : () => { };
+        const result = Array.isArray(value) ? {results: value} : {result: value};
+        if (!this.finished) {
+          this.onSuccess(result);
+          this.finished = true;
+        }
+      });
+    } else {
+      this.chain = this.chain.then(...arguments);
+    }
     return this;
   }
 
   fetch({onSuccess, onFailure}) {
+    this.onSuccess = typeof onSuccess === "function" ? onSuccess : () => { };
+    this.onFailure = typeof onFailure === "function" ? onFailure : () => { };
     this.chain = this.chain.then((value) => {
       const result = Array.isArray(value) ? {results: value} : {result: value};
-      onSuccess(result);
+      if (!this.finished) {
+        this.onSuccess(result);
+        this.finished = true;
+      }
     });
     this.chain.catch((error) => {
-      onFailure({ errors: [{ error: "databaseError", code: error.code }] })
+      if (!this.finished) {
+        this.onFailure({ errors: [{ error: "databaseError", code: error.code }] })
+        this.finished = true;
+      }
     });
+    return this;
+  }
+  
+  catch() {
+    if (typeof arguments[0] === "object" && "onFailure" in arguments[0]) {
+      this.chain = this.chain.then((value) => {
+        this.onFailure = arguments[0] ? typeof arguments[0].onFailure === "function" ? arguments[0].onFailure : () => { } : () => { };
+        const result = Array.isArray(value) ? {results: value} : {result: value};
+        if (!this.finished) {
+          this.onFailure(result);
+          this.finished = true;
+        }
+      });
+    } else {
+      this.chain = this.chain.catch(...arguments);
+    }
+    return this;
+  }
+  
+  insert() {
+    this.chain = this.chain.catch(...arguments);
     return this;
   }
 
 }
+
 
 module.exports = AVAQueryBuilder;
