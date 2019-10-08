@@ -24,6 +24,14 @@ class AVAModel extends AVAQueryBuilder {
 
 }
 
-AVAModel.register = (model) => { return model };
+AVAModel.register = (Model) => {
+  const model = new Model();
+  Model.PROPERTIES = model.PROPERTIES;
+  Model.IDENTIFIER = model.IDENTIFIER;
+  Model.METHOD = model.METHOD;
+  Model.DRAFT = model.DRAFT;
+  Model.NAME = model.NAME;
+  return Model
+};
 
 module.exports = AVAModel;
