@@ -22,7 +22,7 @@ class AVAQueryBuilder {
   }
 
   init() {
-    const knexInstance = Knex(kConfig);
+    const knexInstance = Knex(this.kConfig);
     this.chain = knexInstance(this.NAME);
   }
 
