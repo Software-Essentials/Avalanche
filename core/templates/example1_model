@@ -14,7 +14,7 @@ class Post extends AVAModel {
     // Model configuration.
     this.NAME = "Post"; // Name of the Storage Zone / Database Table.
     this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
-    this.METHOD = "STORAGE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+    this.METHOD = "DATABASE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
     this.PROPERTIES = {
       "ID": {
         name: "post_id",
