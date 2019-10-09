@@ -303,12 +303,12 @@ AVAModel.register = (Model) => {
   Model.DRAFT = _AVAModel.DRAFT;
   Model.NAME = _AVAModel.NAME;
   const _AVAQueryBuilder = new AVAQueryBuilder(Model.NAME);
-  AVAQueryBuilder.select = _AVAQueryBuilder.select;
-  AVAQueryBuilder.where = _AVAQueryBuilder.where;
-  AVAQueryBuilder.then = _AVAQueryBuilder.then;
-  AVAQueryBuilder.fetch = _AVAQueryBuilder.fetch;
-  AVAQueryBuilder.catch = _AVAQueryBuilder.catch;
-  AVAQueryBuilder.insert = _AVAQueryBuilder.insert;
+  Model.select = _AVAQueryBuilder.select;
+  Model.where = _AVAQueryBuilder.where;
+  Model.then = _AVAQueryBuilder.then;
+  Model.fetch = _AVAQueryBuilder.fetch;
+  Model.catch = _AVAQueryBuilder.catch;
+  Model.insert = _AVAQueryBuilder.insert;
 
   /**
    * @description Returns JSON representation.
