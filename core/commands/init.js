@@ -2,7 +2,7 @@ const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const inquirer = require("inquirer");
 const { exec, execSync } = require("child_process");
-const { AVAError } = require("../../index");
+const AVAError = require("../../foundation/AVAError");
 const Installer = require("../Installer");
 var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 

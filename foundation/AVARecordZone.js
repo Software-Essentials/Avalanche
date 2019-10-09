@@ -1,4 +1,4 @@
-const { AVARecordZoneType } = require("../index.js");
+const AVARecordZoneType = require("../foundation/AVARecordZoneType");
 
 
 

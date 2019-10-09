@@ -2,8 +2,9 @@ const CoreUtil = require("../CoreUtil");
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
-const { AVAEnvironment } = require("../../index");
+const AVAEnvironment = require("../../foundation/AVAEnvironment");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+
 
 /**
  * @description Runs your Avalanche application.
@@ -22,7 +23,7 @@ function run() {
       environmentName = null;
     }
   }
-  const environment = new AVAEnvironment(environmentName);
+  global.environment = new AVAEnvironment(environmentName);
   var cProcess = start(environmentName);
   if(environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;

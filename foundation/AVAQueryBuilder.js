@@ -6,7 +6,7 @@ class AVAQueryBuilder {
   /**
    * @param {Object} options Optional object containing options.
    */
-  constructor() {
+  constructor(table) {
     const options = arguments[0] ? arguments[0] : null;
     this.kConfig = {
       client: "mysql",
@@ -22,6 +22,7 @@ class AVAQueryBuilder {
         max: 10
       }
     };
+    this.NAME = table;
     this.SELECTED = false;
     this.finished = false;
     this.onSuccess = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };

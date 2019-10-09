@@ -1,6 +1,7 @@
 const fs = require("fs");
-const CoreUtil = require("./CoreUtil")
-const { AVADatabase, AVAStorage } = require("../index");
+const CoreUtil = require("./CoreUtil");
+const AVADatabase = require("../foundation/AVADatabase");
+const AVAStorage = require("../foundation/AVAStorage");
 
 
 class Seeder {

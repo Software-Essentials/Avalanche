@@ -1,6 +1,8 @@
 const fs = require("fs");
 const CoreUtil = require("./CoreUtil");
-const { AVADatabase, AVAStorage, AVARecordZone } = require("../index");
+const AVADatabase = require("../foundation/AVADatabase");
+const AVAStorage = require("../foundation/AVAStorage");
+const AVARecordZone = require("../foundation/AVARecordZone");
 
 
 class Migrator {

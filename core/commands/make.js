@@ -1,6 +1,6 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
-const { AVAError } = require("../../index.js");
+const AVAError = require("../../foundation/AVAError");
 const { COPYFILE_EXCL } = fs.constants;
 const CoreUtil = require("../CoreUtil");
 

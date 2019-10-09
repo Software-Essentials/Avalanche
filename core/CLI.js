@@ -5,7 +5,8 @@ global.CoreUtil = require("./CoreUtil");
 const fs = require("fs");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const { AVAError, AVAEnvironment } = require("../index.js");
+const AVAEnvironment = require("../foundation/AVAEnvironment");
+const AVAError = require("../foundation/AVAError");
 
 cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
@@ -28,7 +29,6 @@ if (typeof cmdValue !== "undefined") {
     }
   }
 
-  var found = false;
   const path = `${__dirname}/commands`;
   const commands = fs.readdirSync(path);
   for (const key of commands) {
@@ -53,11 +53,8 @@ if (typeof cmdValue !== "undefined") {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
         return;
       }
-      found = true;
+      return;
     }
   }
-  if (!found) {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command not found.\x1b[0m`);
-    return;
-  }
+  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command not found.\x1b[0m`);
 }
