@@ -341,6 +341,7 @@ AVAModel.register = (Model) => {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError" }] });
+          return;
         } else {
           var data = [];
           for (const result of results) {
@@ -349,6 +350,7 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
+          return;
         }
       });
     }
@@ -356,7 +358,8 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] })
+        success({ results: [] });
+        return;
       }
       const records = zone.getRecords();
       var results = [];
@@ -365,11 +368,9 @@ AVAModel.register = (Model) => {
         model.setupDone(records[record]);
         results.push(model);
       }
-      success({ results: results })
+      success({ results: results });
+      return;
     }
-    console.log("I am here")
-    failure();
-    return;
   }
   Model.all = all;
 
@@ -392,6 +393,7 @@ AVAModel.register = (Model) => {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError" }] });
+          return;
         } else {
           var data = [];
           for (const result of results) {
@@ -400,6 +402,7 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
+          return;
         }
       });
     }
@@ -408,7 +411,8 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] })
+        success({ results: [] });
+        return;
       }
       const records = zone.getRecords();
       for (const record in records) {
@@ -422,6 +426,7 @@ AVAModel.register = (Model) => {
         }
       }
       success({ results: results });
+      return;
     }
   }
   Model.where = where;
