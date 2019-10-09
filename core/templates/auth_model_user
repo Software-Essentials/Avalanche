@@ -48,7 +48,7 @@ class User extends AVAModel {
         length: 1
       }
     }; // Format: "<model key>": { <properties> }
-    this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
+    this.setupDone(); // Lets the super Model know that we are done with the setup of this Model.
     // Default values.
     this.createdAt = new Date().valueOf();
   }

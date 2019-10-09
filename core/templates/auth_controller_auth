@@ -10,11 +10,6 @@ const jwt = require("jsonwebtoken");
  */
 class AuthController extends AVAController {
 
-  constructor() {
-    super()
-  }
-
-
   /**
    * @param {Object} request
    * @param {Object} response
@@ -37,51 +32,57 @@ class AuthController extends AVAController {
    * @param {Object} response
    */
   login(request, response) {
-    const userEmail = request.body.userEmail;
-    const givenPassword = request.body.userPassword;
-    const rememberMe = request.body.rememberMe === "on";
-    const onSuccess = ({token}) => {
+    const onSuccess = ({result}) => {
       if (typeof request.headers.referer === "string") {
         response.redirect("/profile");
       } else {
         response.json({
           success: true,
           message: "Signed in.",
-          data: { token }
+          data: result
         });
       }
     }
-    const onFailure = ({error}) => {
+    const onFailure = ({errors}) => {
       if (typeof request.headers.referer === "string") {
         response.redirect("/signin");
       } else {
         response.json({
-          success: true,
-          message: error.message
+          success: false,
+          errors: errors
         });
       }
     }
-    new User().where("user_email", userEmail).fetch(({error, self}) => {
-      if (error) {
-        onFailure({error});
-      } else {
-        bcrypt.compare(givenPassword, self.password).then((passwordIsCorrect) => {
-          if (!passwordIsCorrect) {
-            onFailure({error: new Error("Password incorrect.")});
-          } else {
-            const data = {
-              userID: self.ID
-            };
-            jwt.sign(data, environment.secret, { expiresIn: "30d" }, (error, token) => {
-              if (error) {
-                onFailure({error});
-              } else {
-                request.session.token = token;
-                onSuccess({token});
-              }
-            });
-          }
-        });
+    request.body.validate("userEmail").type("string");
+    request.body.validate("userEmail").greaterThan(4);
+    request.body.validate("userPassword").type("string");
+    request.body.validate("userPassword").greaterThan(4);
+    const { userEmail, userPassword } = request.body;
+    new User().where("email", userEmail).fetch({
+      onFailure,
+      onSuccess: ({results}) => {
+        if (results.length === 1) {
+          const result = results[0];
+          const data = { userID: result.ID };
+          bcrypt.compare(userPassword, result.password).then((passwordIsCorrect) => {
+            if (!passwordIsCorrect) {
+              onFailure({errors: [{ error: "invalidPassword", message: "Password incorrect." }]});
+            } else {
+              jwt.sign(data, environment.secret, { expiresIn: "30d" }, (error, token) => {
+                if (error) {
+                  onFailure({ errors: [{error: "signError", message: "Failed to generate token." }]});
+                } else {
+                  request.session.token = token;
+                  onSuccess({result: { token }});
+                }
+              });
+            }
+          }).catch((error) => {
+            onFailure({errors: [{ error: "decryptionFailure", message: "Unable to decrypt password." }]});
+          });
+        } else {
+          onFailure({errors: [{ error: "emailNotFound", message: "Email not found." }]});
+        }
       }
     });
   }
@@ -92,9 +93,7 @@ class AuthController extends AVAController {
    * @param {Object} response
    */
   register(request, response) {
-    const userPassword = request.body.userPassword;
-    const userPassword2 = request.body.userPassword2;
-    const userEmail = request.body.userEmail;
+    const { userEmail, userPassword } = request.body;
     const onSuccess = () => {
       if(typeof request.headers.referer === "string") {
         response.redirect("/profile");
@@ -105,29 +104,22 @@ class AuthController extends AVAController {
         });
       }
     };
-    const onFailure = ({error}) => {
+    const onFailure = ({errors}) => {
       if(typeof request.headers.referer === "string") {
         response.redirect("/signup");
       } else {
         response.json({
           success: false,
-          message: error.message
+          errors: errors
         });
       }
     };
-    if (userPassword !== userPassword2) {
-      onFailure();
-      return;
-    }
     bcrypt.hash(userPassword, global.environment.saltRounds, (error, hashedPassword) => {
       if(error) {
-        onFailure({error});
+        onFailure({errors: [{ error: "encryptionFailure", message: "Failed to encrypt password" }]});
         return;
       }
-      const user = new User();
-      user.email = userEmail;
-      user.password = hashedPassword;
-      user.save({onSuccess, onFailure});
+      new User().insert({email: userEmail, password: hashedPassword}).then({onSuccess}).catch({onFailure});
     });
   }
   
