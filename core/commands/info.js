@@ -1,4 +1,5 @@
 const fs = require("fs");
+const Table = require("cli-table");
 const CoreUtil = require("../CoreUtil");
 const avalanchePackage = require("../../package.json");
 const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -8,6 +9,50 @@ const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${project
  * @description Prints information about the current Avalanche version and about the project.
  */
 function info() {
+  const chars = {
+    "right-mid": "",
+    "left-mid": "",
+    "mid-mid": "",
+    "mid": ""
+  };
+  var table1 = new Table({chars});
+  var table2 = new Table({chars});
+ 
+  table1.push(
+    ["CLI Version:", `\x1b[34m\x1b[1mv${avalanchePackage.version}\x1b[0m`],
+    ["CLI Directory:", `${__dirname}`]
+  );
+ 
+  table2.push(
+    ["Is NPM project:", `\x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m`],
+    ["Is Avalanche project:", `\x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m`]
+  );
+  if(CoreUtil.isAVACoreInstalled()) {
+    const version = package.dependencies.avacore;
+    const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
+    table2.push(
+      ["AVACore version:", `\x1b[34m\x1b[1mv${projectVersion}\x1b[0m`]
+    );
+  } else {
+    table2.push(
+      ["AVACore version:", `\x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m`]
+    );
+  }
+  if(CoreUtil.isAVAProject()) {
+    table2.push(
+      ["Models:", `\x1b[32m\x1b[1m${CoreUtil.getModels().length}\x1b[0m`],
+      ["Controllers:", `\x1b[32m\x1b[1m${CoreUtil.getControllers().length}\x1b[0m`],
+      ["Routes:", `\x1b[32m\x1b[1m${CoreUtil.getRoutes().length}\x1b[0m`],
+      ["Middleware:", `\x1b[32m\x1b[1m${CoreUtil.getMiddleware().length}\x1b[0m`],
+      ["Localisations:", `\x1b[32m\x1b[1m${CoreUtil.getLocalisations().length}\x1b[0m`],
+      ["Translations:", `\x1b[32m\x1b[1m${CoreUtil.getTranslations().length}\x1b[0m`],
+      ["Helpers:", `\x1b[32m\x1b[1m${Object.keys(CoreUtil.getHelpers()).length}\x1b[0m`],
+      ["Migrations:", `\x1b[32m\x1b[1m${Object.keys(CoreUtil.getMigrations()).length}\x1b[0m`]
+    );
+  }
+   
+
+
   var string = "\n";
   string += `  \x1b[1m++==============================[Avalanche info]==============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
@@ -37,7 +82,11 @@ function info() {
   }
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++============================================================================\x1b[0m\n`;
-  console.log(string);
+  console.log("\n\n\n");
+  console.log("\x1b[32m\x1b[1mAvalanche CLI info\x1b[0m");
+  console.log(`${table1.toString()}\n`);
+  console.log("\x1b[32m\x1b[1mProject info\x1b[0m");
+  console.log(`${table2.toString()}\n`);
 }
 
 
