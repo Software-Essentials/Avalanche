@@ -92,7 +92,10 @@ class Router {
                         }
                         ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
                     } else {
-                        ExRouter[method.toLowerCase()](routePath, routeHandler[controllerHandler]);
+                        ExRouter[method.toLowerCase()](routePath, (request, response, next) => {
+                            new AVAValidator(request);
+                            next();
+                        }, routeHandler[controllerHandler]);
                     }
                 } else {
                     // ViewController handler

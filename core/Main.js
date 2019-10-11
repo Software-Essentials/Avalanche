@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 global.CoreUtil = require("./CoreUtil");
 
-const { AVAEnvironment } = require("../index");
+const AVAEnvironment = require("../foundation/AVAEnvironment");
 const express = require("express");
 
 cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];

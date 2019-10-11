@@ -1,4 +1,5 @@
 const { AVAStorage, AVARecordZone, AVADatabase, AVAError } = require("../index");
+const AVAQueryBuilder = require("./AVAQueryBuilder");
 
 
 /**
@@ -295,13 +296,19 @@ class AVAModel {
 
 
 AVAModel.register = (Model) => {
-  const dummy = new Model();
-  Model.PROPERTIES = dummy.PROPERTIES;
-  Model.IDENTIFIER = dummy.IDENTIFIER;
-  Model.METHOD = dummy.METHOD;
-  Model.DRAFT = dummy.DRAFT;
-  Model.NAME = dummy.NAME;
-
+  const _AVAModel = new Model();
+  Model.PROPERTIES = _AVAModel.PROPERTIES;
+  Model.IDENTIFIER = _AVAModel.IDENTIFIER;
+  Model.METHOD = _AVAModel.METHOD;
+  Model.DRAFT = _AVAModel.DRAFT;
+  Model.NAME = _AVAModel.NAME;
+  const _AVAQueryBuilder = new AVAQueryBuilder(Model.NAME);
+  Model.select = _AVAQueryBuilder.select;
+  Model.where = _AVAQueryBuilder.where;
+  Model.then = _AVAQueryBuilder.then;
+  Model.fetch = _AVAQueryBuilder.fetch;
+  Model.catch = _AVAQueryBuilder.catch;
+  Model.insert = _AVAQueryBuilder.insert;
 
   /**
    * @description Returns JSON representation.
@@ -334,6 +341,7 @@ AVAModel.register = (Model) => {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError" }] });
+          return;
         } else {
           var data = [];
           for (const result of results) {
@@ -342,6 +350,7 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
+          return;
         }
       });
     }
@@ -349,7 +358,8 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] })
+        success({ results: [] });
+        return;
       }
       const records = zone.getRecords();
       var results = [];
@@ -358,7 +368,8 @@ AVAModel.register = (Model) => {
         model.setupDone(records[record]);
         results.push(model);
       }
-      success({ results: results })
+      success({ results: results });
+      return;
     }
   }
   Model.all = all;
@@ -382,6 +393,7 @@ AVAModel.register = (Model) => {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError" }] });
+          return;
         } else {
           var data = [];
           for (const result of results) {
@@ -390,6 +402,7 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
+          return;
         }
       });
     }
@@ -398,7 +411,8 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] })
+        success({ results: [] });
+        return;
       }
       const records = zone.getRecords();
       for (const record in records) {
@@ -412,13 +426,13 @@ AVAModel.register = (Model) => {
         }
       }
       success({ results: results });
+      return;
     }
   }
   Model.where = where;
 
-
   return Model;
-}
+};
 
 
-module.exports = AVAModel.register(AVAModel);
+module.exports = AVAModel;

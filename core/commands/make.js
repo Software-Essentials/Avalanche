@@ -1,8 +1,9 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
-const { AVAError } = require("../../index.js");
+const AVAError = require("../../foundation/AVAError");
 const { COPYFILE_EXCL } = fs.constants;
 const CoreUtil = require("../CoreUtil");
+const { UUID } = require("../Util");
 
 
 /**
@@ -131,11 +132,23 @@ function make_environment() {
   const questions = [
     {
       type: "input",
-      name: "name",
-      message: "Name your environment:",
+      name: "filename",
+      message: "Name your environment file:",
+      default: "development",
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
-      default: "development",
+      validate: (answer) => {
+        if(fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
+          return "\x1b[31mAn environment file with this name already exists.\x1b[0m"
+        return true;
+      }
+    },
+    {
+      type: "input",
+      name: "name",
+      message: "Name your application title for this environment:",
+      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m",
       validate: (answer) => {
         if(fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
           return "\x1b[31mAn environment file with this name already exists.\x1b[0m"
@@ -143,11 +156,18 @@ function make_environment() {
       }
     }
   ];
+  const string = new UUID().string.split("-").join("");
+  var secret = []
+  for (const character of string) {
+    secret.push(Math.round(Math.random()) ? character.toLowerCase() : character.toUpperCase());
+  }
+  secret = secret.join("");
   inquirer.prompt(questions).then(answers => {
-    const path = `app/environments/${answers.name}.environment.json`;
+    const path = `app/environments/${answers.filename}.environment.json`;
     const template = "TEMPLATE_environment";
     const variables = {
-      name: answers.name
+      name: answers.name,
+      secret: secret
     };
     makeTemplate(variables, template, path);
   });

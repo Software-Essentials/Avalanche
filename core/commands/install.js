@@ -1,5 +1,5 @@
 const CoreUtil = require("../CoreUtil");
-const { AVAError } = require("../../index");
+const AVAError = require("../../foundation/AVAError");
 const Installer = require("../Installer");
 
 

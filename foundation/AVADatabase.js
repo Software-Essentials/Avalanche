@@ -8,7 +8,7 @@ const CoreUtil = require("../core/CoreUtil");
 class AVADatabase {
 
   constructor() {
-    this.connection = mysql.createPool(global.environment.database);
+    this.connection = mysql.createPool(environment.database);
   }
 
 
@@ -90,26 +90,27 @@ class AVADatabase {
       "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
       "DOUBLE": { type: "double", unsignable: true, incrementable: true },
       "BIT": { type: "bit", length: true },
-      "CHAR": { type: "char", length: true },
-      "VARCHAR": { type: "varchar", length: true },
-      "DATETIME": { type: "varchar" },
-      "DATE": { type: "date" },
-      "TIMESTAMP": { type: "timestamp" },
-      "TEXT": { type: "text" },
-      "TINYTEXT": { type: "tinytext" },
-      "MEDIUMTEXT": { type: "mediumtext" },
-      "LONGTEXT": { type: "longtext" }
+      "CHAR": { type: "char", string: true, length: true },
+      "VARCHAR": { type: "varchar", string: true, length: true },
+      "DATETIME": { type: "varchar", string: true },
+      "DATE": { type: "date", string: true },
+      "TIMESTAMP": { type: "timestamp", string: true },
+      "TEXT": { type: "text", string: true },
+      "TINYTEXT": { type: "tinytext", string: true },
+      "MEDIUMTEXT": { type: "mediumtext", string: true },
+      "LONGTEXT": { type: "longtext", string: true }
     };
     var columnStrings = [];
     for (const column of columns) {
       const typeProperty = datatypes[column.type];
       const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
       const name = column.name;
+      const defaultVal = column.default;
       const required = !!column.required;
       const unique = !!column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
       const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
-      columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
+      columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
       if (unique) {
         columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
       }

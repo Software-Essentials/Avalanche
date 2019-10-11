@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.4.4",
+  "version": "0.4.21",
   "description": "Node MVC OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -15,6 +15,8 @@
     "MVC",
     "OOP",
     "CLI",
+    "ORM",
+    "QueryBuilder",
     "Framework",
     "Automated",
     "Express",
@@ -33,6 +35,7 @@
     "ava": "core/CLI.js"
   },
   "dependencies": {
+    "cli-table": "^0.3.1",
     "connect-mysql": "^2.2.5",
     "cookie-parser": "^1.4.3",
     "csurf": "^1.10.0",
@@ -40,6 +43,7 @@
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
     "inquirer": "^6.5.1",
+    "knex": "^0.19.5",
     "md5": "^2.2.1",
     "mysql": "^2.16.0",
     "nodemailer": "^6.3.0",

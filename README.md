@@ -4,7 +4,9 @@ No more structuring your Node projects over and over again.
 
 # Getting started
 
-A step by step guide how to get a development environment up and running
+A step by step guide how to get a development environment up and running.
+
+Alternatively, you can [watch the YouTube tutorial](https://www.youtube.com/watch?v=c7-wttwkv7I).
 
 ## Prerequisites
  
