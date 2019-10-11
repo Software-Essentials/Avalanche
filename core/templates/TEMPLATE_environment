@@ -12,7 +12,7 @@
     "restartOnFileChange": true
   },
   "auth": {
-    "secret": "sEcreT5",
+    "secret": "<#secret?>",
     "saltRounds": 10,
     "sessionStore": "MYSQL"
   },
