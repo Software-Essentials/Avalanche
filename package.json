@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.4.17",
+  "version": "0.4.18",
   "description": "Node MVC OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -35,6 +35,7 @@
     "ava": "core/CLI.js"
   },
   "dependencies": {
+    "cli-table": "^0.3.1",
     "connect-mysql": "^2.2.5",
     "cookie-parser": "^1.4.3",
     "csurf": "^1.10.0",
