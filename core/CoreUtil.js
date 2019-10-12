@@ -1,26 +1,41 @@
 const fs = require("fs");
 const md5 = require("md5");
+const path = require("path");
 
 
 /**
  * @description Removes a directory recursively.
- * @param {String} path
+ * @param {String} filePath
  */
-function rmdirSyncRecursive(path) {
+function rmdirSyncRecursive(filePath) {
   var files = [];
-  if( fs.existsSync(path) ) {
-    files = fs.readdirSync(path);
+  if( fs.existsSync(filePath) ) {
+    files = fs.readdirSync(filePath);
     files.forEach(function(file,index){
-      var curPath = path + "/" + file;
+      var curPath = filePath + "/" + file;
       if(fs.lstatSync(curPath).isDirectory()) {
         rmdirSyncRecursive(curPath);
       } else {
         fs.unlinkSync(curPath);
       }
     });
-    fs.rmdirSync(path);
+    fs.rmdirSync(filePath);
   }
 };
+
+
+/**
+ * @description Creates directory tree if needed
+ * @param {String} filePath
+ */
+function ensureDirectoryExistence(filePath) {
+  var dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) {
+    return true;
+  }
+  ensureDirectoryExistence(dirname);
+  fs.mkdirSync(dirname);
+}
 
 
 /**
@@ -93,20 +108,20 @@ function directoryLooper(filename, previousChildren) {
 
 /**
  * @description Will trigger a callback when a change in the given file is detected.
- * @param {String} path Path of the file to start watching.
+ * @param {String} filePath Path of the file to start watching.
  * @param {Function} callback Will be triggered when a file change is detected.
  */
-function startWatchingSession(path, callback) {  
+function startWatchingSession(filePath, callback) {  
   let md5Previous = null;
   let fsWait = false;
-  fs.watch(path, (event, filename) => {
+  fs.watch(filePath, (event, filename) => {
     if (filename) {
       if (fsWait) return;
       fsWait = setTimeout(() => {
         fsWait = false;
       }, 100);
-      if (fs.existsSync(path)) {
-        const md5Current = md5(fs.readFileSync(path));
+      if (fs.existsSync(filePath)) {
+        const md5Current = md5(fs.readFileSync(filePath));
         if (md5Current === md5Previous) {
           return;
         }
@@ -316,6 +331,7 @@ function getSeedFilesNames() {
 
 module.exports = {
     rmdirSyncRecursive: rmdirSyncRecursive,
+    ensureDirectoryExistence: ensureDirectoryExistence,
     isAVACoreInstalled: isAVACoreInstalled,
     isAVAProject: isAVAProject,
     isNodeProject: isNodeProject,

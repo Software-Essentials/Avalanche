@@ -114,6 +114,12 @@ class AVAModel {
           }
         }
       }
+      for(const i in values) {
+        if (values[i] === "NULL") {
+          keys.splice(i, 1);
+          values.splice(i, 1);
+        }
+      }
       var query = "";
       if (this.DRAFT) {
         query = `INSERT INTO \`${this.NAME}\` (${keys.join(", ")}) VALUES (${values.join(", ")})`;
@@ -130,7 +136,8 @@ class AVAModel {
             failure({ errors: [{ error: "duplicateEntry", message: "Record already exists." }] });
             return;
           }
-          failure({ errors: [{ error: "databaseError" }] });
+          console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+          failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
           this.DRAFT = false;
           success({result: this});
@@ -178,8 +185,10 @@ class AVAModel {
         if (error) {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+          } else {
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
-          failure({ errors: [{ error: "databaseError" }] });
+          failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
           success({});
         }
@@ -339,8 +348,10 @@ AVAModel.register = (Model) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+          } else {
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
-          failure({ errors: [{ error: "databaseError" }] });
+          failure({ errors: [{ error: "databaseError", message: error.code }] });
           return;
         } else {
           var data = [];
@@ -391,8 +402,10 @@ AVAModel.register = (Model) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
             console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+          } else {
+            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
-          failure({ errors: [{ error: "databaseError" }] });
+          failure({ errors: [{ error: "databaseError", message: error.code }] });
           return;
         } else {
           var data = [];
