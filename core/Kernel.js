@@ -6,6 +6,7 @@ const exphbs = require("express-handlebars");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const { AVADatabase } = require("../index");
+const CoreUtil = require("./CoreUtil");
 const MySQLStore = require("connect-mysql")(session);
 const Router = require("./Router");
 const SocketKernel = require("./SocketKernel");
@@ -131,21 +132,25 @@ class Kernel {
 
 		// Request logger
 		if (global.environment.logHTTPRequestsToConsole) {
-			const now = new Date().toLocaleString();
+			const now = new Date();
 			const method = request.method;
 			const status = response.statusCode;
-			const log = `[${now}]\t[${method}::${status}]\t>> ${request.url}`;
+			const log = `[${now.toLocaleString()}]\t[${method}::${status}]\t>> ${request.url}`;
 			const color = status === 200 ? 32 : status === 304 ? 33 : 31
 			const methodColor =
 				method === "GET" ? 32 :
 				method === "POST" ? 33 :
 				method === "PUT" ? 34 :
 				method === "DELETE" ? 31 : 0
-			console.log(`[\x1b[1m${now}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
+			console.log(`[\x1b[1m${now.toLocaleTimeString()}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
 			if(!fs.existsSync(`${projectPWD}/logs`)) {
 				fs.mkdirSync(`${projectPWD}/logs`);
 			}
-			fs.appendFileSync(`${projectPWD}/logs/server.log`, `${log}\n`);
+			fs.appendFile(`${projectPWD}/logs/requests.log`, `${log}\n`, (error) => {
+				if (error) {
+					console.log(`${CoreUtil.terminalPrefix()}\x1b[33m ${error.message}\x1b[0m`);
+				}
+			});
 		}
 
 	}
