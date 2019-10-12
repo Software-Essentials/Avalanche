@@ -114,6 +114,12 @@ class AVAModel {
           }
         }
       }
+      for(const i in values) {
+        if (values[i] === "NULL") {
+          keys.splice(i, 1);
+          values.splice(i, 1);
+        }
+      }
       var query = "";
       if (this.DRAFT) {
         query = `INSERT INTO \`${this.NAME}\` (${keys.join(", ")}) VALUES (${values.join(", ")})`;
