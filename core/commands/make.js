@@ -4,6 +4,7 @@ const AVAError = require("../../foundation/AVAError");
 const { COPYFILE_EXCL } = fs.constants;
 const CoreUtil = require("../CoreUtil");
 const { UUID } = require("../Util");
+const path = require("path");
 
 
 /**
@@ -357,19 +358,25 @@ function make_view() {
  * @param {String} template 
  * @param {String} path 
  */
-function makeTemplate(variables, template, path) {
-  const src = `${__dirname}/../templates/${template}`;
-  const dest = `${projectPWD}/${path}`;
+function makeTemplate(variables, template, projectPath) {
+  const src = path.normalize(`${__dirname}/../templates/${template}`);
+  const dest = path.normalize(`${projectPWD}/${projectPath}`);
   if(fs.existsSync(src)) {
     if (!fs.existsSync(dest)) {
-      fs.copyFileSync(src, dest, COPYFILE_EXCL);
-      var content = fs.readFileSync(dest).toString();
-      for(const key in variables) {
-        const variable = variables[key];
-        content = content.split(`<#${key}?>`).join(variable);
-      }
-      fs.writeFileSync(dest, content, { encoding: "utf8" });
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
+      CoreUtil.ensureDirectoryExistence(dest);
+      fs.copyFile(src, dest, COPYFILE_EXCL, (error) => {
+        if (error) {
+          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) ${error.message}\x1b[0m`);
+          return;
+        }
+        var content = fs.readFileSync(dest).toString();
+        for(const key in variables) {
+          const variable = variables[key];
+          content = content.split(`<#${key}?>`).join(variable);
+        }
+        fs.writeFileSync(dest, content, { encoding: "utf8" });
+        console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
+      });
     } else {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
     }
