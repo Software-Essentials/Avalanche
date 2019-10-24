@@ -1,0 +1,7 @@
+FROM node:11.8
+WORKDIR /app_container
+COPY package.json /app_container
+RUN npm install
+RUN npm install avacore -g
+COPY . /app_container
+CMD ["avalanche", "run", "production"]

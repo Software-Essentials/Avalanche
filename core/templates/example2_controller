@@ -1,0 +1,132 @@
+// Imports
+const { AVAController } = require("avacore");
+
+
+/**
+*   For managing posts.
+*/
+class PostController extends AVAController {
+
+  /**
+  *   Returns all posts.
+  */
+  index(request, response) {
+    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, updated_at AS updatedAt FROM Post ORDER BY created_at DESC";
+    global.database.query(query, [], (error, rows, fields) => {
+      if (error) {
+        response.json({
+          success: false,
+          message: "Database error",
+          error: ["databaseError"]
+        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: "Showing all records.",
+        data: rows
+      });
+    });
+  }
+
+  /**
+  *   Returns a specific post.
+  */
+  show(request, response) {
+    const postID = request.query.id;
+    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, updated_at AS updatedAt FROM Post WHERE post_id = ?";
+    const parameters = [postID];
+    global.database.query(query, parameters, (error, rows, fields) => {
+      if (error) {
+        response.json({
+          success: false,
+          message: "Database error",
+          error: ["databaseError"]
+        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: "Showing all records.",
+        data: rows[0]
+      });
+    });
+  }
+
+  /**
+  *   Stores a new post into the database.
+  */
+  store(request, response) {
+    const postName = request.body.postName;
+    const postBody = request.body.postBody;
+    const query = "INSERT INTO Post (post_name, post_body) VALUES (?, ?)";
+    const parameters = [postName, postBody];
+    global.database.query(query, parameters, (error, rows, fields) => {
+      if (error) {
+        response.json({
+          success: false,
+          message: "Database error",
+          error: ["databaseError"]
+        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: "Post created."
+      });
+    });
+  }
+
+  /**
+  *   Updates an existing post.
+  */
+  update(request, response) {
+    const postID = request.body.ID;
+    const postName = request.body.postName;
+    const postBody = request.body.postBody;
+    const query = "UPDATE Post SET post_name = ?, post_body = ? WHERE post_id = ?";
+    const parameters = [postName, postBody, postID];
+    global.database.query(query, parameters, (error, rows, fields) => {
+      if (error) {
+        response.json({
+          success: false,
+          message: "Database error",
+          error: ["databaseError"]
+        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: "Post updated."
+      });
+    });
+  }
+
+  /**
+  *   Deletes an existing post from the database.
+  */
+  destroy(request, response) {
+    const postID = request.body.ID;
+    const query = "DELETE FROM Post WHERE post_id = ?";
+    const parameters = [postID];
+    global.database.query(query, parameters, (error, rows, fields) => {
+      if (error) {
+        response.json({
+          success: false,
+          message: "Database error",
+          error: ["databaseError"]
+        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: "Post deleted."
+      });
+    });
+  }
+
+}
+
+
+
+module.exports = PostController;
