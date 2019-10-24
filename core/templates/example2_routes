@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/post",
+    "method": "GET",
+    "controller": "PostController",
+    "handler": "index"
+  },
+  {
+    "path": "/post/show",
+    "method": "GET",
+    "controller": "PostController",
+    "handler": "show"
+  },
+  {
+    "path": "/post/store",
+    "method": "POST",
+    "controller": "PostController",
+    "handler": "store"
+  },
+  {
+    "path": "/post/update",
+    "method": "PUT",
+    "controller": "PostController",
+    "handler": "update"
+  },
+  {
+    "path": "/post/destroy",
+    "method": "DELETE",
+    "controller": "PostController",
+    "handler": "destroy"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "Gitignore",
+  "type": "PACKAGE",
+  "description": "This is package installs the .gitignore file.",
+  "aliases": [
+    "gitignore"
+  ],
+  "modules": [],
+  "files": [
+    {
+      "template": "gitignore_gitignore",
+      "path": "/.gitignore"
+    }
+  ]
+}

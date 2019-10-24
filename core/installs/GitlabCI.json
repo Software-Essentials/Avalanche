@@ -1,0 +1,16 @@
+{
+  "name": "GitlabCI",
+  "type": "PACKAGE",
+  "description": "This is package installs the .gitlab-ci file.",
+  "aliases": [
+    "Gitlab-CI",
+    "gitlab-ci"
+  ],
+  "modules": [],
+  "files": [
+    {
+      "template": "gitlabci_gitlab-ci",
+      "path": "/.gitlab-ci.yml"
+    }
+  ]
+}

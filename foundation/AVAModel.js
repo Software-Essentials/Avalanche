@@ -1,5 +1,4 @@
 const { AVAStorage, AVARecordZone, AVADatabase, AVAError } = require("../index");
-const AVAQueryBuilder = require("./AVAQueryBuilder");
 
 
 /**
@@ -83,22 +82,26 @@ class AVAModel {
       const database = new AVADatabase();
       var keys = [];
       var values = [];
+      var parameters = [];
       for (const key in this.PROPERTIES) {
-        keys.push(this.PROPERTIES[key].name);
         const value = this[key];
         switch (typeof value) {
           case "string":
-            values.push(`'${value}'`);
+            parameters.push(value);
+            values.push("?");
             break;
           case "number":
-            values.push(value);
+            parameters.push(value);
+            values.push("?");
             break;
           case "boolean":
-            values.push(value ? 1 : 0);
+            parameters.push(value ? 1 : 0);
+            values.push("?");
             break;
           default:
-            values.push("NULL");
+            continue;
         }
+        keys.push(this.PROPERTIES[key].name);
       }
       var setString = "";
       var merged = keys.reduce((object, key, index) => {
@@ -107,17 +110,12 @@ class AVAModel {
       }, {});
       for (const key in merged) {
         if (key !== this.PROPERTIES[this.IDENTIFIER].name) {
+          parameters.push(merged[key]);
           if (setString === "") {
-            setString = `${key} = ${merged[key]}`;
+            setString = `${key} = ?`;
           } else {
-            setString = `${setString}, ${key} = ${merged[key]}`;
+            setString = `${setString}, ${key} = ?`;
           }
-        }
-      }
-      for(const i in values) {
-        if (values[i] === "NULL") {
-          keys.splice(i, 1);
-          values.splice(i, 1);
         }
       }
       var query = "";
@@ -126,7 +124,6 @@ class AVAModel {
       } else {
         query = `UPDATE \`${this.NAME}\` SET ${setString} WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ${this[this.IDENTIFIER]}`;
       }
-      const parameters = [];
       database.connection.query(query, parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
@@ -305,19 +302,13 @@ class AVAModel {
 
 
 AVAModel.register = (Model) => {
-  const _AVAModel = new Model();
-  Model.PROPERTIES = _AVAModel.PROPERTIES;
-  Model.IDENTIFIER = _AVAModel.IDENTIFIER;
-  Model.METHOD = _AVAModel.METHOD;
-  Model.DRAFT = _AVAModel.DRAFT;
-  Model.NAME = _AVAModel.NAME;
-  const _AVAQueryBuilder = new AVAQueryBuilder(Model.NAME);
-  Model.select = _AVAQueryBuilder.select;
-  Model.where = _AVAQueryBuilder.where;
-  Model.then = _AVAQueryBuilder.then;
-  Model.fetch = _AVAQueryBuilder.fetch;
-  Model.catch = _AVAQueryBuilder.catch;
-  Model.insert = _AVAQueryBuilder.insert;
+  const dummy = new Model();
+  Model.PROPERTIES = dummy.PROPERTIES;
+  Model.IDENTIFIER = dummy.IDENTIFIER;
+  Model.METHOD = dummy.METHOD;
+  Model.DRAFT = dummy.DRAFT;
+  Model.NAME = dummy.NAME;
+
 
   /**
    * @description Returns JSON representation.
@@ -361,7 +352,6 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
-          return;
         }
       });
     }
@@ -369,8 +359,7 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] });
-        return;
+        success({ results: [] })
       }
       const records = zone.getRecords();
       var results = [];
@@ -379,8 +368,7 @@ AVAModel.register = (Model) => {
         model.setupDone(records[record]);
         results.push(model);
       }
-      success({ results: results });
-      return;
+      success({ results: results })
     }
   }
   Model.all = all;
@@ -415,7 +403,6 @@ AVAModel.register = (Model) => {
             data.push(model);
           }
           success({ results: data });
-          return;
         }
       });
     }
@@ -424,8 +411,7 @@ AVAModel.register = (Model) => {
       const storage = new AVAStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
-        success({ results: [] });
-        return;
+        success({ results: [] })
       }
       const records = zone.getRecords();
       for (const record in records) {
@@ -439,13 +425,13 @@ AVAModel.register = (Model) => {
         }
       }
       success({ results: results });
-      return;
     }
   }
   Model.where = where;
 
+
   return Model;
-};
+}
 
 
-module.exports = AVAModel;
+module.exports = AVAModel.register(AVAModel);

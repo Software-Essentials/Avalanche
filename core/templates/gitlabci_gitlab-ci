@@ -1,0 +1,44 @@
+stages:
+  - setup
+  - build
+  - deploy
+
+cache:
+ paths:
+  - cachefile
+
+versioning:
+  image: node:11.8
+  script:
+    - VERSION=$(node -p -e "require('./package.json').version")
+    - echo $VERSION > cachefile
+  stage: setup
+
+build:
+  image: docker:18
+  services:
+    - docker:18-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - VERSION="$(cat cachefile)"
+    - docker build -t "$IMAGE:$VERSION" .
+    - docker tag "$IMAGE:$VERSION" $CI_REGISTRY/$IMAGE_PATH/$IMAGE:$VERSION
+    - docker push $CI_REGISTRY/$IMAGE_PATH/$IMAGE:$VERSION
+    - docker tag "$IMAGE:$VERSION" $CI_REGISTRY/$IMAGE_PATH/$IMAGE:latest
+    - docker push $CI_REGISTRY/$IMAGE_PATH/$IMAGE:latest
+  stage: build
+
+deploy:dev:
+  script:
+    - curl -X POST $CI_SERVICE_WEBHOOK_URI_DEV
+  only:
+    - develop
+  stage: deploy
+
+deploy:prod:
+  script:
+    - curl -X POST $CI_SERVICE_WEBHOOK_URI_PROD
+  when: manual
+  only:
+    - master
+  stage: deploy

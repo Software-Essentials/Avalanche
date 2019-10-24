@@ -1,0 +1,15 @@
+{
+  "name": "Docker",
+  "type": "PACKAGE",
+  "description": "This is a package that installs files used by Docker.",
+  "aliases": [
+    "docker"
+  ],
+  "modules": [],
+  "files": [
+    {
+      "template": "docker_dockerfile",
+      "path": "/Dockerfile"
+    }
+  ]
+}
