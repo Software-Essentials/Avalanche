@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.26] - 2014-08-24
+### Added
+- Added 'gitignore' installable package
+- Added 'gitlab-ci' installable package
+- Added 'docker' installable package
+
+### Changes
+- Optimised AVAModel
+
 ## [0.4.25] - 2014-08-12
 ### Added
 - Added error handling to template builder.
