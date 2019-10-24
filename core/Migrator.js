@@ -62,9 +62,8 @@ class Migrator {
           const Model = require(path);
           if (Model.METHOD === "DATABASE") {
             var properties = [];
-            const options = {
+            var options = {
               force: force,
-              primaryKey: Model.PROPERTIES[Model.IDENTIFIER].name,
               onSuccess: ({table}) => {
                 migrations[table] = true;
                 update();
@@ -77,6 +76,9 @@ class Migrator {
                 update();
               }
             };
+            if (Model.PROPERTIES[Model.IDENTIFIER]) {
+              options.primaryKey = Model.PROPERTIES[Model.IDENTIFIER].name;
+            }
             for (const key of Object.keys(Model.PROPERTIES)) {
               properties.push(Model.PROPERTIES[key]);
             }

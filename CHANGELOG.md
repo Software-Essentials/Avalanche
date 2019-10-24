@@ -3,14 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.26] - 2014-08-24
+## [0.4.27] - 2014-08-24
 ### Added
-- Added 'gitignore' installable package
-- Added 'gitlab-ci' installable package
-- Added 'docker' installable package
+- Added 'gitignore' installable package.
+- Added 'gitlab-ci' installable package.
+- Added 'docker' installable package.
+- Added ability to have no primaryKey in Migrator.
 
 ### Changes
-- Optimised AVAModel
+- Optimised AVAModel.
 
 ## [0.4.25] - 2014-08-12
 ### Added
