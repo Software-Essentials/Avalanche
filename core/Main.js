@@ -1,7 +1,8 @@
-#!/usr/bin/env node --require=esm
+#!/usr/bin/env node
 
 global.projectPWD = process.cwd();
 
+require = require("esm")(module);
 const AVAEnvironment = require("../foundation/AVAEnvironment");
 import express from "express";
 import { terminalPrefix } from "./CoreUtil";
