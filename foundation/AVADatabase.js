@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const CoreUtil = require("../core/CoreUtil");
+const fs = require("fs");
 
 const DATATYPES = {
   "INT": { type: "int", length: true, unsignable: true, incrementable: true },
@@ -21,6 +22,13 @@ const DATATYPES = {
   "MEDIUMTEXT": { type: "mediumtext", string: true },
   "LONGTEXT": { type: "longtext", string: true }
 };
+
+const CONSTRAINT_BEHAVIOUR = {
+  NO_ACTION: "NO ACTION",
+  RESTRICT: "RESTRICT",
+  SET_NULL: "SET NULL",
+  CASCADE: "CASCADE",
+}
 
 /**
  * @description Can be used to store large or structured files.
@@ -115,13 +123,17 @@ class AVADatabase {
       const unsigned = typeProperty.unsignable ? column.relatable : false;
       const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
       const relation = column.relation;
-      if (relation !== undefined) {
-        const id = relation.IDENTIFIER;
-        const relatedName = relation.NAME;
-        const primaryKey = relation.PROPERTIES[id];
-        const relationName = `${tablename} ${relatedName}`;
-        columnStrings.push(`KEY \`${relationName}\` (\`${name}\`)`);
-        columnStrings.push(`CONSTRAINT \`${relationName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${relatedName}\` (\`${primaryKey.name}\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+      if (typeof relation === "string" || typeof relation === "object") {
+        const options = typeof relation === "object" ? relation : {};
+        const onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
+        const onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
+        const foreignClass = typeof relation === "object" ? options.table : relation;
+        const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`);
+        const foreignTable = foreignModel.NAME;
+        const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+        const constraintName = `${tablename} ${foreignTable}`;
+        columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+        columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
       }
       columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
       if (unique) {
