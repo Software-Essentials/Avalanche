@@ -3,7 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.31] - 2019-11-16
+## [0.4.32] - 2019-11-16
+### Added
+- Added CoreUtil to AVAFoundation
 
 ### Changes
 - Started implementation of ESM.

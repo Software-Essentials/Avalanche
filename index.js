@@ -12,6 +12,7 @@ module.exports.AVAMailer = require("./foundation/AVAMailer.js");
 module.exports.AVAError = require("./foundation/AVAError.js");
 
 module.exports.Util = require("./core/Util.js");
+module.exports.CoreUtil = require("./core/CoreUtil.js");
 module.exports._ = require("./foundation/AVALocalisation.js").translate;
 
 // Super components
