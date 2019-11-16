@@ -1,16 +1,16 @@
 // Dependencies
-const fs = require("fs");
-const bodyParser = require("body-parser");
-const express = require("express");
-const exphbs = require("express-handlebars");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const { AVADatabase } = require("../index");
-const CoreUtil = require("./CoreUtil");
+import fs from "fs";
+import bodyParser from "body-parser";
+import express from "express";
+import exphbs from "express-handlebars";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import { AVADatabase } from "../index";
+import CoreUtil from "./CoreUtil";
+import Router from "./Router";
+import SocketKernel from "./SocketKernel";
+import csrf from "csurf";
 const MySQLStore = require("connect-mysql")(session);
-const Router = require("./Router");
-const SocketKernel = require("./SocketKernel");
-const csrf = require("csurf");
 
 
 /**

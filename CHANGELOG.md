@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.31] - 2019-11-16
+
+### Changes
+- Started implementation of ESM.
+
 ## [0.4.30] - 2019-11-16
 ### Added
 - Added foreign key constraints (relations) to Migrator.

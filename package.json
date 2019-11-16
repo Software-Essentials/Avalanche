@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.4.30",
+  "version": "0.4.31",
   "description": "Node MVC OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "connect-mysql": "^2.2.5",
     "cookie-parser": "^1.4.3",
     "csurf": "^1.10.0",
+    "esm": "^3.2.25",
     "express": "^4.16.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
