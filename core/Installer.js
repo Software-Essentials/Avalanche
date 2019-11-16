@@ -1,8 +1,11 @@
-const fs = require("fs");
-const { execSync } = require("child_process");
-const { getProjectPackage } = require("./CoreUtil");
+import fs from "fs";
+import { execSync } from "child_process";
+import { getProjectPackage } from "./CoreUtil";
 
 
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class Installer {
 
   constructor() {
@@ -10,16 +13,16 @@ class Installer {
   }
 
   install(options) {
-    const onFailure = options ? typeof options.onFailure === "function" ? options.onFailure : () => {} : () => {};
-    const onSuccess = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => {} : () => {};
-    const onOutput = options ? typeof options.onOutput === "function" ? options.onOutput : () => {} : () => {};
+    const onFailure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+    const onSuccess = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const onOutput = options ? typeof options.onOutput === "function" ? options.onOutput : () => { } : () => { };
     const example = options ? typeof options.package === "string" ? options.package : null : null;
     var boilerplate = {};
     const path = `${__dirname}/installs/${example}.json`;
-    if(typeof example === "string" && fs.existsSync(path)) {
+    if (typeof example === "string" && fs.existsSync(path)) {
       boilerplate = require(path);
     } else {
-      onFailure({message: "Package not found."});
+      onFailure({ message: "Package not found." });
       return;
     }
     onOutput("Copying files.");
@@ -61,12 +64,12 @@ class Installer {
           onOutput(`Installing module '${moduleNaming.join("@")}'.`);
           execSync(`npm install ${moduleNaming.join("@")}`, { windowsHide: true, stdio: "ignore" });
           const dependency = JSON.parse(fs.readFileSync(`${projectPWD}/node_modules/${moduleName}/package.json`));
-          if(!projectPackage.dependencies) {
+          if (!projectPackage.dependencies) {
             projectPackage.dependencies = {};
           }
           projectPackage.dependencies[moduleName] = `^${dependency.version}`;
         } catch (error) {
-          onFailure({error, message: `Failed to install '${moduleName}'.`})
+          onFailure({ error, message: `Failed to install '${moduleName}'.` })
         }
       }
     }
@@ -77,3 +80,4 @@ class Installer {
 
 
 module.exports = Installer;
+export default Installer;

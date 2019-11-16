@@ -1,32 +1,32 @@
-const CoreUtil = require("../CoreUtil");
-const AVAError = require("../../foundation/AVAError");
-const Installer = require("../Installer");
+import { terminalPrefix } from "../CoreUtil";
+import AVAError from "../../foundation/AVAError";
+import Installer from "../Installer";
 
 
 /**
  * @description Sets up the project structure
  */
-function install(package) {
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Installing package.\x1b[0m`);
+function install(pkg) {
+  console.log(`${terminalPrefix()}\x1b[32m Installing package.\x1b[0m`);
   const onSuccess = () => {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Installation done!\x1b[0m`);
+    console.log(`${terminalPrefix()}\x1b[32m Installation done!\x1b[0m`);
   };
-  const onFailure = ({error, message}) => {
+  const onFailure = ({ error, message }) => {
     if (message || error) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m ${error ? error.message : message}\x1b[0m`);
+      console.log(`${terminalPrefix()}\x1b[31m ${error ? error.message : message}\x1b[0m`);
     }
     process.exit(AVAError.INCOMPLETECORE);
   };
   const onOutput = (message) => {
     if (message) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[32m ${message}\x1b[0m`);
+      console.log(`${terminalPrefix()}\x1b[32m ${message}\x1b[0m`);
     }
   };
-  if (typeof package === "string" && package !== "") {
+  if (typeof pkg === "string" && pkg !== "") {
     const installer = new Installer();
-    installer.install({package, onSuccess, onFailure, onOutput});
+    installer.install({ package: pkg, onSuccess, onFailure, onOutput });
   } else {
-    onFailure({message: "Specify a package!"});
+    onFailure({ message: "Specify a package!" });
   }
 }
 

@@ -1,19 +1,19 @@
-const fs = require("fs");
-const md5 = require("md5");
-const path = require("path");
+import fs from "fs";
+import md5 from "md5";
+import path from "path";
 
 
 /**
  * @description Removes a directory recursively.
  * @param {String} filePath
  */
-function rmdirSyncRecursive(filePath) {
+export function rmdirSyncRecursive(filePath) {
   var files = [];
-  if( fs.existsSync(filePath) ) {
+  if (fs.existsSync(filePath)) {
     files = fs.readdirSync(filePath);
-    files.forEach(function(file,index){
+    files.forEach(function (file, index) {
       var curPath = filePath + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) {
+      if (fs.lstatSync(curPath).isDirectory()) {
         rmdirSyncRecursive(curPath);
       } else {
         fs.unlinkSync(curPath);
@@ -28,7 +28,7 @@ function rmdirSyncRecursive(filePath) {
  * @description Creates directory tree if needed
  * @param {String} filePath
  */
-function ensureDirectoryExistence(filePath) {
+export function ensureDirectoryExistence(filePath) {
   var dirname = path.dirname(filePath);
   if (fs.existsSync(dirname)) {
     return true;
@@ -42,7 +42,7 @@ function ensureDirectoryExistence(filePath) {
  * @description Checks if the AVACore is installed.
  * @returns {Boolean}
  */
-function isAVACoreInstalled() {
+export function isAVACoreInstalled() {
   const projectPackage = getProjectPackage();
   return (!!projectPackage && !!projectPackage.dependencies && !!projectPackage.dependencies.avacore);
 }
@@ -51,7 +51,7 @@ function isAVACoreInstalled() {
 /**
  * @returns {Boolean}
  */
-function isAVAProject() {
+export function isAVAProject() {
   const projectPackage = getProjectPackage();
   return (!!projectPackage && typeof projectPackage.avalancheConfig === "object");
 }
@@ -60,7 +60,7 @@ function isAVAProject() {
 /**
  * @returns {Boolean}
  */
-function isNodeProject() {
+export function isNodeProject() {
   return fs.existsSync(`${projectPWD}/package.json`);
 }
 
@@ -68,7 +68,7 @@ function isNodeProject() {
 /**
  * @returns {String}
  */
-function terminalPrefix() {
+export function terminalPrefix() {
   return "\x1b[36m\x1b[1m[AVALANCHE]\x1b[0m";
 }
 
@@ -77,7 +77,7 @@ function terminalPrefix() {
  * @description Returns the package.json if it exsists.
  * @returns {Object|null}
  */
-function getProjectPackage() {
+export function getProjectPackage() {
   return fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
 }
 
@@ -88,15 +88,15 @@ function getProjectPackage() {
  * @param {Object} previousChildren Collection of the results of the previous scan.
  * @returns {Object}
  */
-function directoryLooper(filename, previousChildren) {
+export function directoryLooper(filename, previousChildren) {
   var children = previousChildren;
   children.push(filename);
   var stats = fs.lstatSync(filename),
-  info = {
-    path: filename,
-  };
+    info = {
+      path: filename,
+    };
   if (stats.isDirectory()) {
-    info.children = fs.readdirSync(filename).map(function(child) {
+    info.children = fs.readdirSync(filename).map(function (child) {
       const tree = directoryLooper(filename + "/" + child, children);
       return tree.info;
     });
@@ -111,7 +111,7 @@ function directoryLooper(filename, previousChildren) {
  * @param {String} filePath Path of the file to start watching.
  * @param {Function} callback Will be triggered when a file change is detected.
  */
-function startWatchingSession(filePath, callback) {  
+export function startWatchingSession(filePath, callback) {
   let md5Previous = null;
   let fsWait = false;
   fs.watch(filePath, (event, filename) => {
@@ -136,7 +136,7 @@ function startWatchingSession(filePath, callback) {
 /**
  * @returns {Object}
  */
-function getRoutes() {
+export function getRoutes() {
   const normalizedPath = `${projectPWD}/app/routes`;
   var routes = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -158,7 +158,7 @@ function getRoutes() {
 /**
  * @returns {Object}
  */
-function getControllers() {
+export function getControllers() {
   const normalizedPath = `${projectPWD}/app/controllers`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -179,7 +179,7 @@ function getControllers() {
 /**
  * @returns {Object}
  */
-function getMiddleware() {
+export function getMiddleware() {
   const normalizedPath = `${projectPWD}/app/middleware`;
   var middleware = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -200,7 +200,7 @@ function getMiddleware() {
 /**
  * @returns {Object}
  */
-function getLocalisations() {
+export function getLocalisations() {
   const normalizedPath = `${projectPWD}/app/localisations`;
   var localisations = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -221,7 +221,7 @@ function getLocalisations() {
 /**
  * @returns {Object}
  */
-function getTranslations() {
+export function getTranslations() {
   const normalizedPath = `${projectPWD}/app/localisations`;
   var translations = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -245,7 +245,7 @@ function getTranslations() {
 /**
  * @returns {Object}
  */
-function getModels() {
+export function getModels() {
   const normalizedPath = `${projectPWD}/app/models`;
   var models = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -266,13 +266,13 @@ function getModels() {
 /**
  * @returns {Object}
  */
-function getHelpers(projectPWD) {
+export function getHelpers(projectPWD) {
   var helpers = {};
   const helpersDirectory = `${projectPWD}/app/helpers`;
-  if(fs.existsSync(helpersDirectory)) {
+  if (fs.existsSync(helpersDirectory)) {
     const dir = fs.readdirSync(helpersDirectory);
     for (const file of dir) {
-      if(fs.existsSync(`${helpersDirectory}/${file}`)) {
+      if (fs.existsSync(`${helpersDirectory}/${file}`)) {
         const helpersInFile = require(`${helpersDirectory}/${file}`);
         const keys = Object.keys(helpersInFile);
         for (const key of keys) {
@@ -288,7 +288,7 @@ function getHelpers(projectPWD) {
 /**
  * @returns {Object}
  */
-function getMigrations() {
+export function getMigrations() {
   const normalizedPath = `${projectPWD}/app/migrations`;
   var models = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -311,7 +311,7 @@ function getMigrations() {
 /**
  * @returns {Object}
  */
-function getSeedFilesNames() {
+export function getSeedFilesNames() {
   const normalizedPath = `${projectPWD}/app/migrations/seeds`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
@@ -329,23 +329,38 @@ function getSeedFilesNames() {
 }
 
 
-module.exports = {
-    rmdirSyncRecursive: rmdirSyncRecursive,
-    ensureDirectoryExistence: ensureDirectoryExistence,
-    isAVACoreInstalled: isAVACoreInstalled,
-    isAVAProject: isAVAProject,
-    isNodeProject: isNodeProject,
-    terminalPrefix: terminalPrefix,
-    getProjectPackage: getProjectPackage,
-    directoryLooper: directoryLooper,
-    startWatchingSession: startWatchingSession,
-    getRoutes: getRoutes,
-    getControllers: getControllers,
-    getMiddleware: getMiddleware,
-    getLocalisations: getLocalisations,
-    getTranslations: getTranslations,
-    getModels: getModels,
-    getHelpers: getHelpers,
-    getMigrations: getMigrations,
-    getSeedFilesNames: getSeedFilesNames
+/**
+ * @param {String} versionValue 
+ * @returns {Boolean}
+ */
+export function isSemVer(versionValue) {
+  const splittedValue = versionValue.split(".");
+  const parsedValue = parseInt(splittedValue.join(""));
+  if (splittedValue.length === 3 && typeof parsedValue === "number" && parsedValue !== NaN) {
+    return true;
+  }
+  return false;
 }
+
+
+// module.exports = {
+//   rmdirSyncRecursive: rmdirSyncRecursive,
+//   ensureDirectoryExistence: ensureDirectoryExistence,
+//   isAVACoreInstalled: isAVACoreInstalled,
+//   isAVAProject: isAVAProject,
+//   isNodeProject: isNodeProject,
+//   terminalPrefix: terminalPrefix,
+//   getProjectPackage: getProjectPackage,
+//   directoryLooper: directoryLooper,
+//   startWatchingSession: startWatchingSession,
+//   getRoutes: getRoutes,
+//   getControllers: getControllers,
+//   getMiddleware: getMiddleware,
+//   getLocalisations: getLocalisations,
+//   getTranslations: getTranslations,
+//   getModels: getModels,
+//   getHelpers: getHelpers,
+//   getMigrations: getMigrations,
+//   getSeedFilesNames: getSeedFilesNames
+// };
+export default null;

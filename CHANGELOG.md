@@ -3,12 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.32] - 2019-11-16
+## [0.4.41] - 2019-11-16
 ### Added
-- Added CoreUtil to AVAFoundation
+- Added CoreUtil to AVAFoundation.
+- Added AVAPushNotification class for iOS remote notifications.
 
 ### Changes
-- Started implementation of ESM.
+- Started implementation of ESM. (A lot of refactoring)
 
 ## [0.4.30] - 2019-11-16
 ### Added

@@ -3,7 +3,7 @@
 /**
  * Creates and formats a UUID from a given string, or generates a new UUID.
  */
-function UUID() {
+export function UUID() {
   if(typeof(arguments[0]) === "string" && arguments[0].length === 36 && arguments[0].substring(8, 9) === "-" && arguments[0].substring(13, 14) === "-" && arguments[0].substring(14, 15) === "4" && arguments[0].substring(18, 19) === "-" && arguments[0].substring(23, 24) === "-") {
     this.string = arguments[0].toUpperCase();
   } else {
@@ -20,7 +20,7 @@ function UUID() {
 /**
  * 
  */
-function getOSFromUserAgent(ua) {
+export function getOSFromUserAgent(ua) {
   if(ua.includes("Mac OS X")) {
     return "Mac OS X";
   }
@@ -37,7 +37,7 @@ function getOSFromUserAgent(ua) {
 /**
  * 
  */
-function getBrowserFromUserAgent(ua) {
+export function getBrowserFromUserAgent(ua) {
   if(ua.includes("Safari")) {
     return "Safari";
   }
@@ -54,7 +54,7 @@ function getBrowserFromUserAgent(ua) {
 /**
  *
  */
-function getParameterByName(name, url) {
+export function getParameterByName(name, url) {
   if (!url) url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
   var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),

@@ -1,8 +1,10 @@
-const socketIO = require("socket.io");
-const { UUID } = require("./Util");
+import socketIO from "socket.io";
+import { UUID } from "./Util";
 
 
-
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class SocketKernel {
 
   constructor(server) {
@@ -14,7 +16,7 @@ class SocketKernel {
       console.log(`\x1b[32m[AVALANCHE] Sockermanager initialized.\x1b[0m`)
     }
   }
-  
+
 
   /**
    * Setsup the socket kernel
@@ -43,3 +45,4 @@ class SocketKernel {
 
 
 module.exports = SocketKernel;
+export default SocketKernel;

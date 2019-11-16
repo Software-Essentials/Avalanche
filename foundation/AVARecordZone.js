@@ -1,9 +1,9 @@
-const AVARecordZoneType = require("../foundation/AVARecordZoneType");
-
+import AVARecordZoneType from "../foundation/AVARecordZoneType";
 
 
 /**
  * @description Record controller.
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVARecordZone {
 
@@ -166,4 +166,6 @@ class AVARecordZone {
 
 }
 
+
 module.exports = AVARecordZone;
+export default AVARecordZone;

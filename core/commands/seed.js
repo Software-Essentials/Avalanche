@@ -1,5 +1,6 @@
-const inquirer = require("inquirer");
-const Seeder = require("../Seeder");
+import { terminalPrefix } from "../CoreUtil";
+import inquirer from "inquirer";
+import Seeder from "../Seeder";
 
 
 /**
@@ -18,7 +19,7 @@ function seed() {
       name: "mode",
       message: "Choose a seeding mode:",
       default: 0,
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       choices: choices
     }
@@ -37,7 +38,7 @@ function seed() {
       });
       return;
     }
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
+    console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m`);
   });
 }
 

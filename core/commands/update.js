@@ -1,13 +1,13 @@
-const CoreUtil = require("../CoreUtil");
-const { exec } = require("child_process");
-const fs = require("fs");
+import fs from "fs";
+import * as CoreUtil from "../CoreUtil";
+import { exec } from "child_process";
 
 
 /**
  * @description Updates Avalanche CLI
  */
 function update() {
-  const ready = typeof arguments[0] === "function" ? arguments[0] : () => {};
+  const ready = typeof arguments[0] === "function" ? arguments[0] : () => { };
 
   const pconfig = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`, "utf8"));
   const latestVersion = pconfig.avalancheCache ? pconfig.avalancheCache.latestUpdate ? pconfig.avalancheCache.latestUpdate : null : null;
@@ -27,7 +27,7 @@ function update() {
     process.stdout.cursorTo(0);
   }, 50);
   const version = require(`${__dirname}/../../package.json`).version;
-  const iProcess = exec("npm uninstall -g avacore && npm install -g avacore", (error, stout, sterr) => {});
+  const iProcess = exec("npm uninstall -g avacore && npm install -g avacore", (error, stout, sterr) => { });
   iProcess.on("error", (error) => {
     clearInterval(animation);
     console.log(`${CoreUtil.terminalPrefix()}\x1b[34m Sorry! I was unable to fix any issues :(\x1b[0m`);

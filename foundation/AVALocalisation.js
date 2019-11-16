@@ -1,9 +1,8 @@
-// Dependencies
-const fs = require("fs");
+import fs from "fs";
 
 
 /**
- * 
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVALocalisation {
 
@@ -13,8 +12,8 @@ class AVALocalisation {
     if (fs.existsSync(normalizedPath)) {
       fs.readdirSync(normalizedPath).forEach(function (file) {
         const extensions = file.split(".");
-        if(extensions.length === 2)
-          if(extensions[extensions.length - 1].toUpperCase() === "JSON")
+        if (extensions.length === 2)
+          if (extensions[extensions.length - 1].toUpperCase() === "JSON")
             localisations[extensions[0]] = require(`${projectPWD}/app/localisations/${file}`);
       });
       this.list = localisations[locale];
@@ -39,3 +38,4 @@ AVALocalisation.translate = (context) => {
 
 
 module.exports = AVALocalisation;
+export default AVALocalisation;

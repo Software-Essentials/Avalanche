@@ -1,6 +1,7 @@
-const inquirer = require("inquirer");
-const Migrator = require("../Migrator");
-const Seeder = require("../Seeder");
+import { terminalPrefix } from "../CoreUtil";
+import inquirer from "inquirer";
+import Migrator from "../Migrator";
+import Seeder from "../Seeder";
 
 
 /**
@@ -20,7 +21,7 @@ function migrate() {
       name: "mode",
       message: "Choose a migration mode:",
       default: 0,
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       choices: choices
     },
@@ -29,7 +30,7 @@ function migrate() {
       name: "seed",
       message: "Also seed?",
       default: true,
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"
     }
   ];
@@ -55,7 +56,7 @@ function migrate() {
       });
       return;
     }
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m`);
+    console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m`);
   });
 }
 

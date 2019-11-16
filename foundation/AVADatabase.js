@@ -1,6 +1,5 @@
-const mysql = require("mysql");
-const CoreUtil = require("../core/CoreUtil");
-const fs = require("fs");
+import mysql from "mysql";
+import { terminalPrefix } from "../core/CoreUtil";
 
 const DATATYPES = {
   "INT": { type: "int", length: true, unsignable: true, incrementable: true },
@@ -32,6 +31,7 @@ const CONSTRAINT_BEHAVIOUR = {
 
 /**
  * @description Can be used to store large or structured files.
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVADatabase {
 
@@ -176,7 +176,7 @@ class AVADatabase {
         const onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
         const onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
         const foreignClass = typeof relation === "object" ? options.table : relation;
-        const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`);
+        const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
         const foreignTable = foreignModel.NAME;
         const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
         const constraintName = `${tablename} ${foreignTable}`;
@@ -285,7 +285,7 @@ class AVADatabase {
       that.query(that.preQuery() + query, [], (error, _results, fields) => {
         const results = _results.slice(1);
         if (error) {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
+          console.log(`${terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
           failure({ table: name, error: error });
           return;
         }
@@ -302,3 +302,4 @@ class AVADatabase {
 
 
 module.exports = AVADatabase;
+export default AVADatabase;

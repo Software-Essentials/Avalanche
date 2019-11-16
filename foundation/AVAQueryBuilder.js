@@ -1,6 +1,9 @@
 const Knex = require("knex");
 
 
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class AVAQueryBuilder {
   
   /**
@@ -137,3 +140,4 @@ class AVAQueryBuilder {
 
 
 module.exports = AVAQueryBuilder;
+export default AVAQueryBuilder;

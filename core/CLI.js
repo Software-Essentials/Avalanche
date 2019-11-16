@@ -1,52 +1,56 @@
 #!/usr/bin/env node
+require = require("esm")(module);
+const { terminalPrefix, isSemVer, isAVAProject, isAVACoreInstalled } = require("./CoreUtil");
 
 global.projectPWD = process.cwd();
-global.CoreUtil = require("./CoreUtil");
 const npmRegistryAPIURI = "https://registry.npmjs.com/-/package/avacore/dist-tags";
 const fs = require("fs");
 const https = require("https");
 const Table = require("cli-table");
-const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const AVAEnvironment = require("../foundation/AVAEnvironment");
 const AVAError = require("../foundation/AVAError");
 
-cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
-envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
-argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
+const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
+const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
+const argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
 
-if (typeof cmdValue !== "undefined") {
-  if (cmdValue !== "update" && cmdValue !== "upgrade") {
-    notifyIfInconsistentVersion();
-  }
-  const path = `${__dirname}/commands`;
-  const commands = fs.readdirSync(path);
-  for (const key of commands) {
-    const command = require(`${path}/${key}`);
-    if (cmdValue === command.command) {
-      checkForUpdate();
-      notifyIfUpdate();
-      if (command.enabled) {
-        if (command.scope === "PROJECT") {
-          if (!CoreUtil.isAVAProject()) {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
-            process.exit(AVAError.NOTANAVAPROJECT);
-            return;
+main();
+function main() {
+  if (typeof cmdValue !== "undefined") {
+    if (cmdValue !== "update" && cmdValue !== "upgrade") {
+      notifyIfInconsistentVersion();
+    }
+    const path = `${__dirname}/commands`;
+    const commands = fs.readdirSync(path);
+    for (const key of commands) {
+      const command = require(`${path}/${key}`);
+      if (cmdValue === command.command) {
+        checkForUpdate();
+        notifyIfUpdate();
+        if (command.enabled) {
+          if (command.scope === "PROJECT") {
+            if (!isAVAProject()) {
+              console.log(`${terminalPrefix()}\x1b[31m (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
+              process.exit(AVAError.NOTANAVAPROJECT);
+              return;
+            }
+            notifyIfExperimental();
+            if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
+              global.environment = new AVAEnvironment(pkg.avalancheConfig.preferredEnvironment);
+            }
           }
-          notifyIfExperimental();
-          if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
-            global.environment = new AVAEnvironment(package.avalancheConfig.preferredEnvironment);
-          }
+          command.execute(envValue, argValue);
+        } else {
+          console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
+          return;
         }
-        command.execute(envValue, argValue);
-      } else {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
         return;
       }
-      return;
     }
+    console.log(`${terminalPrefix()}\x1b[31m (error) Command not found.\x1b[0m`);
   }
-  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Command not found.\x1b[0m`);
 }
 
 
@@ -105,34 +109,24 @@ function notifyIfUpdate() {
 
 
 function notifyIfExperimental() {
-  if (!CoreUtil.isAVACoreInstalled()) {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
+  if (!isAVACoreInstalled()) {
+    console.log(`${terminalPrefix()}\x1b[33m (warning) The avacore is not installed. Are you working in an experimental project?\x1b[0m`);
   }
 }
 
 
 function notifyIfInconsistentVersion() {
-  if (package && package.dependencies && package.dependencies.avacore) {
-    const version = package.dependencies.avacore;
+  if (pkg && pkg.dependencies && pkg.dependencies.avacore) {
+    const version = pkg.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     const cliVersion = avalanchePackage.version;
     const cliValue = parseInt(projectVersion.split(".").join(""));
     const projectValue = parseInt(cliVersion.split(".").join(""));
     if (cliValue > projectValue) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
+      console.log(`${terminalPrefix()}\x1b[33m (notice) Your AVA-CLI version (${cliVersion}) is lower than your project version of Avalanche (${projectVersion}). Update the AVA-CLI.\x1b[0m`);
     }
     if (projectValue > cliValue) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
+      console.log(`${terminalPrefix()}\x1b[33m (notice) Your project version of Avalanche (${projectVersion}) is lower than your AVA-CLI version (${cliVersion}). Update the avacore package.\x1b[0m`);
     }
   }
-}
-
-
-function isSemVer(versionValue) {
-  const splittedValue = versionValue.split(".");
-  const parsedValue = parseInt(splittedValue.join(""));
-  if (splittedValue.length === 3 && typeof parsedValue === "number" && parsedValue !== NaN) {
-    return true;
-  }
-  return false;
 }

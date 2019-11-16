@@ -1,10 +1,13 @@
-const fs = require("fs");
-const CoreUtil = require("./CoreUtil");
-const AVADatabase = require("../foundation/AVADatabase");
-const AVAStorage = require("../foundation/AVAStorage");
-const AVARecordZone = require("../foundation/AVARecordZone");
+import fs from "fs";
+import { terminalPrefix, getModels } from "./CoreUtil";
+import AVADatabase from "../foundation/AVADatabase";
+import AVAStorage from "../foundation/AVAStorage";
+import AVARecordZone from "../foundation/AVARecordZone";
 
 
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class Migrator {
 
   constructor() {
@@ -25,28 +28,28 @@ class Migrator {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const force = options ? typeof options.force === "boolean" ? options.force : false : false;
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
-    const models = CoreUtil.getModels();
+    const models = getModels();
     const database = new AVADatabase();
     database.foreignKeyChecks = false;
     const storage = new AVAStorage();
     var migrations = {};
     if (wipe) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
+      console.log(`${terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
       database.dropAllTables({
         onSuccess: ({ total, success }) => {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
+          console.log(`${terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
           migrate();
         },
         onFailure: ({ error }) => {
           switch (error.code) {
             case "ER_NOT_SUPPORTED_AUTH_MODE":
-              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+              console.log(`${terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
               break;
             case "ER_ACCESS_DENIED_ERROR":
-              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+              console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
               break;
             default:
-              console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+              console.log(`${terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
           }
         }
       });
@@ -54,13 +57,13 @@ class Migrator {
       migrate();
     }
     function migrate() {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Migrating...\x1b[0m`)
+      console.log(`${terminalPrefix()}\x1b[32m Migrating...\x1b[0m`)
       for (const i in models) {
         const model = models[i];
         migrations[model] = null;
         const path = `${projectPWD}/app/models/${model}.js`;
         if (fs.existsSync(path)) {
-          const Model = require(path);
+          const Model = require(path).default;
           if (Model.METHOD === "DATABASE") {
             var properties = [];
             var options = {
@@ -72,7 +75,7 @@ class Migrator {
               onFailure: ({ table, error }) => {
                 migrations[table] = false;
                 if (error) {
-                  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Migration failed:\x1b[0m ${error.message}`);
+                  console.log(`${terminalPrefix()}\x1b[31m (error) Migration failed:\x1b[0m ${error.message}`);
                 }
                 update();
               }
@@ -103,7 +106,7 @@ class Migrator {
         if (migrations[key]) successful++;
       }
       if (completed === Object.keys(migrations).length) {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Migration complete. (${completed}/${successful} tables/zones migrated)\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[32m Migration complete. (${completed}/${successful} tables/zones migrated)\x1b[0m`);
         ready(true);
       }
     }
@@ -113,3 +116,4 @@ class Migrator {
 
 
 module.exports = Migrator;
+export default Migrator;
