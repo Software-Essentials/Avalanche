@@ -25,8 +25,8 @@ class Seeder {
   seed(mode, callback) {
     switch (mode) {
       case "SAFE": this.execute({ wipe: false, onReady: callback }); break;
-      case "WIPE": this.execute({ wipe: true, onReady: callback }); break;
       case "OVERWRITE": this.execute({ wipe: false, onReady: callback }); break;
+      case "WIPE": this.execute({ wipe: true, onReady: callback }); break;
     }
   }
 
@@ -39,7 +39,14 @@ class Seeder {
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
     var permissionIssue = false;
+    const database = new AVADatabase();
+    database.foreignKeyChecks = false;
+    var seedStats = {};
+    const that = this;
     if (wipe) {
+      database.wipeAllData({
+        onSuccess: proceed
+      });
       try {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
         AVAStorage.wipe();
@@ -50,54 +57,55 @@ class Seeder {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m ${error}`);
         }
       }
-    }
-    const database = new AVADatabase();
-    database.foreignKeyChecks = false;
-    var seedStats = {};
-    if (this.seeds.length > 0) {
-      for (let i = 0; i < this.seeds.length; i++) {
-        const seed = this.seeds[i];
-        if (seed.hasOwnProperty("zone")) {
-          seedStats[seed.zone] = null;
-          const path = `${projectPWD}/storage/${seed.zone}.json`;
-          fs.writeFileSync(path, JSON.stringify(seed.data, null, 2));
-          seedStats[seed.zone] = true;
-          update();
-        }
-        if (seed.hasOwnProperty("table")) {
-          seedStats[seed.table] = null;
-          const options = {
-            force: true,
-            onSuccess: ({ table }) => {
-              seedStats[table] = true;
-              update();
-            },
-            onFailure: ({ table, error }) => {
-              seedStats[table] = false;
-              switch (error.code) {
-                case "ER_NOT_SUPPORTED_AUTH_MODE":
-                  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
-                  break;
-                case "ER_ACCESS_DENIED_ERROR":
-                  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
-                  break;
-                case "ER_NO_SUCH_TABLE":
-                  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
-                  break;
-                default:
-                  console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
-              }
-              update();
-            }
-          };
-          database.insertInto(seed.table, seed.data, options);
-        }
-      }
     } else {
-      update();
+      proceed();
     }
-    if (permissionIssue) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
+    function proceed() {
+      if (that.seeds.length > 0) {
+        for (let i = 0; i < that.seeds.length; i++) {
+          const seed = that.seeds[i];
+          if (seed.hasOwnProperty("zone")) {
+            seedStats[seed.zone] = null;
+            const path = `${projectPWD}/storage/${seed.zone}.json`;
+            fs.writeFileSync(path, JSON.stringify(seed.data, null, 2));
+            seedStats[seed.zone] = true;
+            update();
+          }
+          if (seed.hasOwnProperty("table")) {
+            seedStats[seed.table] = null;
+            const options = {
+              force: true,
+              onSuccess: ({ table }) => {
+                seedStats[table] = true;
+                update();
+              },
+              onFailure: ({ table, error }) => {
+                seedStats[table] = false;
+                switch (error.code) {
+                  case "ER_NOT_SUPPORTED_AUTH_MODE":
+                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+                    break;
+                  case "ER_ACCESS_DENIED_ERROR":
+                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+                    break;
+                  case "ER_NO_SUCH_TABLE":
+                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
+                    break;
+                  default:
+                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+                }
+                update();
+              }
+            };
+            database.insertInto(seed.table, seed.data, options);
+          }
+        }
+      } else {
+        update();
+      }
+      if (permissionIssue) {
+        console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
+      }
     }
     function update() {
       var completed = 0;

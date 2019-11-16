@@ -15,8 +15,8 @@ class Migrator {
   migrate(mode, callback) {
     switch (mode) {
       case "SAFE": this.execute({ wipe: false, force: false, onReady: callback }); break;
-      case "WIPE": this.execute({ wipe: true, force: true, onReady: callback }); break;
       case "OVERWRITE": this.execute({ wipe: false, force: true, onReady: callback }); break;
+      case "WIPE": this.execute({ wipe: true, force: true, onReady: callback }); break;
     }
   }
 
@@ -32,7 +32,7 @@ class Migrator {
     var migrations = {};
     if (wipe) {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
-      database.wipeAllTables({
+      database.dropAllTables({
         onSuccess: ({ total, success }) => {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
           migrate();

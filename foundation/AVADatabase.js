@@ -52,7 +52,55 @@ class AVADatabase {
   }
 
 
-  wipeAllTables(options) {
+  wipeAllData(options) {
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+    var wipes = {};
+    const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
+    this.query(this.preQuery() + query, [], (error, _results, fields) => {
+      if (error) {
+        failure({ error });
+        return;
+      }
+      const results = _results.slice(1)[0];
+      if (results.length > 0) {
+        for (const result of results) {
+          const table = result.table_name;
+          wipes[table] = null;
+          const query = `DELETE FROM \`${result.table_name}\`;`;
+          this.query(this.preQuery() + query, [], (error, _results, fields) => {
+            const results = _results.slice(1);
+            if (error) {
+              wipes[table] = false;
+              failure({ error });
+            } else {
+              wipes[table] = true;
+              update();
+            }
+          });
+        }
+      } else {
+        update();
+      }
+    });
+    function update() {
+      var completed = 0;
+      var successful = 0;
+      for (const key in wipes) {
+        if (wipes[key] !== null) completed++;
+        if (wipes[key]) successful++;
+      }
+      if (completed === Object.keys(wipes).length) {
+        success({
+          total: completed,
+          success: successful
+        });
+      }
+    }
+  }
+
+
+  dropAllTables(options) {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};

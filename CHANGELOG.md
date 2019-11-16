@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.29] - 2019-11-16
+## [0.4.30] - 2019-11-16
 ### Added
 - Added foreign key constraints (relations) to Migrator.
 - Added constraint checks option to AVADatabase.
+
+### Fixed
+- Fixed Seeder 'wipe' option.
 
 ## [0.4.27] - 2019-08-24
 ### Added
