@@ -1,6 +1,34 @@
 const mysql = require("mysql");
 const CoreUtil = require("../core/CoreUtil");
+const fs = require("fs");
 
+const DATATYPES = {
+  "INT": { type: "int", length: true, unsignable: true, incrementable: true },
+  "TINYINT": { type: "tinyint", length: true, unsignable: true, incrementable: true },
+  "SMALLINT": { type: "smallint", length: true, unsignable: true, incrementable: true },
+  "MEDIUMINT": { type: "mediumint", length: true, unsignable: true, incrementable: true },
+  "BIGINT": { type: "bigint", length: true, unsignable: true, incrementable: true },
+  "FLOAT": { type: "float", unsignable: true, incrementable: true },
+  "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
+  "DOUBLE": { type: "double", unsignable: true, incrementable: true },
+  "BIT": { type: "bit", length: true },
+  "CHAR": { type: "char", string: true, length: true },
+  "VARCHAR": { type: "varchar", string: true, length: true },
+  "DATETIME": { type: "varchar", string: true },
+  "DATE": { type: "date", string: true },
+  "TIMESTAMP": { type: "timestamp", string: true },
+  "TEXT": { type: "text", string: true },
+  "TINYTEXT": { type: "tinytext", string: true },
+  "MEDIUMTEXT": { type: "mediumtext", string: true },
+  "LONGTEXT": { type: "longtext", string: true }
+};
+
+const CONSTRAINT_BEHAVIOUR = {
+  NO_ACTION: "NO ACTION",
+  RESTRICT: "RESTRICT",
+  SET_NULL: "SET NULL",
+  CASCADE: "CASCADE",
+}
 
 /**
  * @description Can be used to store large or structured files.
@@ -9,6 +37,7 @@ class AVADatabase {
 
   constructor() {
     this.connection = mysql.createPool(environment.database);
+    this.foreignKeyChecks = true;
   }
 
 
@@ -28,27 +57,30 @@ class AVADatabase {
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
     const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
-    this.query(query, [], (error, results, fields) => {
+    this.query(this.preQuery() + query, [], (error, _results, fields) => {
       if (error) {
         failure({ error });
         return;
       }
-      if (results.length <= 0) {
+      const results = _results.slice(1)[0];
+      if (results.length > 0) {
+        for (const result of results) {
+          const table = result.table_name;
+          wipes[table] = null;
+          const query = `DROP TABLE IF EXISTS \`${result.table_name}\`;`;
+          this.query(this.preQuery() + query, [], (error, _results, fields) => {
+            const results = _results.slice(1);
+            if (error) {
+              wipes[table] = false;
+              failure({ error });
+            } else {
+              wipes[table] = true;
+              update();
+            }
+          });
+        }
+      } else {
         update();
-      }
-      for (const i in results) {
-        const table = results[i].table_name;
-        wipes[table] = null;
-        const query = `DROP TABLE IF EXISTS \`${results[i].table_name}\`;`;
-        this.query(query, [], (error, results, fields) => {
-          if (error) {
-            wipes[table] = false;
-            failure({ error });
-          } else {
-            wipes[table] = true;
-            update();
-          }
-        });
       }
     });
     function update() {
@@ -70,39 +102,19 @@ class AVADatabase {
 
   /**
    * @description Creates table in the database.
-   * @param {String} name Name of the table.
+   * @param {String} tablename Name of the table.
    * @param {Array} columns Columns.
    * @param {Object} options Options.
    */
-  createTable(name, columns, options) {
+  createTable(tablename, columns, options) {
     const force = options ? options.force ? true : false : false;
     const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     const that = this;
-    const datatypes = {
-      "INT": { type: "int", length: true, unsignable: true, incrementable: true },
-      "TINYINT": { type: "tinyint", length: true, unsignable: true, incrementable: true },
-      "SMALLINT": { type: "smallint", length: true, unsignable: true, incrementable: true },
-      "MEDIUMINT": { type: "mediumint", length: true, unsignable: true, incrementable: true },
-      "BIGINT": { type: "bigint", length: true, unsignable: true, incrementable: true },
-      "FLOAT": { type: "float", unsignable: true, incrementable: true },
-      "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
-      "DOUBLE": { type: "double", unsignable: true, incrementable: true },
-      "BIT": { type: "bit", length: true },
-      "CHAR": { type: "char", string: true, length: true },
-      "VARCHAR": { type: "varchar", string: true, length: true },
-      "DATETIME": { type: "varchar", string: true },
-      "DATE": { type: "date", string: true },
-      "TIMESTAMP": { type: "timestamp", string: true },
-      "TEXT": { type: "text", string: true },
-      "TINYTEXT": { type: "tinytext", string: true },
-      "MEDIUMTEXT": { type: "mediumtext", string: true },
-      "LONGTEXT": { type: "longtext", string: true }
-    };
     var columnStrings = [];
     for (const column of columns) {
-      const typeProperty = datatypes[column.type];
+      const typeProperty = DATATYPES[column.type];
       const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
       const name = column.name;
       const defaultVal = column.default;
@@ -110,6 +122,19 @@ class AVADatabase {
       const unique = !!column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
       const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
+      const relation = column.relation;
+      if (typeof relation === "string" || typeof relation === "object") {
+        const options = typeof relation === "object" ? relation : {};
+        const onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
+        const onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
+        const foreignClass = typeof relation === "object" ? options.table : relation;
+        const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`);
+        const foreignTable = foreignModel.NAME;
+        const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+        const constraintName = `${tablename} ${foreignTable}`;
+        columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+        columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+      }
       columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
       if (unique) {
         columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
@@ -119,10 +144,11 @@ class AVADatabase {
       columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
     }
     if (force) {
-      const query = `DROP TABLE IF EXISTS \`${name}\`;`;
-      this.query(query, [], (error, results, fields) => {
+      const query = `DROP TABLE IF EXISTS \`${tablename}\`;`;
+      this.query(that.preQuery() + query, [], (error, _results, fields) => {
+        const results = _results.slice(1);
         if (error) {
-          failure({ table: name, error: error });
+          failure({ table: tablename, error: error });
           return;
         }
         create();
@@ -131,13 +157,14 @@ class AVADatabase {
       create();
     }
     function create() {
-      const query = `CREATE TABLE \`${name}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
-      that.query(query, [], (error, results, fields) => {
+      const query = `CREATE TABLE \`${tablename}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
+      that.query(that.preQuery() + query, [], (error, _results, fields) => {
+        const results = _results.slice(1);
         if (error) {
-          failure({ table: name, error: error });
+          failure({ table: tablename, error: error });
           return;
         }
-        success({ table: name });
+        success({ table: tablename });
       });
     }
   }
@@ -182,7 +209,8 @@ class AVADatabase {
     insert();
     function insert() {
       const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
-      that.query(query, [], (error, results, fields) => {
+      that.query(that.preQuery() + query, [], (error, _results, fields) => {
+        const results = _results.slice(1);
         if (error) {
           failure({ table: name, error: error });
           return;
@@ -206,7 +234,8 @@ class AVADatabase {
     select();
     function select() {
       const query = `SELECT ${columns.length <= 0 ? "*" : columns.join(", ")} FROM \`${name}\`${Object.keys(conditions).length > 0 ? ` WHERE ${compiledConditions}` : ""};`;
-      that.query(query, [], (error, results, fields) => {
+      that.query(that.preQuery() + query, [], (error, _results, fields) => {
+        const results = _results.slice(1);
         if (error) {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
           failure({ table: name, error: error });
@@ -215,6 +244,10 @@ class AVADatabase {
         success({ table: name, results: results, fields: fields });
       });
     }
+  }
+
+  preQuery() {
+    return `SET foreign_key_checks = ${!!this.foreignKeyChecks ? "1" : "0"};`;
   }
 
 }

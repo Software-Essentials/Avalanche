@@ -22,22 +22,23 @@ class Migrator {
 
 
   execute(options) {
-    const ready = options ? typeof options.onReady === "function" ? options.onReady : () => {} : () => {};
+    const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const force = options ? typeof options.force === "boolean" ? options.force : false : false;
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     const models = CoreUtil.getModels();
     const database = new AVADatabase();
+    database.foreignKeyChecks = false;
     const storage = new AVAStorage();
     var migrations = {};
     if (wipe) {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
       database.wipeAllTables({
-        onSuccess: ({total, success}) => {
+        onSuccess: ({ total, success }) => {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
           migrate();
         },
-        onFailure: ({error}) => {
-          switch(error.code) {
+        onFailure: ({ error }) => {
+          switch (error.code) {
             case "ER_NOT_SUPPORTED_AUTH_MODE":
               console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
               break;
@@ -64,11 +65,11 @@ class Migrator {
             var properties = [];
             var options = {
               force: force,
-              onSuccess: ({table}) => {
+              onSuccess: ({ table }) => {
                 migrations[table] = true;
                 update();
               },
-              onFailure: ({table, error}) => {
+              onFailure: ({ table, error }) => {
                 migrations[table] = false;
                 if (error) {
                   console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Migration failed:\x1b[0m ${error.message}`);
@@ -85,7 +86,7 @@ class Migrator {
             database.createTable(Model.NAME, properties, options);
           }
           if (Model.METHOD === "STORAGE") {
-            if(!storage.recordZoneExists(Model.NAME)) {
+            if (!storage.recordZoneExists(Model.NAME)) {
               storage.addRecordZone(new AVARecordZone(this.NAME, []));
             }
             migrations[Model.NAME] = true;
@@ -97,7 +98,7 @@ class Migrator {
     function update() {
       var completed = 0;
       var successful = 0;
-      for(const key in migrations) {
+      for (const key in migrations) {
         if (migrations[key] !== null) completed++;
         if (migrations[key]) successful++;
       }
