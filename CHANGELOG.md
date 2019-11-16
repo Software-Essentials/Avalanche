@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.27] - 2014-08-24
+## [0.4.28] - 2019-11-16
+### Added
+- Added foreign key constraints (relations) to Migrator.
+- Added constraint checks option to AVADatabase.
+
+## [0.4.27] - 2019-08-24
 ### Added
 - Added 'gitignore' installable package.
 - Added 'gitlab-ci' installable package.
@@ -13,7 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Changes
 - Optimised AVAModel.
 
-## [0.4.25] - 2014-08-12
+## [0.4.25] - 2019-08-12
 ### Added
 - Added error handling to template builder.
 - Added error handling when writing to request.log.
@@ -32,12 +37,12 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - Removed date from request console logs.
 
-## [0.4.21] - 2014-08-11
+## [0.4.21] - 2019-08-11
 ### Changes
 - Replaced all ugly tables printed by console.
 - Minor improvements.
 
-## [0.4.17] - 2014-08-09
+## [0.4.17] - 2019-08-09
 ### Added
 - Added validator to non-middleware endpoints.
 - Added YouTube tutorial video link to readme.md.
@@ -45,7 +50,7 @@ All notable changes to this project will be documented in this file.
 ### Changes
 - Many optimisations in AVAModel class.
 
-## [0.4.11] - 2014-08-08
+## [0.4.11] - 2019-08-08
 ### Added
 - Added Knex query builder.
 
@@ -55,7 +60,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fixed many fatal bugs.
 
-## [0.4.7] - 2014-08-07
+## [0.4.7] - 2019-08-07
 ### Added
 - Added AVAValidator class. The validator is contained in every request object.
 - Added ability to choose storage type in 'make' command when making a model.
@@ -72,11 +77,11 @@ All notable changes to this project will be documented in this file.
 - Deprecated view resource option in 'make' command.
 - Optimised 'fix' command.
 
-## [0.3.25] - 2014-07-24
+## [0.3.25] - 2019-07-24
 ### Added
 - Added ability to render file directly from routing without a controller as middle-man.
 
-## [0.3.24] - 2014-07-23
+## [0.3.24] - 2019-07-23
 ### Added
 - Dependency installer.
 
@@ -93,7 +98,7 @@ All notable changes to this project will be documented in this file.
 ## Removed
 - Removed third-party modules from AVAFoundation. Dependencies are now installed seperately.
 
-## [0.3.7] - 2014-07-17
+## [0.3.7] - 2019-07-17
 ### Added
 - Added 'help' command.
 - Added 'make' command.
@@ -101,7 +106,7 @@ All notable changes to this project will be documented in this file.
 ### Changes
 - Commands are now dynamic and stored in the commands folder.
 
-## [0.3.1] - 2014-07-16
+## [0.3.1] - 2019-07-16
 ### Added
 - Added CSRF security tokens.
 - Added model registerer.
@@ -115,7 +120,7 @@ All notable changes to this project will be documented in this file.
 - Major improvements on AVAModel.
 - Minor improvements.
 
-## [0.2.24] - 2014-07-14
+## [0.2.24] - 2019-07-14
 ### Added
 - Added filewatcher.
 - Added server restarter (triggered by filewatcher).
@@ -123,7 +128,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Minor improvements.
 
-## [0.2.13] - 2014-07-13
+## [0.2.13] - 2019-07-13
 ### Added
 - Added AVAStorage class to utilize filestorage.
 - Added AVADatabase class to utilize a database.
@@ -134,7 +139,7 @@ All notable changes to this project will be documented in this file.
 - Optimised boilerplates.
 - Minor improvements.
 
-## [0.2.3] - 2014-07-11
+## [0.2.3] - 2019-07-11
 ### Changed
 - Renamed all AVAFoundation classes by adding 'AVA' prefix to all class names.
 - Minor improvements.

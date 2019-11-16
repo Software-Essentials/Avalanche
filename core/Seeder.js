@@ -14,13 +14,13 @@ class Seeder {
       const path = `${projectPWD}/app/migrations/seeds/${fileName}.json`;
       if (fs.existsSync(path)) {
         const fileSeeds = require(path);
-        for(const i in fileSeeds) {
+        for (const i in fileSeeds) {
           this.seeds.push(fileSeeds[i]);
         }
       }
     }
   }
-  
+
 
   seed(mode, callback) {
     switch (mode) {
@@ -35,22 +35,24 @@ class Seeder {
    * @description Wipes the data in the storage and database. Then seeds.
    */
   execute(options) {
-    const ready = options ? typeof options.onReady === "function" ? options.onReady : () => {} : () => {};
+    const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
     var permissionIssue = false;
-    if(wipe) {
+    if (wipe) {
       try {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
         AVAStorage.wipe();
       } catch (error) {
         if (error.code === "EPERM") {
-          permissionIssue = true;
+          // permissionIssue = true; // Should be uncommented, BUT the issue can't be resolved and the warning is very annoying.
         } else {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m ${error}`);
         }
       }
     }
+    const database = new AVADatabase();
+    database.foreignKeyChecks = false;
     var seedStats = {};
     if (this.seeds.length > 0) {
       for (let i = 0; i < this.seeds.length; i++) {
@@ -64,15 +66,15 @@ class Seeder {
         }
         if (seed.hasOwnProperty("table")) {
           seedStats[seed.table] = null;
-          const database = new AVADatabase();
-          const options = { force: true,
-            onSuccess: ({table}) => {
+          const options = {
+            force: true,
+            onSuccess: ({ table }) => {
               seedStats[table] = true;
               update();
             },
-            onFailure: ({table, error}) => {
+            onFailure: ({ table, error }) => {
               seedStats[table] = false;
-              switch(error.code) {
+              switch (error.code) {
                 case "ER_NOT_SUPPORTED_AUTH_MODE":
                   console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
                   break;
@@ -94,13 +96,13 @@ class Seeder {
     } else {
       update();
     }
-    if(permissionIssue) {
+    if (permissionIssue) {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
     }
     function update() {
       var completed = 0;
       var successful = 0;
-      for(const key in seedStats) {
+      for (const key in seedStats) {
         if (seedStats[key] !== null) completed++;
         if (seedStats[key]) successful++;
       }
