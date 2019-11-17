@@ -6,7 +6,7 @@ import { getProjectPackage } from "./ACUtil";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Installer {
+class ACInstaller {
 
   constructor() {
 
@@ -79,5 +79,4 @@ class Installer {
 }
 
 
-module.exports = Installer;
-export default Installer;
+export default ACInstaller;

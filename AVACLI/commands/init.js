@@ -1,7 +1,7 @@
 import fs from "fs";
 import inquirer from "inquirer";
 import { exec, execSync } from "child_process";
-import Installer from "../../AVACore/Installer";
+import ACInstaller from "../../AVACore/ACInstaller";
 import { AFError } from "../../AVAFoundation/index";
 import * as ACUtil from "../../AVACore/ACUtil";
 
@@ -131,7 +131,7 @@ function installBoilerplate(packageName) {
     console.log(`${ACUtil.terminalPrefix()}\x1b[31m ${message}\x1b[0m`);
     process.exit(AFError.INCOMPLETECORE);
   };
-  const installer = new Installer();
+  const installer = new ACInstaller();
   installer.install({ package: packageName, onSuccess, onFailure });
 }
 

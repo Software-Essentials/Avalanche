@@ -56,7 +56,7 @@ function run() {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const mainPath = path.normalize(`${__dirname}/../../AVACore/Main.js`);
+  const mainPath = path.normalize(`${__dirname}/../../AVACore/main.js`);
   const command = environmentFormatted ? `node "${mainPath}" run ${environmentFormatted}` : `node "${mainPath}" run`;
   const cProcess = exec(command, (error, stdout, stderr) => {
     if (error) {

@@ -1,22 +1,19 @@
-import express from "express";
+import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import url from "url";
 import { AFValidator } from "../index";
 import { terminalPrefix } from "../AVACore/ACUtil";
 
-const ExRouter = express.Router();
-
 
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Router {
+class ACRouter extends Router {
 
     constructor() {
-    }
+        super();
 
-    routes() {
         const normalizedPath = `${projectPWD}/app/routes`;
         var routes = [];
         if (fs.existsSync(normalizedPath)) {
@@ -54,7 +51,7 @@ class Router {
             const controllerHandler = route.handler;
             var controller;
             if (typeof (route.redirect) === "string") {
-                ExRouter[method.toLowerCase()](routePath, (request, response) => {
+                this[method.toLowerCase()](routePath, (request, response) => {
                     response.redirect(url.format({
                         pathname: route.redirect,
                     }));
@@ -90,9 +87,9 @@ class Router {
                                 mwo.init(request, response, next);
                             };
                         }
-                        ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
+                        this[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
                     } else {
-                        ExRouter[method.toLowerCase()](routePath, (request, response, next) => {
+                        this[method.toLowerCase()](routePath, (request, response, next) => {
                             new AFValidator(request);
                             next();
                         }, routeHandler[controllerHandler]);
@@ -116,33 +113,31 @@ class Router {
                                 const mwo = new mw();
                                 filteredMiddleware[i] = (request, response, next) => { mwo.init(request, response, next, cntrlr); };;
                             }
-                            ExRouter[method.toLowerCase()](routePath, filteredMiddleware, (request, response) => { routeHandler(request, response, that); });
+                            this[method.toLowerCase()](routePath, filteredMiddleware, (request, response) => { routeHandler(request, response, that); });
                         } else {
-                            ExRouter[method.toLowerCase()](routePath, (request, response) => { routeHandler(request, response, that); });
+                            this[method.toLowerCase()](routePath, (request, response) => { routeHandler(request, response, that); });
                         }
                     });
                 }
                 continue;
             }
             if (typeof routeFile === "string") {
-                ExRouter.get(routePath, (request, response) => {
+                this.get(routePath, (request, response) => {
                     response.render(routeFile);
                 });
                 continue;
             }
         }
-        ExRouter.use((request, response) => {
+        this.use((request, response) => {
             const layout = "layout.hbs";
             response.status(404);
             response.render("status/404.hbs", {
                 layout: layout
             });
         });
-        return ExRouter;
     }
 
 }
 
 
-module.exports = Router;
-export default Router;
+export default ACRouter;

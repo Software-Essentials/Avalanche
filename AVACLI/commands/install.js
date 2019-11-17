@@ -1,5 +1,5 @@
 import { AFError } from "../../AVAFoundation/index";
-import Installer from "../../AVACore/Installer";
+import ACInstaller from "../../AVACore/ACInstaller";
 import { terminalPrefix } from "../../AVACore/ACUtil";
 
 
@@ -23,7 +23,7 @@ function install(pkg) {
     }
   };
   if (typeof pkg === "string" && pkg !== "") {
-    const installer = new Installer();
+    const installer = new ACInstaller();
     installer.install({ package: pkg, onSuccess, onFailure, onOutput });
   } else {
     onFailure({ message: "Specify a package!" });

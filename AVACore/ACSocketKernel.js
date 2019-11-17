@@ -5,7 +5,7 @@ import { UUID } from "../AVAFoundation/AFUtil";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class SocketKernel {
+class ACSocketKernel {
 
   constructor(server) {
     this.instance = socketIO(server);
@@ -44,5 +44,4 @@ class SocketKernel {
 }
 
 
-module.exports = SocketKernel;
-export default SocketKernel;
+export default ACSocketKernel;

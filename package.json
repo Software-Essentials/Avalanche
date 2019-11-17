@@ -32,8 +32,8 @@
     "url": "git+https://github.com/noriasoft/Avalanche.git"
   },
   "bin": {
-    "avalanche": "AVACLI/CLI.js",
-    "ava": "AVACLI/CLI.js"
+    "avalanche": "AVACLI/main.js",
+    "ava": "AVACLI/main.js"
   },
   "dependencies": {
     "apn": "^2.2.0",
@@ -54,5 +54,8 @@
     "nodemailer-mailgun-transport": "^1.4.0",
     "session-file-store": "^1.3.1",
     "socket.io": "^2.2.0"
+  },
+  "avalancheCache": {
+    "latestUpdate": "0.4.58"
   }
 }

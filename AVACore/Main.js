@@ -15,14 +15,14 @@ if (cmdValue !== "run") {
 } else {
   global.environment = new AFEnvironment(envValue);
 
-  const Kernel = require("./Kernel.js").default;
-  const Webserver = require("./Webserver.js").default;
+  const ACKernel = require("./ACKernel.js").default;
+  const ACWebServer = require("./ACWebServer.js").default;
 
   const app = express();
 
   console.log(`${terminalPrefix()}\x1b[32m Starting server.\x1b[0m`);
 
-  const server = new Webserver(app);
+  const server = new ACWebServer(app);
   const stream = server.getStream();
-  new Kernel(app, stream);
+  new ACKernel(app, stream);
 }

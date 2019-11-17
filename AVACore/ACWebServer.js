@@ -5,7 +5,7 @@ import { terminalPrefix } from "./ACUtil";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Webserver {
+class ACWebServer {
 
   constructor(app) {
     this.stream = null;
@@ -70,4 +70,4 @@ class Webserver {
 }
 
 
-export default Webserver;
+export default ACWebServer;

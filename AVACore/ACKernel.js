@@ -6,8 +6,8 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { AFDatabase } from "../index";
 import { terminalPrefix } from "./ACUtil";
-import Router from "./Router";
-import SocketKernel from "./SocketKernel";
+import ACRouter from "./ACRouter";
+import ACSocketKernel from "./ACSocketKernel";
 import csrf from "csurf";
 import connectMySQL from "connect-mysql";
 
@@ -15,10 +15,10 @@ const MySQLStore = connectMySQL(session);
 
 
 /**
- * @description The Kernel is the primary entry point of the system. It acts as a gateway between the listener and the rest of the system.
+ * @description The ACKernel is the primary entry point of the system. It acts as a gateway between the listener and the rest of the system.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Kernel {
+class ACKernel {
 
   constructor(app, stream) {
 
@@ -74,7 +74,7 @@ class Kernel {
     }
 
     // Global sockets
-    global.socket = new SocketKernel(stream);
+    global.socket = new ACSocketKernel(stream);
     global.cronjobs = {};
     global.database = new AFDatabase().connection;
 
@@ -124,7 +124,7 @@ class Kernel {
     }
 
     // Utilize router
-    app.use(new Router().routes());
+    app.use(new ACRouter());
   }
 
   middleware(request, response, next) {
@@ -159,4 +159,4 @@ class Kernel {
 }
 
 
-export default Kernel;
+export default ACKernel;
