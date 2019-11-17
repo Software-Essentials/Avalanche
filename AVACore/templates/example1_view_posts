@@ -1,11 +1,11 @@
-import { AVAViewController } from "avacore";
+import { AFViewController } from "avacore";
 import Post from "../models/Post";
 
 
 /**
  *
  */
-class PostViewController extends AVAViewController {
+class PostViewController extends AFViewController {
 
   constructor(request, response) {
     super(request, response);

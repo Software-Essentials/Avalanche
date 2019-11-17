@@ -6,7 +6,7 @@ import hbs from "nodemailer-express-handlebars";
  * @description Talks to the specified mailserver.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAMailer {
+class AFMailer {
 
   sendMail(recipient, subject, template, context) {
     const callback = typeof arguments[4] === "function" ? arguments[4] : null;
@@ -44,4 +44,4 @@ class AVAMailer {
 }
 
 
-export default AVAMailer;
+export default AFMailer;

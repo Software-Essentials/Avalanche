@@ -1,4 +1,4 @@
-import { AVAStorage, AVARecordZone, AVADatabase, AVAError } from "../index";
+import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
 import * as ACUtil from "../AVACore/ACUtil";
 
 
@@ -6,7 +6,7 @@ import * as ACUtil from "../AVACore/ACUtil";
  * @description Super model
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAModel {
+class AFModel {
 
   /**
    * @param {String} name Name of the resource.
@@ -19,7 +19,7 @@ class AVAModel {
       this.METHOD = "STORAGE";
       this.DRAFT = false;
     }
-    if (typeof arguments[0] === "object" && arguments[0] instanceof AVAModel, typeof arguments[1] === "function") {
+    if (typeof arguments[0] === "object" && arguments[0] instanceof AFModel, typeof arguments[1] === "function") {
       const self = arguments[0];
       this.NAME = self.NAME;
       this.IDENTIFIER = self.IDENTIFIER;
@@ -40,7 +40,7 @@ class AVAModel {
         const object = arguments[0];
         for (const key in this.PROPERTIES) {
           if (object.hasOwnProperty(this.PROPERTIES[key].name) === false) {
-            throw new AVAError("Model incomplete");
+            throw new AFError("Model incomplete");
           }
           this[key] = object[this.PROPERTIES[key].name]
         }
@@ -52,15 +52,15 @@ class AVAModel {
       }
     }
     if (this.METHOD === "STORAGE") {
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       if (!storage.recordZoneExists(this.NAME)) {
-        storage.addRecordZone(new AVARecordZone(this.NAME, []));
+        storage.addRecordZone(new AFRecordZone(this.NAME, []));
       }
       if (typeof arguments[0] === "object") {
         const object = arguments[0];
         for (const key in this.PROPERTIES) {
           if (object.hasOwnProperty(this.PROPERTIES[key].name) === false) {
-            throw new AVAError("Model incomplete");
+            throw new AFError("Model incomplete");
           }
           this[key] = object[this.PROPERTIES[key].name]
         }
@@ -81,7 +81,7 @@ class AVAModel {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (this.METHOD === "DATABASE") {
-      const database = new AVADatabase();
+      const database = new AFDatabase();
       var keys = [];
       var values = [];
       var parameters = [];
@@ -144,7 +144,7 @@ class AVAModel {
       });
     }
     if (this.METHOD === "STORAGE") {
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       const allRecords = storage.getRecordZone(this.NAME).getRecords()
       if (this.PROPERTIES[this.IDENTIFIER].autoIncrement && this.DRAFT === true) {
         var highest = 0;
@@ -177,7 +177,7 @@ class AVAModel {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (this.METHOD === "DATABASE") {
-      const database = new AVADatabase();
+      const database = new AFDatabase();
       const query = `DELETE FROM \`${this.NAME}\` WHERE \`${this.PROPERTIES[this.IDENTIFIER].name}\` = ?`;
       const parameters = [this[this.IDENTIFIER]];
       database.connection.query(query, parameters, (error, results, fields) => {
@@ -194,7 +194,7 @@ class AVAModel {
       });
     }
     if (this.METHOD === "STORAGE") {
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       const zone = storage.getRecordZone(this.NAME);
       if (!this.DRAFT) {
         if (zone.deleteRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID)) {
@@ -214,10 +214,10 @@ class AVAModel {
   where(key, value) {
     this.DRAFT = false;
     if (this.METHOD === "DATABASE") {
-      const database = new AVADatabase();
+      const database = new AFDatabase();
       const query = `SELECT * FROM \`${this.NAME}\` WHERE \`${key}\` = ?`;
       const parameters = [value];
-      return new AVAModel(this, (resolve, reject) => {
+      return new AFModel(this, (resolve, reject) => {
         database.connection.query(query, parameters, (error, results, fields) => {
           if (error) {
             if (error.code === "ECONNREFUSED") {
@@ -240,9 +240,9 @@ class AVAModel {
     }
     if (this.METHOD === "STORAGE") {
       var results = [];
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       const zone = storage.getRecordZone(this.NAME);
-      return new AVAModel(this, (resolve, reject) => {
+      return new AFModel(this, (resolve, reject) => {
         if (zone === null) {
           reject({ error: new Error("Zone not found.") });
         }
@@ -303,7 +303,7 @@ class AVAModel {
 }
 
 
-AVAModel.register = (Model) => {
+AFModel.register = (Model) => {
   const dummy = new Model();
   Model.PROPERTIES = dummy.PROPERTIES;
   Model.IDENTIFIER = dummy.IDENTIFIER;
@@ -314,7 +314,7 @@ AVAModel.register = (Model) => {
 
   /**
    * @description Returns JSON representation.
-   * @param {[AVAModel]}
+   * @param {[AFModel]}
    * @returns {Object}
    */
   function get(array) {
@@ -334,7 +334,7 @@ AVAModel.register = (Model) => {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (Model.METHOD === "DATABASE") {
-      const database = new AVADatabase();
+      const database = new AFDatabase();
       const query = `SELECT * FROM \`${Model.NAME}\``;
       const parameters = [];
       database.connection.query(query, parameters, (error, results, fields) => {
@@ -349,7 +349,7 @@ AVAModel.register = (Model) => {
         } else {
           var data = [];
           for (const result of results) {
-            const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
+            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
             model.setupDone(result);
             data.push(model);
           }
@@ -358,7 +358,7 @@ AVAModel.register = (Model) => {
       });
     }
     if (Model.METHOD === "STORAGE") {
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
         success({ results: [] })
@@ -366,7 +366,7 @@ AVAModel.register = (Model) => {
       const records = zone.getRecords();
       var results = [];
       for (const record in records) {
-        const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
+        const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
         model.setupDone(records[record]);
         results.push(model);
       }
@@ -385,7 +385,7 @@ AVAModel.register = (Model) => {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (Model.METHOD === "DATABASE") {
-      const database = new AVADatabase();
+      const database = new AFDatabase();
       const query = `SELECT * FROM \`${Model.NAME}\` WHERE \`${key}\` = ?`;
       const parameters = [value];
       database.connection.query(query, parameters, (error, results, fields) => {
@@ -400,7 +400,7 @@ AVAModel.register = (Model) => {
         } else {
           var data = [];
           for (const result of results) {
-            const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
+            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
             model.setupDone(result);
             data.push(model);
           }
@@ -410,7 +410,7 @@ AVAModel.register = (Model) => {
     }
     if (Model.METHOD === "STORAGE") {
       var results = [];
-      const storage = new AVAStorage();
+      const storage = new AFStorage();
       const zone = storage.getRecordZone(Model.NAME);
       if (zone === null) {
         success({ results: [] })
@@ -420,7 +420,7 @@ AVAModel.register = (Model) => {
         if (records[record].hasOwnProperty(key)) {
           const recordValue = records[record][key];
           if (recordValue === value) {
-            const model = new AVAModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
+            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
             model.setupDone(records[record]);
             results.push(model);
           }
@@ -436,4 +436,4 @@ AVAModel.register = (Model) => {
 }
 
 
-export default AVAModel.register(AVAModel);
+export default AFModel.register(AFModel);

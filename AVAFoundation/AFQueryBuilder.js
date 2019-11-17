@@ -4,7 +4,7 @@ import Knex from "knex";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAQueryBuilder {
+class AFQueryBuilder {
   
   /**
    * @param {Object} options Optional object containing options.
@@ -139,4 +139,4 @@ class AVAQueryBuilder {
 }
 
 
-export default AVAQueryBuilder;
+export default AFQueryBuilder;

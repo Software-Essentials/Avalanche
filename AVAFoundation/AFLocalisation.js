@@ -4,7 +4,7 @@ import fs from "fs";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVALocalisation {
+class AFLocalisation {
 
   constructor(locale) {
     var normalizedPath = `${projectPWD}/app/localisations`;
@@ -31,10 +31,10 @@ class AVALocalisation {
 
 
 export function translate(context) {
-  const localisation = new AVALocalisation("en_GB");
+  const localisation = new AFLocalisation("en_GB");
   const locale = localisation.getList();
   return typeof locale[context] === "string" ? locale[context] : context;
 };
 
 
-export default AVALocalisation;
+export default AFLocalisation;

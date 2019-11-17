@@ -1,10 +1,10 @@
-import { AVAViewController } from "avacore";
+import { AFViewController } from "avacore";
 
 
 /**
  *
  */
-class MainViewController extends AVAViewController {
+class MainViewController extends AFViewController {
 
   constructor(request, response) {
     super(request, response);

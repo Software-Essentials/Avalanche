@@ -1,10 +1,10 @@
-import { AVAMiddleware } from "avacore";
+import { AFMiddleware } from "avacore";
 
 
 /**
  * Ability to alter request before it reaches the controller.
  */
-class <#name?> extends AVAMiddleware {
+class <#name?> extends AFMiddleware {
 
   constructor() {
     super();

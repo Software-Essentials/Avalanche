@@ -1,4 +1,4 @@
-import { AVAController } from "avacore";
+import { AFController } from "avacore";
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 /**
  * @description Manages requests.
  */
-class AuthController extends AVAController {
+class AuthController extends AFController {
 
   /**
    * @param {Object} request

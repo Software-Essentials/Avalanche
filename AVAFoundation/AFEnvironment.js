@@ -1,5 +1,5 @@
 import fs from "fs";
-import AVAError from "../AVAFoundation/AVAError";
+import AFError from "../AVAFoundation/AFError";
 import * as ACUtil from "../AVACore/ACUtil";
 
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -8,7 +8,7 @@ const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${p
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAEnvironment {
+class AFEnvironment {
 
   constructor() {
 
@@ -28,7 +28,7 @@ class AVAEnvironment {
 
     if (Object.keys(environments).length <= 0) {
       console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment file missing!\x1b[0m`);
-      process.exit(AVAError.NOENV);
+      process.exit(AFError.NOENV);
     }
 
     var prefferedEnvironmentLoaded = false;
@@ -191,11 +191,11 @@ class AVAEnvironment {
     this.info.description = this.description;
 
     if (!isValid) {
-      process.exit(AVAError.ENVINVALID);
+      process.exit(AFError.ENVINVALID);
     }
   }
 
 }
 
 
-export default AVAEnvironment;
+export default AFEnvironment;

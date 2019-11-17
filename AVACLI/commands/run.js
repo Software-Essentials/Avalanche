@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
-import { AVAEnvironment } from "../../AVAFoundation/index";
-import { directoryLooper } from "../../AVAFoundation/AVAUtil";
+import { AFEnvironment } from "../../AVAFoundation/index";
+import { directoryLooper } from "../../AVAFoundation/AFUtil";
 import * as ACUtil from "../../AVACore/ACUtil";
 
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -25,7 +25,7 @@ function run() {
       environmentName = null;
     }
   }
-  global.environment = new AVAEnvironment(environmentName);
+  global.environment = new AFEnvironment(environmentName);
   var cProcess = start(environmentName);
   if (environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
@@ -39,7 +39,7 @@ function run() {
           const path = `${folder}/${file}`;
           if (fs.lstatSync(path).isFile()) {
             ACUtil.startWatchingSession(path, () => {
-              cProcess.kill("SIGQUIT")
+              cProcess.kill("SIGTERM")
               cProcess = start(environmentName);
             });
           }

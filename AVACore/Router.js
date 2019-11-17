@@ -2,7 +2,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import url from "url";
-import { AVAValidator } from "../index";
+import { AFValidator } from "../index";
 import { terminalPrefix } from "../AVACore/ACUtil";
 
 const ExRouter = express.Router();
@@ -86,14 +86,14 @@ class Router {
                             const mw = middleware[key];
                             const mwo = new mw();
                             filteredMiddleware[i] = (request, response, next) => {
-                                new AVAValidator(request);
+                                new AFValidator(request);
                                 mwo.init(request, response, next);
                             };
                         }
                         ExRouter[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
                     } else {
                         ExRouter[method.toLowerCase()](routePath, (request, response, next) => {
-                            new AVAValidator(request);
+                            new AFValidator(request);
                             next();
                         }, routeHandler[controllerHandler]);
                     }

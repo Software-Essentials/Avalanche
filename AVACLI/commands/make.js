@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import inquirer from "inquirer";
-import { AVAError } from "../../AVAFoundation/index";
-import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AVAUtil";
+import { AFError } from "../../AVAFoundation/index";
+import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AFUtil";
 import * as ACUtil from "../../AVACore/ACUtil";
 
 const { COPYFILE_EXCL } = fs.constants;
@@ -238,7 +238,7 @@ function make_model() {
     {
       type: "list",
       name: "method",
-      choices: ["AVAStorage", "AVADatabase"],
+      choices: ["AFStorage", "AFDatabase"],
       message: "Choose a storage method:",
       prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"
@@ -251,7 +251,7 @@ function make_model() {
       name: answers.name,
       name_lower: answers.name.toLowerCase(),
       method: answers.method,
-      method_key: answers.method === "AVAStorage" ? "STORAGE" : "DATABASE"
+      method_key: answers.method === "AFStorage" ? "STORAGE" : "DATABASE"
     };
     makeTemplate(variables, template, path);
   });
@@ -383,7 +383,7 @@ function makeTemplate(variables, template, projectPath) {
     }
   } else {
     console.log(`${ACUtil.terminalPrefix()}\x1b[31m (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
-    process.exit(AVAError.INCOMPLETECORE);
+    process.exit(AFError.INCOMPLETECORE);
   }
 }
 

@@ -34,7 +34,7 @@ const CONSTRAINT_BEHAVIOUR = {
  * @description Can be used to store large or structured files.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVADatabase {
+class AFDatabase {
 
   constructor() {
     this.connection = mysql.createPool(environment.database);
@@ -304,4 +304,4 @@ class AVADatabase {
 }
 
 
-export default AVADatabase;
+export default AFDatabase;

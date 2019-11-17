@@ -4,7 +4,7 @@
  * @description Super controller
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAController {
+class AFController {
 
   constructor() {
 
@@ -13,4 +13,4 @@ class AVAController {
 }
 
 
-export default AVAController;
+export default AFController;

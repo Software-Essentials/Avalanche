@@ -1,18 +1,18 @@
-import AVARecordZoneType from "../AVAFoundation/AVARecordZoneType";
+import AFRecordZoneType from "../AVAFoundation/AFRecordZoneType";
 
 
 /**
  * @description Record controller.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVARecordZone {
+class AFRecordZone {
 
   // /**
   //  * @param {String} name Name of the RecordZone.
-  //  * @param {AVARecordZoneType|String} type
+  //  * @param {AFRecordZoneType|String} type
   //  */
   // constructor(name, type) {
-  //   this.type = type === AVARecordZoneType.OBJECT ? type : AVARecordZoneType.LIST;
+  //   this.type = type === AFRecordZoneType.OBJECT ? type : AFRecordZoneType.LIST;
   //   this.name = name;
   // }
 
@@ -21,7 +21,7 @@ class AVARecordZone {
    * @param {Object} data Data represented in a JSON structure.
    */
   constructor(name, data) {
-    this.type = Array.isArray(data) ? AVARecordZoneType.LIST : AVARecordZoneType.OBJECT;
+    this.type = Array.isArray(data) ? AFRecordZoneType.LIST : AFRecordZoneType.OBJECT;
     this.name = name;
     this.data = data;
   }
@@ -42,7 +42,7 @@ class AVARecordZone {
    * @returns {any}
    */
   getRecordAtIndex(index) {
-    if(this.type == AVARecordZoneType.LIST) {
+    if(this.type == AFRecordZoneType.LIST) {
       const record = this.data[index];
       if(typeof record !== "undefined") {
         return record;
@@ -79,7 +79,7 @@ class AVARecordZone {
    * @returns {Boolean}
    */
   setRecordAtIndex(data, index) {
-    if(this.type === AVARecordZoneType.LIST) {
+    if(this.type === AFRecordZoneType.LIST) {
       if(typeof this.data[index] !== "undefined") {
         this.data[index] = data;
         return true
@@ -133,7 +133,7 @@ class AVARecordZone {
    * @param {Object} data Data to add.
    */
   addRecord(data) {
-    if(this.type === AVARecordZoneType.LIST) {
+    if(this.type === AFRecordZoneType.LIST) {
       this.data.push(data);
     }
   }
@@ -144,7 +144,7 @@ class AVARecordZone {
   //  * @param {Object} data Data to add.
   //  */
   // addRecord(key, data) {
-  //   if(this.type === AVARecordZoneType.OBJECT) {
+  //   if(this.type === AFRecordZoneType.OBJECT) {
   //     this.data[key] = data;
   //   }
   // }
@@ -155,7 +155,7 @@ class AVARecordZone {
    * @returns {Boolean}
    */
   deleteRecordAtIndex(index) {
-    if(this.type == AVARecordZoneType.LIST) {
+    if(this.type == AFRecordZoneType.LIST) {
       if(typeof this.data[index] !== "undefined") {
         this.data.splice(index, 1);
         return true
@@ -167,4 +167,4 @@ class AVARecordZone {
 }
 
 
-export default AVARecordZone;
+export default AFRecordZone;

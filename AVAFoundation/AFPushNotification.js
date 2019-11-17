@@ -4,7 +4,7 @@ import { Provider, Notification } from "apn";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAPushNotification {
+class AFPushNotification {
 
   constructor(tokens) {
     this.tokens = tokens;
@@ -41,4 +41,4 @@ class AVAPushNotification {
 }
 
 
-export default AVAPushNotification;
+export default AFPushNotification;

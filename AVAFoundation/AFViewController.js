@@ -1,11 +1,12 @@
-import AVAController from "./AVAController";
+import AFController from "./AFController";
 
 
 /**
+ * @deprecated
  * @description Super view controller
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAViewController extends AVAController {
+class AFViewController extends AFController {
 
   constructor(callback) {
     super();
@@ -49,4 +50,4 @@ class AVAViewController extends AVAController {
 }
 
 
-export default AVAViewController;
+export default AFViewController;

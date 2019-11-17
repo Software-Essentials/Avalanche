@@ -4,7 +4,7 @@
  * @description Super middleware
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAMiddleware {
+class AFMiddleware {
 
     constructor() {
         this.controller = null;
@@ -13,4 +13,4 @@ class AVAMiddleware {
 }
 
 
-export default AVAMiddleware;
+export default AFMiddleware;

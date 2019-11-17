@@ -1,6 +1,6 @@
 import fs from "fs";
 import { terminalPrefix, getModels } from "./ACUtil";
-import { AVADatabase, AVAStorage, AVARecordZone } from "../AVAFoundation/index";
+import { AFDatabase, AFStorage, AFRecordZone } from "../AVAFoundation/index";
 
 
 /**
@@ -27,9 +27,9 @@ class ACMigrator {
     const force = options ? typeof options.force === "boolean" ? options.force : false : false;
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     const models = getModels();
-    const database = new AVADatabase();
+    const database = new AFDatabase();
     database.foreignKeyChecks = false;
-    const storage = new AVAStorage();
+    const storage = new AFStorage();
     var migrations = {};
     if (wipe) {
       console.log(`${terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
@@ -88,7 +88,7 @@ class ACMigrator {
           }
           if (Model.METHOD === "STORAGE") {
             if (!storage.recordZoneExists(Model.NAME)) {
-              storage.addRecordZone(new AVARecordZone(this.NAME, []));
+              storage.addRecordZone(new AFRecordZone(this.NAME, []));
             }
             migrations[Model.NAME] = true;
             update();

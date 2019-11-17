@@ -1,10 +1,10 @@
-import { AVAController } from "avacore";
+import { AFController } from "avacore";
 
 
 /**
 *   For managing posts.
 */
-class PostController extends AVAController {
+class PostController extends AFController {
 
   /**
   *   Returns all posts.

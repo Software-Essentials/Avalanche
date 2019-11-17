@@ -1,8 +1,8 @@
-import { AVALocalisation } from "avacore";
+import { AFLocalisation } from "avacore";
 import fs from "fs";
 import hbs from "hbs";
 
-const localisation = new AVALocalisation("en_GB");
+const localisation = new AFLocalisation("en_GB");
 
 
 module.exports = {

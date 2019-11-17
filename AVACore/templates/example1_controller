@@ -1,4 +1,4 @@
-import { AVAController } from "avacore";
+import { AFController } from "avacore";
 import Post from "../models/Post.js";
 
 
@@ -6,7 +6,7 @@ import Post from "../models/Post.js";
  * This Controller was added as a part of the 'WebApp' boilerplate at initialisation of this Avalanche project.
  * @description Manages requests regarding Posts.
  */
-class PostController extends AVAController {
+class PostController extends AFController {
 
   constructor() {
     super()

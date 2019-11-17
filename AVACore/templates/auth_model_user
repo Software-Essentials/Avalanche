@@ -1,13 +1,13 @@
-import { AVAModel } from "avacore";
+import { AFModel } from "avacore";
 
 
 /**
  * @description Manages users.
  */
-class User extends AVAModel {
+class User extends AFModel {
 
   /**
-   * @throws AVAError
+   * @throws AFError
    */
   constructor() {
     super();
@@ -56,4 +56,4 @@ class User extends AVAModel {
 }
 
 
-export default AVAModel.register(User);
+export default AFModel.register(User);

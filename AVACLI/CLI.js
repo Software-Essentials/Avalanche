@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require = require("esm")(module);
-const { isSemVer } = require("../AVAFoundation/AVAUtil");
+const { isSemVer } = require("../AVAFoundation/AFUtil");
 const { terminalPrefix, isAVAProject, isAVACoreInstalled } = require("../AVACore/ACUtil");
 
 global.projectPWD = process.cwd();
@@ -10,8 +10,8 @@ const https = require("https");
 const Table = require("cli-table");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const AVAEnvironment = require("../AVAFoundation/AVAEnvironment").default;
-const AVAError = require("../AVAFoundation/AVAError").default;
+const AFEnvironment = require("../AVAFoundation/AFEnvironment").default;
+const AFError = require("../AVAFoundation/AFError").default;
 
 const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
@@ -34,12 +34,12 @@ function main() {
           if (command.scope === "PROJECT") {
             if (!isAVAProject()) {
               console.log(`${terminalPrefix()}\x1b[31m (error) This is not an Avalanche project. use "avalanche init" to initialize project.\x1b[0m`);
-              process.exit(AVAError.NOTANAVAPROJECT);
+              process.exit(AFError.NOTANAVAPROJECT);
               return;
             }
             notifyIfExperimental();
             if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
-              global.environment = new AVAEnvironment(pkg.avalancheConfig.preferredEnvironment);
+              global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
             }
           }
           command.execute(envValue, argValue);

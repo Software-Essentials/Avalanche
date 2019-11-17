@@ -1,4 +1,4 @@
-import { AVAMiddleware } from "avacore";
+import { AFMiddleware } from "avacore";
 import url from "url";
 import jwt from "jsonwebtoken";
 
@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 /**
  * 
  */
-class Auth extends AVAMiddleware {
+class Auth extends AFMiddleware {
 
   constructor() {
     super();

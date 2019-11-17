@@ -1,13 +1,13 @@
 import fs from "fs";
-import AVARecordZone from "./AVARecordZone";
-import { directoryLooper } from "./AVAUtil";
+import AFRecordZone from "./AFRecordZone";
+import { directoryLooper } from "./AFUtil";
 
 
 /**
  * @description Can be used to store large or structured files.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAStorage {
+class AFStorage {
 
   constructor() {
     const path = `${projectPWD}/storage`;
@@ -18,13 +18,13 @@ class AVAStorage {
 
   /**
    * @param {String} name Name of the record zone you want to retrieve.
-   * @returns {AVARecordZone|null}
+   * @returns {AFRecordZone|null}
    */
   getRecordZone(name) {
     const path = `${projectPWD}/storage/${name}.json`;
     if (fs.existsSync(path)) {
       const data = require(path)
-      return new AVARecordZone(name, data);
+      return new AFRecordZone(name, data);
     }
     return null;
   }
@@ -44,7 +44,7 @@ class AVAStorage {
 
   /**
    * @description Adds a RecordZone to the Storage.
-   * @param {AVARecordZone} recordZone Record zone to add.
+   * @param {AFRecordZone} recordZone Record zone to add.
    */
   addRecordZone(recordZone) {
     const name = recordZone.name;
@@ -69,7 +69,7 @@ class AVAStorage {
 
   /**
    * @description Updates the Storage with the updated RecordZone.
-   * @param {AVARecordZone} recordZone Record zone to save.
+   * @param {AFRecordZone} recordZone Record zone to save.
    */
   save(recordZone) {
     const name = recordZone.name;
@@ -110,7 +110,7 @@ function wipe() {
     fs.mkdirSync(storagePath);
   }
 }
-AVAStorage.wipe = wipe;
+AFStorage.wipe = wipe;
 
 
-export default AVAStorage;
+export default AFStorage;

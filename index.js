@@ -1,22 +1,22 @@
 // AVAFoundation
-export const AVAPushNotification = require("./AVAFoundation/AVAPushNotification").default;
-export const AVARecordZoneType = require("./AVAFoundation/AVARecordZoneType").default;
-export const AVALocalisation = require("./AVAFoundation/AVALocalisation").default;
-export const AVAQueryBuilder = require("./AVAFoundation/AVAQueryBuilder").default;
-export const AVAEnvironment = require("./AVAFoundation/AVAEnvironment").default;
-export const AVARecordZone = require("./AVAFoundation/AVARecordZone").default;
-export const AVAValidator = require("./AVAFoundation/AVAValidator").default;
-export const AVADatabase = require("./AVAFoundation/AVADatabase").default;
-export const AVAStorage = require("./AVAFoundation/AVAStorage").default;
-export const AVAMailer = require("./AVAFoundation/AVAMailer").default;
-export const AVAError = require("./AVAFoundation/AVAError").default;
-export const AVAUtil = require("./AVAFoundation/AVAUtil");
+export const AFPushNotification = require("./AVAFoundation/AFPushNotification").default;
+export const AFRecordZoneType = require("./AVAFoundation/AFRecordZoneType").default;
+export const AFLocalisation = require("./AVAFoundation/AFLocalisation").default;
+export const AFQueryBuilder = require("./AVAFoundation/AFQueryBuilder").default;
+export const AFEnvironment = require("./AVAFoundation/AFEnvironment").default;
+export const AFRecordZone = require("./AVAFoundation/AFRecordZone").default;
+export const AFValidator = require("./AVAFoundation/AFValidator").default;
+export const AFDatabase = require("./AVAFoundation/AFDatabase").default;
+export const AFStorage = require("./AVAFoundation/AFStorage").default;
+export const AFMailer = require("./AVAFoundation/AFMailer").default;
+export const AFError = require("./AVAFoundation/AFError").default;
+export const AFUtil = require("./AVAFoundation/AFUtil");
 
 // Super components
-export const AVAViewController = require("./AVAFoundation/AVAViewController").default;
-export const AVAController = require("./AVAFoundation/AVAController").default;
-export const AVAMiddleware = require("./AVAFoundation/AVAMiddleware").default;
-export const AVAModel = require("./AVAFoundation/AVAModel").default;
+export const AFViewController = require("./AVAFoundation/AFViewController").default;
+export const AFController = require("./AVAFoundation/AFController").default;
+export const AFMiddleware = require("./AVAFoundation/AFMiddleware").default;
+export const AFModel = require("./AVAFoundation/AFModel").default;
 
 // Other
-export const _ = require("./AVAFoundation/AVALocalisation").translate;
+export const _ = require("./AVAFoundation/AFLocalisation").translate;

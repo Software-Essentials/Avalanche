@@ -1,4 +1,4 @@
-import { AVAError } from "../../AVAFoundation/index";
+import { AFError } from "../../AVAFoundation/index";
 import Installer from "../../AVACore/Installer";
 import { terminalPrefix } from "../../AVACore/ACUtil";
 
@@ -15,7 +15,7 @@ function install(pkg) {
     if (message || error) {
       console.log(`${terminalPrefix()}\x1b[31m ${error ? error.message : message}\x1b[0m`);
     }
-    process.exit(AVAError.INCOMPLETECORE);
+    process.exit(AFError.INCOMPLETECORE);
   };
   const onOutput = (message) => {
     if (message) {

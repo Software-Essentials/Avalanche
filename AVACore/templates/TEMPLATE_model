@@ -1,4 +1,4 @@
-import { AVAModel, Util } from "avacore";
+import { AFModel, Util } from "avacore";
 
 const { UUID } = Util;
 
@@ -6,10 +6,10 @@ const { UUID } = Util;
 /**
  * @description Manages '<#name?>' entity.
  */
-class <#name?> extends AVAModel {
+class <#name?> extends AFModel {
 
   /**
-   * @throws AVAError
+   * @throws AFError
    */
   constructor() {
     super();
@@ -51,4 +51,4 @@ class <#name?> extends AVAModel {
 }
 
 
-export default AVAModel.register(<#name?>);
+export default AFModel.register(<#name?>);

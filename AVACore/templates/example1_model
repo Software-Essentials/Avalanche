@@ -1,13 +1,13 @@
-import { AVAModel } from "avacore";
+import { AFModel } from "avacore";
 
 
 /**
  * @description Manages posts.
  */
-class Post extends AVAModel {
+class Post extends AFModel {
 
   /**
-   * @throws AVAError
+   * @throws AFError
    */
   constructor() {
     super();
@@ -56,4 +56,4 @@ class Post extends AVAModel {
 }
 
 
-export default AVAModel.register(Post);
+export default AFModel.register(Post);

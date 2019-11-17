@@ -2,7 +2,7 @@ import fs from "fs";
 import inquirer from "inquirer";
 import { exec, execSync } from "child_process";
 import Installer from "../../AVACore/Installer";
-import { AVAError } from "../../AVAFoundation/index";
+import { AFError } from "../../AVAFoundation/index";
 import * as ACUtil from "../../AVACore/ACUtil";
 
 var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -14,7 +14,7 @@ var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projec
 function init() {
   if (ACUtil.isAVAProject()) {
     console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) Project has already been initialized.\x1b[0m`);
-    process.exit(AVAError.AVAALREADYINIT);
+    process.exit(AFError.AVAALREADYINIT);
   } else {
     initNPMIfNeeded();
     npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -129,7 +129,7 @@ function installBoilerplate(packageName) {
   };
   const onFailure = ({ error, message }) => {
     console.log(`${ACUtil.terminalPrefix()}\x1b[31m ${message}\x1b[0m`);
-    process.exit(AVAError.INCOMPLETECORE);
+    process.exit(AFError.INCOMPLETECORE);
   };
   const installer = new Installer();
   installer.install({ package: packageName, onSuccess, onFailure });

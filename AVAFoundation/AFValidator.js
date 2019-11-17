@@ -3,7 +3,7 @@
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAValidator {
+class AFValidator {
 
   constructor(request) {
     this.invalid = { body: {}, query: {}, param: {} };
@@ -148,4 +148,4 @@ class AVAValidator {
 }
 
 
-export default AVAValidator;
+export default AFValidator;

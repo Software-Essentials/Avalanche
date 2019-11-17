@@ -4,7 +4,7 @@
  * @description Collection of errorcodes.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class AVAError extends Error {
+class AFError extends Error {
 
   constructor() {
     const message = typeof arguments[0] === "string" ? arguments[0] : undefined;
@@ -17,14 +17,14 @@ class AVAError extends Error {
 
 }
 
-AVAError.NOTANAVAPROJECT = 1;
-AVAError.NOENV = 2;
-AVAError.ENVINVALID = 3;
-AVAError.AVAALREADYINIT = 4;
-AVAError.INCOMPLETECORE = 5;
+AFError.NOTANAVAPROJECT = 1;
+AFError.NOENV = 2;
+AFError.ENVINVALID = 3;
+AFError.AVAALREADYINIT = 4;
+AFError.INCOMPLETECORE = 5;
 
 
-export default AVAError
+export default AFError
 export const NOTANAVAPROJECT = 1;
 export const NOENV = 2;
 export const ENVINVALID = 3;

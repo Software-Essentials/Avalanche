@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 
 require = require("esm")(module);
-const { AVAEnvironment } = require("../AVAFoundation/index");
+const { AFEnvironment } = require("../AVAFoundation/index");
 const express = require("express");
 const { terminalPrefix } = require("./ACUtil");
 
@@ -13,7 +13,7 @@ const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
 if (cmdValue !== "run") {
   process.exit(0);
 } else {
-  global.environment = new AVAEnvironment(envValue);
+  global.environment = new AFEnvironment(envValue);
 
   const Kernel = require("./Kernel.js").default;
   const Webserver = require("./Webserver.js").default;

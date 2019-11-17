@@ -1,6 +1,6 @@
 import fs from "fs";
 import { terminalPrefix, getSeedFilesNames } from "./ACUtil";
-import { AVADatabase, AVAStorage } from "../AVAFoundation/index";
+import { AFDatabase, AFStorage } from "../AVAFoundation/index";
 
 
 /**
@@ -41,7 +41,7 @@ class ACSeeder {
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     console.log(`${terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
     var permissionIssue = false;
-    const database = new AVADatabase();
+    const database = new AFDatabase();
     database.foreignKeyChecks = false;
     var seedStats = {};
     const that = this;
@@ -51,7 +51,7 @@ class ACSeeder {
       });
       try {
         console.log(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
-        AVAStorage.wipe();
+        AFStorage.wipe();
       } catch (error) {
         if (error.code === "EPERM") {
           // permissionIssue = true; // Should be uncommented, BUT the issue can't be resolved and the warning is very annoying.

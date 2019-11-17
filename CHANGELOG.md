@@ -5,21 +5,21 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.4.57] - 2019-11-17
+## [0.4.58] - 2019-11-17
 ### Added
-- Added AVAPushNotification class for iOS remote notifications.
+- Added AFPushNotification class for iOS remote notifications.
 
 ### Changes
 - Separated AVAFoundation, AVACore & AVACLI namespaces.
 - Updated package namespaces (AVAFoundation & AVACore).
-- Standardized AVAUtil & CoreUtil.
+- Standardized AFUtil & ACUtil.
 - Started implementation of ESM (A lot of refactoring).
 
 ## [0.4.31] - 2019-11-16
 ### Added
-- Added CoreUtil to AVAFoundation.
+- Added ACUtil to AVAFoundation.
 - Added foreign key constraints (relations) to Migrator.
-- Added constraint checks option to AVADatabase.
+- Added constraint checks option to AFDatabase.
 
 ### Fixed
 - Fixed Seeder 'wipe' option.
@@ -32,7 +32,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Added ability to have no primaryKey in Migrator.
 
 ### Changes
-- Optimised AVAModel.
+- Optimised AFModel.
 
 ## [0.4.25] - 2019-08-12
 ### Added
@@ -43,7 +43,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Added this CHANGELOG.md to the source code.
 
 ### Changes
-- Removed NULL values from insert query on AVAModel.save() fuction.
+- Removed NULL values from insert query on AFModel.save() fuction.
 - Changed the progress animation on the 'update' command.
 - Minor improvements.
 
@@ -64,7 +64,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Added YouTube tutorial video link to readme.md.
 
 ### Changes
-- Many optimisations in AVAModel class.
+- Many optimisations in AFModel class.
 
 ## [0.4.11] - 2019-08-08
 ### Added
@@ -78,7 +78,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.4.7] - 2019-08-07
 ### Added
-- Added AVAValidator class. The validator is contained in every request object.
+- Added AFValidator class. The validator is contained in every request object.
 - Added ability to choose storage type in 'make' command when making a model.
 - Added environment resource to 'make' command.
 - Added seeds resource to 'make' command.
@@ -132,8 +132,8 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Standardised terminal prefix.
 
 ### Changed
-- Moved all AVACore utilities to the CoreUtil class.
-- Major improvements on AVAModel.
+- Moved all AVACore utilities to the ACUtil class.
+- Major improvements on AFModel.
 - Minor improvements.
 
 ## [0.2.24] - 2019-07-14
@@ -146,8 +146,8 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.2.13] - 2019-07-13
 ### Added
-- Added AVAStorage class to utilize filestorage.
-- Added AVADatabase class to utilize a database.
+- Added AFStorage class to utilize filestorage.
+- Added AFDatabase class to utilize a database.
 - Added ASCII art when installation was complete.
 - Added more utilities.
 

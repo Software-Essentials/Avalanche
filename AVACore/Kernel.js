@@ -4,7 +4,7 @@ import express from "express";
 import exphbs from "express-handlebars";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { AVADatabase } from "../index";
+import { AFDatabase } from "../index";
 import { terminalPrefix } from "./ACUtil";
 import Router from "./Router";
 import SocketKernel from "./SocketKernel";
@@ -76,7 +76,7 @@ class Kernel {
     // Global sockets
     global.socket = new SocketKernel(stream);
     global.cronjobs = {};
-    global.database = new AVADatabase().connection;
+    global.database = new AFDatabase().connection;
 
     // Tell express to use EJS
     // app.set('view engine', 'ejs');

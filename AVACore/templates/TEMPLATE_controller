@@ -1,10 +1,10 @@
-import { AVAController } from "avacore";
+import { AFController } from "avacore";
 
 
 /**
  * @description Manages requests.
  */
-class <#name?> extends AVAController {
+class <#name?> extends AFController {
 
   constructor() {
     super()

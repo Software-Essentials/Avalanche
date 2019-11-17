@@ -1,4 +1,4 @@
-import { rmdirSyncRecursive } from "../../AVAFoundation/AVAUtil";
+import { rmdirSyncRecursive } from "../../AVAFoundation/AFUtil";
 import { terminalPrefix } from "../../AVACore/ACUtil";
 import { exec } from "child_process";
 
