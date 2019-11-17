@@ -1,0 +1,80 @@
+import { AFController } from "avacore";
+
+
+/**
+ * @description Manages requests.
+ */
+class <#name?> extends AFController {
+
+  constructor() {
+    super()
+  }
+
+
+  /**
+   * @param {Object} request
+   * @param {Object} response
+   */
+  index(request, response) {
+    response.json({
+      success: true,
+      message: "Showing all records.",
+      data: [ { ID: 1, name: "Test1" }, { ID: 2, name: "Test2" } ]
+    });
+  }
+
+
+  /**
+   * @param {Object} request
+   * @param {Object} response
+   */
+  show(request, response) {
+    const ID = request.params.ID;
+    response.json({
+      success: true,
+      message: "Showing record.",
+      data: { ID: 1, name: "Test1" }
+    });
+  }
+
+
+  /**
+   * @param {Object} request
+   * @param {Object} response
+   */
+  store(request, response) {
+    response.json({
+      success: true,
+      message: "Record added."
+    });
+  }
+
+
+  /**
+   * @param {Object} request
+   * @param {Object} response
+   */
+  update(request, response) {
+    const ID = request.body.ID;
+    response.json({
+      success: true,
+      message: "Record updated."
+    });
+  }
+
+
+  /**
+   * @param {Object} request
+   * @param {Object} response
+   */
+  destroy(request, response) {
+    response.json({
+      success: true,
+      message: "Record deleted."
+    });
+  }
+
+}
+
+
+export default <#name?>;

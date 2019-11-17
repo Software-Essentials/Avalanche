@@ -1,0 +1,22 @@
+import { AFViewController } from "avacore";
+
+
+/**
+ *
+ */
+class <#name?> extends AFViewController {
+
+  constructor(request, response) {
+    super(request, response);
+  }
+
+
+  willLoad(request, response, self) {
+    // self.template = "default";
+    super.willLoad(request, response, self);
+  }
+
+}
+
+
+export default <#name?>;

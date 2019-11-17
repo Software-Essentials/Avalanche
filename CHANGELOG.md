@@ -1,12 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalanche).
+
 ## [Unreleased]
 
-## [0.4.29] - 2019-11-16
+## [0.5.0] - 2019-11-17
 ### Added
+- Added AFPushNotification class for iOS remote notifications.
+- Implemented ES6 Module loader.
+
+### Changes
+- Separated AVAFoundation, AVACore & AVACLI namespaces.
+- Updated package namespaces (AVAFoundation & AVACore).
+- Standardized AFUtil & ACUtil.
+
+## [0.4.31] - 2019-11-16
+### Added
+- Added ACUtil to AVAFoundation.
 - Added foreign key constraints (relations) to Migrator.
-- Added constraint checks option to AVADatabase.
+- Added constraint checks option to AFDatabase.
+
+### Fixed
+- Fixed Seeder 'wipe' option.
 
 ## [0.4.27] - 2019-08-24
 ### Added
@@ -16,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - Added ability to have no primaryKey in Migrator.
 
 ### Changes
-- Optimised AVAModel.
+- Optimised AFModel.
 
 ## [0.4.25] - 2019-08-12
 ### Added
@@ -27,7 +43,7 @@ All notable changes to this project will be documented in this file.
 - Added this CHANGELOG.md to the source code.
 
 ### Changes
-- Removed NULL values from insert query on AVAModel.save() fuction.
+- Removed NULL values from insert query on AFModel.save() fuction.
 - Changed the progress animation on the 'update' command.
 - Minor improvements.
 
@@ -48,7 +64,7 @@ All notable changes to this project will be documented in this file.
 - Added YouTube tutorial video link to readme.md.
 
 ### Changes
-- Many optimisations in AVAModel class.
+- Many optimisations in AFModel class.
 
 ## [0.4.11] - 2019-08-08
 ### Added
@@ -62,7 +78,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.4.7] - 2019-08-07
 ### Added
-- Added AVAValidator class. The validator is contained in every request object.
+- Added AFValidator class. The validator is contained in every request object.
 - Added ability to choose storage type in 'make' command when making a model.
 - Added environment resource to 'make' command.
 - Added seeds resource to 'make' command.
@@ -116,8 +132,8 @@ All notable changes to this project will be documented in this file.
 - Standardised terminal prefix.
 
 ### Changed
-- Moved all AVACore utilities to the CoreUtil class.
-- Major improvements on AVAModel.
+- Moved all AVACore utilities to the ACUtil class.
+- Major improvements on AFModel.
 - Minor improvements.
 
 ## [0.2.24] - 2019-07-14
@@ -130,8 +146,8 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.13] - 2019-07-13
 ### Added
-- Added AVAStorage class to utilize filestorage.
-- Added AVADatabase class to utilize a database.
+- Added AFStorage class to utilize filestorage.
+- Added AFDatabase class to utilize a database.
 - Added ASCII art when installation was complete.
 - Added more utilities.
 

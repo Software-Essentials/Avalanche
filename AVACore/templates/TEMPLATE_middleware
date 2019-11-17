@@ -1,0 +1,26 @@
+import { AFMiddleware } from "avacore";
+
+
+/**
+ * Ability to alter request before it reaches the controller.
+ */
+class <#name?> extends AFMiddleware {
+
+  constructor() {
+    super();
+  }
+
+  /**
+   * @param {[Object]} request
+   * @param {[Object]} response
+   * @param {[Object]} next
+   */
+  init(request, response, next) {
+    next();
+    return;
+  }
+
+}
+
+
+export default = <#name?>;

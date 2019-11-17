@@ -1,0 +1,22 @@
+import { AFViewController } from "avacore";
+
+
+/**
+ *
+ */
+class MainViewController extends AFViewController {
+
+  constructor(request, response) {
+    super(request, response);
+  }
+
+
+  willLoad(request, response, self) {
+    self.template = "landing";
+    super.willLoad(request, response, self);
+  }
+
+}
+
+
+export default MainViewController;

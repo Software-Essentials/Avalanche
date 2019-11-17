@@ -1,0 +1,23 @@
+import { AFLocalisation } from "avacore";
+import fs from "fs";
+import hbs from "hbs";
+
+const localisation = new AFLocalisation("en_GB");
+
+
+module.exports = {
+    lang: () => {
+        return "en";
+    },
+    loadCustomView: (context, options) => {
+        const template = fs.readFileSync(__dirname + "/templates/" + context);
+        return new hbs.compile(template);
+    },
+    replaceSpacesWithUnderscores: (context, options) => {
+        return context.replace(" ", "_");
+    },
+    _: (context, options) => {
+        const locale = localisation.getList();
+        return typeof locale[context] === "string" ? locale[context] : context;
+    }
+};

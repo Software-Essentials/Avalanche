@@ -1,0 +1,23 @@
+import { AFViewController } from "avacore";
+
+
+/**
+ *
+ */
+class AuthViewController extends AFViewController {
+
+  constructor(request, response) {
+    super(request, response);
+  }
+
+
+  willLoad(request, response, self) {
+    self.template = "register";
+    self.variables.isSignedIn = !!request.session.token;
+    super.willLoad(request, response, self);
+  }
+
+}
+
+
+export default AuthViewController;

@@ -1,0 +1,59 @@
+import { AFModel } from "avacore";
+
+
+/**
+ * @description Manages users.
+ */
+class User extends AFModel {
+
+  /**
+   * @throws AFError
+   */
+  constructor() {
+    super();
+    // Model configuration.
+    this.NAME = "User"; // Name of the Storage Zone / Database Table.
+    this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
+    this.METHOD = "DATABASE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+    this.PROPERTIES = {
+      "ID": {
+        name: "user_id",
+        type: "INT",
+        length: 10,
+        required: true,
+        relatable: true,
+        autoIncrement: true
+      },
+      "email": {
+        name: "user_email",
+        type: "CHAR",
+        length: 255,
+        required: true
+      },
+      "password": {
+        name: "user_password",
+        type: "CHAR",
+        length: 255,
+        required: true
+      },
+      "createdAt": {
+        name: "created_at",
+        type: "BIGINT",
+        length: 1,
+        required: true
+      },
+      "updatedAt": {
+        name: "updated_at",
+        type: "BIGINT",
+        length: 1
+      }
+    }; // Format: "<model key>": { <properties> }
+    this.setupDone(); // Lets the super Model know that we are done with the setup of this Model.
+    // Default values.
+    this.createdAt = new Date().valueOf();
+  }
+
+}
+
+
+export default AFModel.register(User);

@@ -1,0 +1,54 @@
+import { AFModel, Util } from "avacore";
+
+const { UUID } = Util;
+
+
+/**
+ * @description Manages '<#name?>' entity.
+ */
+class <#name?> extends AFModel {
+
+  /**
+   * @throws AFError
+   */
+  constructor() {
+    super();
+    this.NAME = "<#name?>"; // Name of the Storage Zone / Database Table.
+    this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
+    this.METHOD = "<#method_key?>"; // Lets the model know we want to use the <#method?> as storage method. Options are "DATABASE" or "STORAGE".
+    this.PROPERTIES = {
+      "ID": {
+        name: "<#name_lower?>_id",
+        type: "CHAR",
+        length: 36,
+        required: true,
+        relatable: true
+      },
+      "name": {
+        name: "<#name_lower?>_name",
+        type: "CHAR",
+        length: 255,
+        required: true
+      },
+      "createdAt": {
+        name: "created_at",
+        type: "BIGINT",
+        length: 1,
+        required: true
+      },
+      "updatedAt": {
+        name: "updated_at",
+        type: "BIGINT",
+        length: 1
+      }
+    };
+    this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
+    // Default values.
+    this.ID = new UUID().string;
+    this.createdAt = new Date().valueOf();
+  }
+
+}
+
+
+export default AFModel.register(<#name?>);
