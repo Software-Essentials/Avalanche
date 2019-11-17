@@ -1,9 +1,9 @@
 import fs from "fs";
+import path from "path";
 import inquirer from "inquirer";
 import AVAError from "../../AVAFoundation/AVAError";
+import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AVAUtil";
 import * as CoreUtil from "../CoreUtil";
-import path from "path";
-import { UUID } from "../Util";
 
 const { COPYFILE_EXCL } = fs.constants;
 
@@ -12,7 +12,7 @@ const { COPYFILE_EXCL } = fs.constants;
  * @description Makes template.
  */
 function make(component) {
-  switch(component) {
+  switch (component) {
     case "controller":
       make_controller();
       return;
@@ -81,9 +81,9 @@ function make_controller() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(!answer.endsWith("Controller"))
+        if (!answer.endsWith("Controller"))
           return `\x1b[31mA controller name should end with "Controller". For example: "UserController".\x1b[0m`;
-        if(fs.existsSync(`${projectPWD}/app/controllers/${answer}.js`))
+        if (fs.existsSync(`${projectPWD}/app/controllers/${answer}.js`))
           return "\x1b[31mA controller with this name already exists.\x1b[0m";
         return true;
       }
@@ -140,7 +140,7 @@ function make_environment() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
+        if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
           return "\x1b[31mAn environment file with this name already exists.\x1b[0m"
         return true;
       }
@@ -152,7 +152,7 @@ function make_environment() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
+        if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
           return "\x1b[31mAn environment file with this name already exists.\x1b[0m"
         return true;
       }
@@ -188,7 +188,7 @@ function make_middleware() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/middleware/${answer}.js`))
+        if (fs.existsSync(`${projectPWD}/app/middleware/${answer}.js`))
           return "\x1b[31mA middleware file with this name already exists.\x1b[0m"
         return true;
       }
@@ -217,7 +217,7 @@ function make_model() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/models/${answer}.js`))
+        if (fs.existsSync(`${projectPWD}/app/models/${answer}.js`))
           return "\x1b[31mA model with this name already exists.\x1b[0m"
         return true;
       }
@@ -270,7 +270,7 @@ function make_routes() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/routes/${answer}.json`))
+        if (fs.existsSync(`${projectPWD}/app/routes/${answer}.json`))
           return "\x1b[31mA routes file with this name already exists.\x1b[0m"
         return true;
       }
@@ -297,7 +297,7 @@ function make_seeds() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
+        if (fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
           return "\x1b[31mA seeds file with this name already exists.\x1b[0m"
         return true;
       }
@@ -317,7 +317,7 @@ function make_seeds() {
     const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`).default;
     const variables = {
       model: answers.model,
-      method: new DummyClass().METHOD === "DATABASE" ? "table": "zone"
+      method: new DummyClass().METHOD === "DATABASE" ? "table" : "zone"
     };
     makeTemplate(variables, template, path);
   });
@@ -336,9 +336,9 @@ function make_view() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(!answer.endsWith("ViewController"))
+        if (!answer.endsWith("ViewController"))
           return `\x1b[31mA voew name should end with "ViewController". For example: "ProfileViewController".\x1b[0m`;
-        if(fs.existsSync(`${projectPWD}/app/views/${answer}.js`))
+        if (fs.existsSync(`${projectPWD}/app/views/${answer}.js`))
           return "\x1b[31mA view with this name already exists.\x1b[0m";
         return true;
       }
@@ -362,16 +362,16 @@ function make_view() {
 function makeTemplate(variables, template, projectPath) {
   const src = path.normalize(`${__dirname}/../templates/${template}`);
   const dest = path.normalize(`${projectPWD}/${projectPath}`);
-  if(fs.existsSync(src)) {
+  if (fs.existsSync(src)) {
     if (!fs.existsSync(dest)) {
-      CoreUtil.ensureDirectoryExistence(dest);
+      ensureDirectoryExistence(dest);
       fs.copyFile(src, dest, COPYFILE_EXCL, (error) => {
         if (error) {
           console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) ${error.message}\x1b[0m`);
           return;
         }
         var content = fs.readFileSync(dest).toString();
-        for(const key in variables) {
+        for (const key in variables) {
           const variable = variables[key];
           content = content.split(`<#${key}?>`).join(variable);
         }

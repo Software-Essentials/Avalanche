@@ -4,38 +4,10 @@ import path from "path";
 
 
 /**
- * @description Removes a directory recursively.
- * @param {String} filePath
+ * 
+ *  This file should contain all utility functions that can only be used by classes in the AVACore package
+ * 
  */
-export function rmdirSyncRecursive(filePath) {
-  var files = [];
-  if (fs.existsSync(filePath)) {
-    files = fs.readdirSync(filePath);
-    files.forEach(function (file, index) {
-      var curPath = filePath + "/" + file;
-      if (fs.lstatSync(curPath).isDirectory()) {
-        rmdirSyncRecursive(curPath);
-      } else {
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(filePath);
-  }
-};
-
-
-/**
- * @description Creates directory tree if needed
- * @param {String} filePath
- */
-export function ensureDirectoryExistence(filePath) {
-  var dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-}
 
 
 /**
@@ -79,30 +51,6 @@ export function terminalPrefix() {
  */
 export function getProjectPackage() {
   return fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : null;
-}
-
-
-/**
- * @description Loops to map a full directory structure until it is done.
- * @param {String} filename Name of the directory to map.
- * @param {Object} previousChildren Collection of the results of the previous scan.
- * @returns {Object}
- */
-export function directoryLooper(filename, previousChildren) {
-  var children = previousChildren;
-  children.push(filename);
-  var stats = fs.lstatSync(filename),
-    info = {
-      path: filename,
-    };
-  if (stats.isDirectory()) {
-    info.children = fs.readdirSync(filename).map(function (child) {
-      const tree = directoryLooper(filename + "/" + child, children);
-      return tree.info;
-    });
-  }
-
-  return { info: info, children: children };
 }
 
 
@@ -326,20 +274,6 @@ export function getSeedFilesNames() {
     }
   });
   return controllers;
-}
-
-
-/**
- * @param {String} versionValue 
- * @returns {Boolean}
- */
-export function isSemVer(versionValue) {
-  const splittedValue = versionValue.split(".");
-  const parsedValue = parseInt(splittedValue.join(""));
-  if (splittedValue.length === 3 && typeof parsedValue === "number" && parsedValue !== NaN) {
-    return true;
-  }
-  return false;
 }
 
 

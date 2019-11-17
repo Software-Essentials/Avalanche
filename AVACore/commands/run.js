@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import AVAEnvironment from "../../AVAFoundation/AVAEnvironment";
+import { directoryLooper } from "../../AVAFoundation/AVAUtil";
 import * as CoreUtil from "../CoreUtil";
 import { exec } from "child_process";
 
@@ -28,7 +29,7 @@ function run() {
   var cProcess = start(environmentName);
   if (environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
-    const folders = CoreUtil.directoryLooper(directory, []).children;
+    const folders = directoryLooper(directory, []).children;
     for (const i in folders) {
       const folder = folders[i];
       if (fs.lstatSync(folder).isDirectory()) {
