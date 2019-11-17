@@ -5,15 +5,15 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.4.59] - 2019-11-17
+## [0.5.0] - 2019-11-17
 ### Added
 - Added AFPushNotification class for iOS remote notifications.
+- Implemented ES6 Module loader.
 
 ### Changes
 - Separated AVAFoundation, AVACore & AVACLI namespaces.
 - Updated package namespaces (AVAFoundation & AVACore).
 - Standardized AFUtil & ACUtil.
-- Started implementation of ESM (A lot of refactoring).
 
 ## [0.4.31] - 2019-11-16
 ### Added
