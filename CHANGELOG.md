@@ -5,7 +5,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.4.55] - 2019-11-17
+## [0.4.56] - 2019-11-17
 ### Added
 - Added AVAPushNotification class for iOS remote notifications.
 
