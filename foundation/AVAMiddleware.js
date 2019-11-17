@@ -13,5 +13,4 @@ class AVAMiddleware {
 }
 
 
-module.exports = AVAMiddleware;
 export default AVAMiddleware;

@@ -49,5 +49,4 @@ class AVAViewController extends AVAController {
 }
 
 
-module.exports = AVAViewController;
 export default AVAViewController;

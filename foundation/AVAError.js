@@ -23,7 +23,7 @@ AVAError.ENVINVALID = 3;
 AVAError.AVAALREADYINIT = 4;
 AVAError.INCOMPLETECORE = 5;
 
-module.exports = AVAError;
+
 export default AVAError
 export const NOTANAVAPROJECT = 1;
 export const NOENV = 2;

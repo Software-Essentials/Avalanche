@@ -1,4 +1,4 @@
-const { AVAModel } = require("avacore");
+import { AVAModel } from "avacore";
 
 
 /**
@@ -56,4 +56,4 @@ class Post extends AVAModel {
 }
 
 
-module.exports = AVAModel.register(Post);
+export default AVAModel.register(Post);

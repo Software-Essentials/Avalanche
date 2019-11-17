@@ -167,5 +167,4 @@ class AVARecordZone {
 }
 
 
-module.exports = AVARecordZone;
 export default AVARecordZone;

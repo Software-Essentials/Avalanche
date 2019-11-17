@@ -113,5 +113,4 @@ function wipe() {
 AVAStorage.wipe = wipe;
 
 
-module.exports = AVAStorage;
 export default AVAStorage;

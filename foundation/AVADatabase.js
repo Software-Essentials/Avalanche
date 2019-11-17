@@ -56,8 +56,9 @@ class AVADatabase {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
-    const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
-    this.query(this.preQuery() + query, [], (error, _results, fields) => {
+    const dbName = environment.database.database;
+    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
+    this.query(this.preQuery() + query, [dbName], (error, _results, fields) => {
       if (error) {
         failure({ error });
         return;
@@ -65,9 +66,9 @@ class AVADatabase {
       const results = _results.slice(1)[0];
       if (results.length > 0) {
         for (const result of results) {
-          const table = result.table_name;
+          const table = result.name;
           wipes[table] = null;
-          const query = `DELETE FROM \`${result.table_name}\`;`;
+          const query = `DELETE FROM \`${result.name}\`;`;
           this.query(this.preQuery() + query, [], (error, _results, fields) => {
             const results = _results.slice(1);
             if (error) {
@@ -104,8 +105,9 @@ class AVADatabase {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
-    const query = `SELECT table_name FROM information_schema.tables where table_schema='${global.environment.database.database}';`;
-    this.query(this.preQuery() + query, [], (error, _results, fields) => {
+    const dbName = environment.database.database;
+    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
+    this.query(this.preQuery() + query, [dbName], (error, _results, fields) => {
       if (error) {
         failure({ error });
         return;
@@ -113,9 +115,9 @@ class AVADatabase {
       const results = _results.slice(1)[0];
       if (results.length > 0) {
         for (const result of results) {
-          const table = result.table_name;
+          const table = result.name;
           wipes[table] = null;
-          const query = `DROP TABLE IF EXISTS \`${result.table_name}\`;`;
+          const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
           this.query(this.preQuery() + query, [], (error, _results, fields) => {
             const results = _results.slice(1);
             if (error) {
@@ -295,11 +297,10 @@ class AVADatabase {
   }
 
   preQuery() {
-    return `SET foreign_key_checks = ${!!this.foreignKeyChecks ? "1" : "0"};`;
+    return `SET foreign_key_checks = ${!!this.foreignKeyChecks ? "1" : "0"}; `;
   }
 
 }
 
 
-module.exports = AVADatabase;
 export default AVADatabase;

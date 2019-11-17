@@ -343,24 +343,4 @@ export function isSemVer(versionValue) {
 }
 
 
-// module.exports = {
-//   rmdirSyncRecursive: rmdirSyncRecursive,
-//   ensureDirectoryExistence: ensureDirectoryExistence,
-//   isAVACoreInstalled: isAVACoreInstalled,
-//   isAVAProject: isAVAProject,
-//   isNodeProject: isNodeProject,
-//   terminalPrefix: terminalPrefix,
-//   getProjectPackage: getProjectPackage,
-//   directoryLooper: directoryLooper,
-//   startWatchingSession: startWatchingSession,
-//   getRoutes: getRoutes,
-//   getControllers: getControllers,
-//   getMiddleware: getMiddleware,
-//   getLocalisations: getLocalisations,
-//   getTranslations: getTranslations,
-//   getModels: getModels,
-//   getHelpers: getHelpers,
-//   getMigrations: getMigrations,
-//   getSeedFilesNames: getSeedFilesNames
-// };
 export default null;

@@ -1,4 +1,6 @@
-const { AVAModel, Util: { UUID } } = require("avacore");
+import { AVAModel, Util } from "avacore";
+
+const { UUID } = Util;
 
 
 /**
@@ -49,4 +51,4 @@ class <#name?> extends AVAModel {
 }
 
 
-module.exports = AVAModel.register(<#name?>);
+export default AVAModel.register(<#name?>);

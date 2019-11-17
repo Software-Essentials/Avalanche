@@ -3,6 +3,7 @@ import hbs from "nodemailer-express-handlebars";
 
 
 /**
+ * @description Talks to the specified mailserver.
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVAMailer {
@@ -43,5 +44,4 @@ class AVAMailer {
 }
 
 
-module.exports = AVAMailer;
 export default AVAMailer;

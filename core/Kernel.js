@@ -9,8 +9,9 @@ import { terminalPrefix } from "./CoreUtil";
 import Router from "./Router";
 import SocketKernel from "./SocketKernel";
 import csrf from "csurf";
+import connectMySQL from "connect-mysql";
 
-const MySQLStore = require("connect-mysql")(session);
+const MySQLStore = connectMySQL(session);
 
 
 /**
@@ -158,5 +159,4 @@ class Kernel {
 }
 
 
-module.exports = Kernel;
 export default Kernel;

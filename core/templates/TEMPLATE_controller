@@ -1,5 +1,4 @@
-// Imports
-const { AVAController } = require("avacore");
+import { AVAController } from "avacore";
 
 
 /**
@@ -78,4 +77,4 @@ class <#name?> extends AVAController {
 }
 
 
-module.exports = <#name?>;
+export default <#name?>;

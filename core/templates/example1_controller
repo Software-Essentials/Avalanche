@@ -1,6 +1,5 @@
-// Imports
-const { AVAController } = require("avacore");
-const Post = require("../models/Post.js");
+import { AVAController } from "avacore";
+import Post from "../models/Post.js";
 
 
 /**
@@ -163,4 +162,4 @@ class PostController extends AVAController {
 }
 
 
-module.exports = PostController;
+export default PostController;

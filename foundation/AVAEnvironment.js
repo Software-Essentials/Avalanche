@@ -1,6 +1,7 @@
 import fs from "fs";
 import AVAError from "../foundation/AVAError";
 import * as CoreUtil from "../core/CoreUtil";
+
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
@@ -164,8 +165,7 @@ class AVAEnvironment {
       }
       if (typeof (environment.database.connectionLimit) === "number")
         this.database.connectionLimit = environment.database.connectionLimit;
-      if (typeof (environment.database.multipleStatements) === "boolean")
-        this.database.multipleStatements = environment.database.multipleStatements;
+      this.database.multipleStatements = true;
     } else {
       isValid = false
       console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database credentials.\x1b[0m`);
@@ -198,5 +198,4 @@ class AVAEnvironment {
 }
 
 
-module.exports = AVAEnvironment;
 export default AVAEnvironment;

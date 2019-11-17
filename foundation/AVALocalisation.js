@@ -30,12 +30,11 @@ class AVALocalisation {
 }
 
 
-AVALocalisation.translate = (context) => {
+export function translate(context) {
   const localisation = new AVALocalisation("en_GB");
   const locale = localisation.getList();
   return typeof locale[context] === "string" ? locale[context] : context;
 };
 
 
-module.exports = AVALocalisation;
 export default AVALocalisation;

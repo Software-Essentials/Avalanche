@@ -1,4 +1,4 @@
-const Knex = require("knex");
+import Knex from "knex";
 
 
 /**
@@ -139,5 +139,4 @@ class AVAQueryBuilder {
 }
 
 
-module.exports = AVAQueryBuilder;
 export default AVAQueryBuilder;

@@ -1,5 +1,4 @@
-// Imports
-const { AVAViewController } = require("avacore");
+import { AVAViewController } from "avacore";
 
 
 /**
@@ -20,4 +19,4 @@ class MainViewController extends AVAViewController {
 }
 
 
-module.exports = MainViewController;
+export default MainViewController;

@@ -41,5 +41,4 @@ class AVAPushNotification {
 }
 
 
-module.exports = AVAPushNotification;
 export default AVAPushNotification;

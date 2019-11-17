@@ -1,7 +1,7 @@
 {
   "name": "avacore",
-  "version": "0.4.44",
-  "description": "Node MVC OOP framework for APIs, & other backend solutions.",
+  "version": "0.4.47",
+  "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
   "homepage": "https://github.com/noriasoft/Avalanche",
@@ -17,12 +17,12 @@
     "OOP",
     "CLI",
     "ORM",
-    "QueryBuilder",
+    "ES6",
     "Framework",
     "Automated",
+    "Utilities",
     "Express",
     "Webserver",
-    "Templating",
     "Boilerplates",
     "Avalanche",
     "Ava"
@@ -54,5 +54,8 @@
     "nodemailer-mailgun-transport": "^1.4.0",
     "session-file-store": "^1.3.1",
     "socket.io": "^2.2.0"
+  },
+  "avalancheCache": {
+    "latestUpdate": "0.4.31"
   }
 }

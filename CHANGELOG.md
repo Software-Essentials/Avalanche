@@ -1,18 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalanche).
+
 ## [Unreleased]
 
-## [0.4.44] - 2019-11-17
+## [0.4.47] - 2019-11-17
 ### Added
-- Added CoreUtil to AVAFoundation.
 - Added AVAPushNotification class for iOS remote notifications.
 
 ### Changes
 - Started implementation of ESM. (A lot of refactoring)
 
-## [0.4.30] - 2019-11-16
+## [0.4.31] - 2019-11-16
 ### Added
+- Added CoreUtil to AVAFoundation.
 - Added foreign key constraints (relations) to Migrator.
 - Added constraint checks option to AVADatabase.
 

@@ -1,7 +1,7 @@
 import fs from "fs";
 import inquirer from "inquirer";
 import AVAError from "../../foundation/AVAError";
-import CoreUtil from "../CoreUtil";
+import * as CoreUtil from "../CoreUtil";
 import path from "path";
 import { UUID } from "../Util";
 
@@ -314,7 +314,7 @@ function make_seeds() {
   inquirer.prompt(questions).then(answers => {
     const path = `app/migrations/seeds/${answers.filename}.json`;
     const template = "TEMPLATE_seeds";
-    const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`);
+    const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`).default;
     const variables = {
       model: answers.model,
       method: new DummyClass().METHOD === "DATABASE" ? "table": "zone"

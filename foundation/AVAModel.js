@@ -1,4 +1,5 @@
 import { AVAStorage, AVARecordZone, AVADatabase, AVAError } from "../index";
+import * as CoreUtil from "../core/CoreUtil";
 
 
 /**
@@ -435,5 +436,4 @@ AVAModel.register = (Model) => {
 }
 
 
-module.exports = AVAModel.register(AVAModel);
 export default AVAModel.register(AVAModel);

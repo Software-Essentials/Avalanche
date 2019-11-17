@@ -148,5 +148,4 @@ class AVAValidator {
 }
 
 
-module.exports = AVAValidator;
 export default AVAValidator;

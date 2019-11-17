@@ -1,8 +1,8 @@
-const { AVAMiddleware } = require("avacore");
+import { AVAMiddleware } from "avacore";
 
 
 /**
- * 
+ * Ability to alter request before it reaches the controller.
  */
 class <#name?> extends AVAMiddleware {
 
@@ -23,4 +23,4 @@ class <#name?> extends AVAMiddleware {
 }
 
 
-module.exports = <#name?>;
+export default = <#name?>;

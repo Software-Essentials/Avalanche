@@ -13,5 +13,4 @@ class AVAController {
 }
 
 
-module.exports = AVAController;
 export default AVAController;

@@ -70,5 +70,4 @@ class Webserver {
 }
 
 
-module.exports = Webserver;
 export default Webserver;

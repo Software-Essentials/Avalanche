@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 
 require = require("esm")(module);
-const AVAEnvironment = require("../foundation/AVAEnvironment");
+const AVAEnvironment = require("../foundation/AVAEnvironment").default;
 const express = require("express");
 const { terminalPrefix } = require("./CoreUtil");
 
@@ -15,8 +15,8 @@ if (cmdValue !== "run") {
 } else {
   global.environment = new AVAEnvironment(envValue);
 
-  const Kernel = require("./Kernel.js");
-  const Webserver = require("./Webserver.js");
+  const Kernel = require("./Kernel.js").default;
+  const Webserver = require("./Webserver.js").default;
 
   const app = express();
 

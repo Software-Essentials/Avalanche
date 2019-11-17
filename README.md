@@ -8,6 +8,8 @@ A step by step guide how to get a development environment up and running.
 
 Alternatively, you can [watch the YouTube tutorial](https://www.youtube.com/watch?v=c7-wttwkv7I).
 
+Development progress of this project can be tracked in our [Trello Board](https://trello.com/b/EPJJJbYH/avalanche).
+
 ## Prerequisites
  
 Install [NodeJS](https://nodejs.org/en/) from their [website](https://nodejs.org/en/)
