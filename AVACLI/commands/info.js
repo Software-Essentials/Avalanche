@@ -1,6 +1,6 @@
 import fs from "fs";
 import Table from "cli-table";
-import * as CoreUtil from "../CoreUtil";
+import * as CoreUtil from "../../AVACore/CoreUtil";
 
 const avalanchePackage = require("../../package.json");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;

@@ -1,6 +1,6 @@
-import { terminalPrefix } from "../CoreUtil";
 import inquirer from "inquirer";
-import Seeder from "../Seeder";
+import Seeder from "../../AVACore/Seeder";
+import { terminalPrefix } from "../../AVACore/CoreUtil";
 
 
 /**

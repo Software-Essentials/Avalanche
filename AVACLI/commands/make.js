@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 import inquirer from "inquirer";
-import AVAError from "../../AVAFoundation/AVAError";
+import { AVAError } from "../../AVAFoundation/index";
 import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AVAUtil";
-import * as CoreUtil from "../CoreUtil";
+import * as CoreUtil from "../../AVACore/CoreUtil";
 
 const { COPYFILE_EXCL } = fs.constants;
 

@@ -1,6 +1,6 @@
-import { terminalPrefix } from "../CoreUtil";
-import AVAError from "../../AVAFoundation/AVAError";
-import Installer from "../Installer";
+import { AVAError } from "../../AVAFoundation/index";
+import Installer from "../../AVACore/Installer";
+import { terminalPrefix } from "../../AVACore/CoreUtil";
 
 
 /**

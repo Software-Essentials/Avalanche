@@ -5,13 +5,14 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.4.51] - 2019-11-17
+## [0.4.54] - 2019-11-17
 ### Added
 - Added AVAPushNotification class for iOS remote notifications.
 
 ### Changes
-- Standardized AVAUtil & CoreUtil.
+- Separated AVAFoundation, AVACore & AVACLI namespaces.
 - Updated package namespaces (AVAFoundation & AVACore).
+- Standardized AVAUtil & CoreUtil.
 - Started implementation of ESM (A lot of refactoring).
 
 ## [0.4.31] - 2019-11-16

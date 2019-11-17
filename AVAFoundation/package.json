@@ -1,7 +1,7 @@
 {
-  "name": "avacore",
-  "version": "0.4.54",
-  "description": "Node OOP framework for APIs, & other backend solutions.",
+  "name": "avafoundation",
+  "version": "1.0.0",
+  "description": "Library for Avalanche applications.",
   "main": "index.js",
   "license": "MIT",
   "homepage": "https://github.com/noriasoft/Avalanche",
@@ -13,27 +13,16 @@
     "url": "https://github.com/lawrencebensaid"
   },
   "keywords": [
-    "MVC",
+    "Library",
     "OOP",
-    "CLI",
     "ORM",
     "ES6",
-    "Framework",
-    "Automated",
-    "Utilities",
-    "Express",
-    "Webserver",
-    "Boilerplates",
     "Avalanche",
     "Ava"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noriasoft/Avalanche.git"
-  },
-  "bin": {
-    "avalanche": "AVACLI/CLI.js",
-    "ava": "AVACLI/CLI.js"
   },
   "dependencies": {
     "apn": "^2.2.0",

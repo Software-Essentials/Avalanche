@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 
 require = require("esm")(module);
-const AVAEnvironment = require("../AVAFoundation/AVAEnvironment").default;
+const { AVAEnvironment } = require("../AVAFoundation/index");
 const express = require("express");
 const { terminalPrefix } = require("./CoreUtil");
 

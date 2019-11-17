@@ -1,5 +1,5 @@
-import { terminalPrefix } from "../CoreUtil";
 import { exec } from "child_process";
+import { terminalPrefix } from "../../AVACore/CoreUtil";
 
 
 /**

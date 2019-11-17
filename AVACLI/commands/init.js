@@ -1,9 +1,9 @@
-import * as CoreUtil from "../CoreUtil";
 import fs from "fs";
 import inquirer from "inquirer";
 import { exec, execSync } from "child_process";
-import AVAError from "../../AVAFoundation/AVAError";
-import Installer from "../Installer";
+import Installer from "../../AVACore/Installer";
+import { AVAError } from "../../AVAFoundation/index";
+import * as CoreUtil from "../../AVACore/CoreUtil";
 
 var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 

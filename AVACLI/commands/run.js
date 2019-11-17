@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import AVAEnvironment from "../../AVAFoundation/AVAEnvironment";
-import { directoryLooper } from "../../AVAFoundation/AVAUtil";
-import * as CoreUtil from "../CoreUtil";
 import { exec } from "child_process";
+import { AVAEnvironment } from "../../AVAFoundation/index";
+import { directoryLooper } from "../../AVAFoundation/AVAUtil";
+import * as CoreUtil from "../../AVACore/CoreUtil";
 
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
@@ -56,7 +56,7 @@ function run() {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const mainPath = path.normalize(`${__dirname}/../Main.js`);
+  const mainPath = path.normalize(`${__dirname}/../../AVACore/Main.js`);
   const command = environmentFormatted ? `"${mainPath}" run ${environmentFormatted}` : `"${mainPath}" run`;
   const cProcess = exec(command, (error, stdout, stderr) => {
     if (error) {
