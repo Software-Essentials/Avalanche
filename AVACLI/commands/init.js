@@ -84,7 +84,7 @@ function installAVACoreIfNeeded() {
 function loadBoilerplates(example, callback) {
   if (example === null) {
     var choices = [];
-    const path = `${__dirname}/../installs`;
+    const path = `${__dirname}/../../AVACore/installs`;
     const prefabs = fs.readdirSync(path);
     for (const i in prefabs) {
       const prefab = prefabs[i];
@@ -120,7 +120,7 @@ function installBoilerplate(packageName) {
     var file = npmPackage;
     file.avalancheConfig = { preferredEnvironment: "development" };
     fs.writeFileSync("./package.json", JSON.stringify(file, null, 2));
-    const asciiPath = `${__dirname}/../resources/asci`;
+    const asciiPath = `${__dirname}/../../AVACore/resources/asci`;
     if (fs.existsSync(asciiPath)) {
       const file = fs.readFileSync(asciiPath, { encoding: "utf8" })
       console.log(`\x1b[36m\x1b[1m${file}\x1b[0m`);

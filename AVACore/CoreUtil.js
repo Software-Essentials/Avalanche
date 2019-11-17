@@ -1,6 +1,5 @@
 import fs from "fs";
 import md5 from "md5";
-import path from "path";
 
 
 /**

@@ -360,7 +360,7 @@ function make_view() {
  * @param {String} path 
  */
 function makeTemplate(variables, template, projectPath) {
-  const src = path.normalize(`${__dirname}/../templates/${template}`);
+  const src = path.normalize(`${__dirname}/../../AVACore/templates/${template}`);
   const dest = path.normalize(`${projectPWD}/${projectPath}`);
   if (fs.existsSync(src)) {
     if (!fs.existsSync(dest)) {
