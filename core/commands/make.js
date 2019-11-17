@@ -297,7 +297,7 @@ function make_seeds() {
       prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if(fs.existsSync(`${projectPWD}/app/migrations/seeds/${answer}.json`))
+        if(fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
           return "\x1b[31mA seeds file with this name already exists.\x1b[0m"
         return true;
       }
@@ -312,7 +312,7 @@ function make_seeds() {
     }
   ];
   inquirer.prompt(questions).then(answers => {
-    const path = `app/migrations/seeds/${answers.filename}.json`;
+    const path = `app/migration/seeds/${answers.filename}.json`;
     const template = "TEMPLATE_seeds";
     const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`).default;
     const variables = {

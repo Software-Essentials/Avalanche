@@ -14,7 +14,7 @@ class Seeder {
     const seedFiles = getSeedFilesNames();
     for (const i in seedFiles) {
       const fileName = seedFiles[i];
-      const path = `${projectPWD}/app/migrations/seeds/${fileName}.json`;
+      const path = `${projectPWD}/app/migration/seeds/${fileName}.json`;
       if (fs.existsSync(path)) {
         const fileSeeds = require(path);
         for (const i in fileSeeds) {

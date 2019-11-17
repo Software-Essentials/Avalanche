@@ -61,25 +61,25 @@ class AVAEnvironment {
     return fullURL;
   }
 
-  loadEnvironment(environment) {
+  loadEnvironment(env) {
     var isValid = true;
 
     this.network = {};
-    if (typeof (environment.network) === "object") {
-      if (typeof (environment.network.domain) === "string") {
-        this.domain = environment.network.domain;
+    if (typeof (env.network) === "object") {
+      if (typeof (env.network.domain) === "string") {
+        this.domain = env.network.domain;
       } else {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
         this.domain = "localhost";
       }
-      if (typeof (environment.network.host) === "string") {
-        this.host = environment.network.host;
+      if (typeof (env.network.host) === "string") {
+        this.host = env.network.host;
       } else {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
         this.host = "127.0.0.1";
       }
-      if (typeof (environment.network.port) === "number") {
-        this.port = environment.network.port;
+      if (typeof (env.network.port) === "number") {
+        this.port = env.network.port;
       } else {
         console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
         this.port = 80;
@@ -90,100 +90,100 @@ class AVAEnvironment {
     }
 
     this.debug = {};
-    if (typeof (environment.debug) === "object") {
-      this.logHTTPRequestsToConsole = typeof environment.debug.logHTTPRequestsToConsole === "boolean" ? environment.debug.logHTTPRequestsToConsole : false;
-      this.restartOnFileChange = typeof environment.debug.restartOnFileChange === "boolean" ? environment.debug.restartOnFileChange : false;
+    if (typeof (env.debug) === "object") {
+      this.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
     } else {
       this.logHTTPRequestsToConsole = false;
       this.restartOnFileChange = false;
     }
 
     this.auth = {};
-    if (typeof (environment.auth) === "object") {
-      if (typeof (environment.auth.secret) === "string") {
-        this.secret = environment.auth.secret;
-        this.auth.secret = environment.auth.secret;
+    if (typeof (env.auth) === "object") {
+      if (typeof (env.auth.secret) === "string") {
+        this.secret = env.auth.secret;
+        this.auth.secret = env.auth.secret;
       } else {
         isValid = false;
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
       }
-      this.saltRounds = typeof environment.auth.saltRounds === "number" ? environment.auth.saltRounds : 0;
-      this.auth.saltRounds = typeof environment.auth.saltRounds === "number" ? environment.auth.saltRounds : 0;
-      this.auth.sessionStore = typeof environment.auth.sessionStore === "string" ? environment.auth.sessionStore : null;
+      this.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
+      this.auth.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
+      this.auth.sessionStore = typeof env.auth.sessionStore === "string" ? env.auth.sessionStore : null;
     } else {
       isValid = false
       console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
     }
 
     this.security = {};
-    if (typeof (environment.security) === "object") {
-      this.security.csrf = typeof environment.security.csrf === "boolean" ? environment.security.csrf : true;;
+    if (typeof (env.security) === "object") {
+      this.security.csrf = typeof env.security.csrf === "boolean" ? env.security.csrf : true;;
     } else {
       this.security.csrf = false;
     }
 
     this.capabilities = {};
-    if (typeof (environment.capabilities) === "object") {
-      this.capabilities.isUsingSSL = typeof environment.capabilities.isUsingSSL === "boolean" ? environment.capabilities.isUsingSSL : true;
-      this.capabilities.useWebSockets = typeof environment.capabilities.useWebSockets === "boolean" ? environment.capabilities.useWebSockets : false;
-      this.capabilities.useMiddleware = typeof environment.capabilities.useMiddleware === "boolean" ? environment.capabilities.useMiddleware : true;
-      this.capabilities.useEmail = typeof environment.capabilities.useEmail === "boolean" ? environment.capabilities.useEmail : false;
+    if (typeof (env.capabilities) === "object") {
+      this.capabilities.isUsingSSL = typeof env.capabilities.isUsingSSL === "boolean" ? env.capabilities.isUsingSSL : true;
+      this.capabilities.useWebSockets = typeof env.capabilities.useWebSockets === "boolean" ? env.capabilities.useWebSockets : false;
+      this.capabilities.useMiddleware = typeof env.capabilities.useMiddleware === "boolean" ? env.capabilities.useMiddleware : true;
+      this.capabilities.useEmail = typeof env.capabilities.useEmail === "boolean" ? env.capabilities.useEmail : false;
     }
 
     this.email = {};
-    if (typeof (environment.email) === "object") {
-      this.email = environment.email;
+    if (typeof (env.email) === "object") {
+      this.email = env.email;
     } else {
       console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): Environment is missing mail server credentials.\x1b[0m`);
     }
 
     this.database = {};
-    if (typeof (environment.database) === "object") {
-      if (typeof (environment.database.host) === "string") {
-        this.database.host = environment.database.host;
+    if (typeof (env.database) === "object") {
+      if (typeof (env.database.host) === "string") {
+        this.database.host = env.database.host;
       } else {
         isValid = false
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database host.\x1b[0m`);
       }
-      if (typeof (environment.database.user) === "string") {
-        this.database.user = environment.database.user;
+      if (typeof (env.database.user) === "string") {
+        this.database.user = env.database.user;
       } else {
         isValid = false
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database user.\x1b[0m`);
       }
-      if (typeof (environment.database.password) === "string") {
-        this.database.password = environment.database.password;
+      if (typeof (env.database.password) === "string") {
+        this.database.password = env.database.password;
       } else {
         isValid = false
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database password.\x1b[0m`);
       }
-      if (typeof (environment.database.database) === "string") {
-        this.database.database = environment.database.database;
+      if (typeof (env.database.database) === "string") {
+        this.database.database = env.database.database;
       } else {
         isValid = false
         console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
       }
-      if (typeof (environment.database.connectionLimit) === "number")
-        this.database.connectionLimit = environment.database.connectionLimit;
+      if (typeof (env.database.connectionLimit) === "number")
+        this.database.connectionLimit = env.database.connectionLimit;
       this.database.multipleStatements = true;
     } else {
       isValid = false
       console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database credentials.\x1b[0m`);
     }
 
-    this.useMapKit = typeof environment.useMapKit === "boolean" ? environment.useMapKit : false;
-    this.allowRegister = typeof environment.allowRegister === "boolean" ? environment.allowRegister : false;
-    this.restrictMapsToDomain = typeof environment.restrictMapsToDomain === "boolean" ? environment.restrictMapsToDomain : true;
-    this.reloadClientsAfterRestart = typeof environment.reloadClientsAfterRestart === "boolean" ? environment.reloadClientsAfterRestart : false;
+    this.useMapKit = typeof env.useMapKit === "boolean" ? env.useMapKit : false;
+    this.allowRegister = typeof env.allowRegister === "boolean" ? env.allowRegister : false;
+    this.restrictMapsToDomain = typeof env.restrictMapsToDomain === "boolean" ? env.restrictMapsToDomain : true;
+    this.reloadClientsAfterRestart = typeof env.reloadClientsAfterRestart === "boolean" ? env.reloadClientsAfterRestart : false;
 
-    this.title = typeof environment.info.title === "string" ? environment.info.title : packageConfig.name;
-    this.version = typeof environment.info.version === "string" ? environment.info.version : packageConfig.version;
-    this.description = typeof environment.info.description === "string" ? environment.info.description : packageConfig.description ? packageConfig.description : null;
-    this.appleDeveloperTeamID = typeof environment.appleDeveloperTeamID === "string" ? environment.appleDeveloperTeamID : null;
-    this.mapKitJSKeyID = typeof environment.mapKitJSKeyID === "string" ? environment.mapKitJSKeyID : null;
-    this.APNSKeyID = typeof environment.APNSKeyID === "string" ? environment.APNSKeyID : null;
-    this.appBundleID = typeof environment.appBundleID === "string" ? environment.appBundleID : null;
-    this.mollieAPIKey = typeof environment.mollieAPIKey === "string" ? environment.mollieAPIKey : null;
+    this.title = typeof env.info.title === "string" ? env.info.title : packageConfig.name;
+    this.version = typeof env.info.version === "string" ? env.info.version : packageConfig.version;
+    this.description = typeof env.info.description === "string" ? env.info.description : packageConfig.description ? packageConfig.description : null;
+    this.appleDeveloperTeamID = typeof env.appleDeveloperTeamID === "string" ? env.appleDeveloperTeamID : null;
+    this.mapKitJSKeyID = typeof env.mapKitJSKeyID === "string" ? env.mapKitJSKeyID : null;
+    this.APNSKeyID = typeof env.APNSKeyID === "string" ? env.APNSKeyID : null;
+    this.appBundleID = typeof env.appBundleID === "string" ? env.appBundleID : null;
+    this.mollieAPIKey = typeof env.mollieAPIKey === "string" ? env.mollieAPIKey : null;
 
     this.info = {};
     this.info.title = this.title;

@@ -289,7 +289,7 @@ export function getHelpers(projectPWD) {
  * @returns {Object}
  */
 export function getMigrations() {
-  const normalizedPath = `${projectPWD}/app/migrations`;
+  const normalizedPath = `${projectPWD}/app/migration`;
   var models = [];
   if (!fs.existsSync(normalizedPath)) {
     return models;
@@ -312,7 +312,7 @@ export function getMigrations() {
  * @returns {Object}
  */
 export function getSeedFilesNames() {
-  const normalizedPath = `${projectPWD}/app/migrations/seeds`;
+  const normalizedPath = `${projectPWD}/app/migration/seeds`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
     return controllers;

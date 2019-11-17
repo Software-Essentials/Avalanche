@@ -17,7 +17,7 @@ class AVAPushNotification {
   push(title, message) {
     var apnProvider = new Provider({
       token: {
-        key: `${projectPWD}/apns.p8`,
+        key: `${projectPWD}/certificates/apns.p8`,
         keyId: environment.APNSKeyID,
         teamId: environment.appleDeveloperTeamID
       },

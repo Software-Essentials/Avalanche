@@ -68,7 +68,7 @@
     },
     {
       "template": "example1_seeds",
-      "path": "/app/migrations/seeds/DummyData.json"
+      "path": "/app/migration/seeds/DummyData.json"
     },
     {
       "template": "example1_assets_logo",
