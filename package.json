@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.4.50",
+  "version": "0.4.51",
   "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -32,8 +32,8 @@
     "url": "git+https://github.com/noriasoft/Avalanche.git"
   },
   "bin": {
-    "avalanche": "core/CLI.js",
-    "ava": "core/CLI.js"
+    "avalanche": "AVACore/CLI.js",
+    "ava": "AVACore/CLI.js"
   },
   "dependencies": {
     "apn": "^2.2.0",
