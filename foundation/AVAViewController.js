@@ -1,18 +1,19 @@
-const AVAController = require("./AVAController");
+import AVAController from "./AVAController";
 
 
 /**
- * Super view controller
+ * @description Super view controller
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVAViewController extends AVAController {
 
   constructor(callback) {
     super();
-    
+
     this.layout = null;
     this.template = "viewControllerView";
     this.variables = {};
-    
+
     callback(this.willLoad, this);
   }
 
@@ -24,8 +25,8 @@ class AVAViewController extends AVAController {
 
     self.request = request;
     self.response = response;
-    
-    const layout = typeof(self.layout) === "string" ? self.layout + ".layout.hbs" : "layout.hbs"
+
+    const layout = typeof (self.layout) === "string" ? self.layout + ".layout.hbs" : "layout.hbs"
     const template = self.template + ".hbs";
     var vars = self.variables;
     vars.layout = layout;
@@ -48,4 +49,5 @@ class AVAViewController extends AVAController {
 }
 
 
-module.exports = AVAViewController
+module.exports = AVAViewController;
+export default AVAViewController;

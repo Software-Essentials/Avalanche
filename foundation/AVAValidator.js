@@ -1,8 +1,7 @@
 
 
-
 /**
- * 
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVAValidator {
 
@@ -26,35 +25,35 @@ class AVAValidator {
       this.value = request.params[key];
       return this;
     }
-    request.validate = ({onFailure}) => {
+    request.validate = ({ onFailure }) => {
       var failures = [];
-      for(const method of Object.keys(this.invalid)) {
-        for(const key in this.invalid[method]) {
-          for(const condition in this.invalid[method][key]) {
+      for (const method of Object.keys(this.invalid)) {
+        for (const key in this.invalid[method]) {
+          for (const condition in this.invalid[method][key]) {
             const conditionValue = this.invalid[method][key][condition];
-            switch(condition) {
+            switch (condition) {
               case "type":
-                failures.push({field: key, scope: method, error: "invalidType", message: `Type of '${key}' must be '${conditionValue}'.`});
+                failures.push({ field: key, scope: method, error: "invalidType", message: `Type of '${key}' must be '${conditionValue}'.` });
                 break;
               case "length":
-                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be ${conditionValue}.`});
+                failures.push({ field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be ${conditionValue}.` });
                 break;
               case "range":
-                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be in range ${conditionValue}.`});
+                failures.push({ field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be in range ${conditionValue}.` });
                 break;
               case "greaterThan":
-                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be greater than ${conditionValue}.`});
+                failures.push({ field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be greater than ${conditionValue}.` });
                 break;
               case "LessThan":
                 errors.push()
-                failures.push({field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be less than ${conditionValue}.`});
+                failures.push({ field: key, scope: method, error: "invalidLength", message: `Length of '${key}' must be less than ${conditionValue}.` });
                 break;
             }
           }
         }
       }
       if (failures.length <= 0) return true;
-      onFailure({error: new Error("Validation failed"), errors: failures})
+      onFailure({ error: new Error("Validation failed"), errors: failures })
       return false;
     }
   }
@@ -69,9 +68,9 @@ class AVAValidator {
     if (type === "boolean" && (
       this.value.toLowerCase() === "false" ||
       this.value.toLowerCase() === "true" ||
-      this.value === "1"  ||
+      this.value === "1" ||
       this.value === "0" ||
-      this.value === 1  ||
+      this.value === 1 ||
       this.value === 0
     )) {
       return this;
@@ -150,3 +149,4 @@ class AVAValidator {
 
 
 module.exports = AVAValidator;
+export default AVAValidator;

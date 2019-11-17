@@ -1,8 +1,8 @@
 
 
-
 /**
- * Super middleware
+ * @description Super middleware
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVAMiddleware {
 
@@ -13,5 +13,5 @@ class AVAMiddleware {
 }
 
 
-
 module.exports = AVAMiddleware;
+export default AVAMiddleware;

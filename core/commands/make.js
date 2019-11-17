@@ -1,10 +1,11 @@
-const fs = require("fs");
-const inquirer = require("inquirer");
-const AVAError = require("../../foundation/AVAError");
+import fs from "fs";
+import inquirer from "inquirer";
+import AVAError from "../../foundation/AVAError";
+import CoreUtil from "../CoreUtil";
+import path from "path";
+import { UUID } from "../Util";
+
 const { COPYFILE_EXCL } = fs.constants;
-const CoreUtil = require("../CoreUtil");
-const { UUID } = require("../Util");
-const path = require("path");
 
 
 /**

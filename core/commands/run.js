@@ -1,41 +1,42 @@
-const CoreUtil = require("../CoreUtil");
-const fs = require("fs");
-const path = require("path");
-const { exec } = require("child_process");
-const AVAEnvironment = require("../../foundation/AVAEnvironment");
-const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+import fs from "fs";
+import path from "path";
+import AVAEnvironment from "../../foundation/AVAEnvironment";
+import * as CoreUtil from "../CoreUtil";
+import { exec } from "child_process";
+
+const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 /**
  * @description Runs your Avalanche application.
  */
 function run() {
-  if(CoreUtil.getRoutes().length < 1) {
+  if (CoreUtil.getRoutes().length < 1) {
     console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
   var environmentName = null;
   if (typeof arguments[0] === "string") {
     environmentName = arguments[0];
   } else {
-    if (package && package.avalancheConfig && package.avalancheConfig.preferredEnvironment) {
-      environmentName = package.avalancheConfig.preferredEnvironment;
+    if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
+      environmentName = pkg.avalancheConfig.preferredEnvironment;
     } else {
       environmentName = null;
     }
   }
   global.environment = new AVAEnvironment(environmentName);
   var cProcess = start(environmentName);
-  if(environment.restartOnFileChange) {
+  if (environment.restartOnFileChange) {
     const directory = `${projectPWD}/app`;
     const folders = CoreUtil.directoryLooper(directory, []).children;
-    for(const i in folders) {
+    for (const i in folders) {
       const folder = folders[i];
-      if(fs.lstatSync(folder).isDirectory()) {
+      if (fs.lstatSync(folder).isDirectory()) {
         const files = fs.readdirSync(folder);
-        for(const i in files) {
+        for (const i in files) {
           const file = files[i];
           const path = `${folder}/${file}`;
-          if(fs.lstatSync(path).isFile()) {
+          if (fs.lstatSync(path).isFile()) {
             CoreUtil.startWatchingSession(path, () => {
               cProcess.kill("SIGQUIT")
               cProcess = start(environmentName);
@@ -54,11 +55,11 @@ function run() {
  */
 function start(environment) {
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
-  const mainPath = path.normalize(`${__dirname}/../Main`);
-  const command = environmentFormatted ? `node -r esm "${mainPath}" run ${environmentFormatted}` : `node -r esm "${mainPath}" run`;
+  const mainPath = path.normalize(`${__dirname}/../Main.js`);
+  const command = environmentFormatted ? `"${mainPath}" run ${environmentFormatted}` : `"${mainPath}" run`;
   const cProcess = exec(command, (error, stdout, stderr) => {
-    if(error) {
-      if(error.signal === "SIGINT") {
+    if (error) {
+      if (error.signal === "SIGINT") {
         return;
       }
     }

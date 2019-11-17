@@ -1,11 +1,10 @@
-// Dependencies
-const nodemailer = require('nodemailer');
-const mg = require("nodemailer-mailgun-transport");
-const hbs = require("nodemailer-express-handlebars");
+import nodemailer from "nodemailer";
+import hbs from "nodemailer-express-handlebars";
 
 
-
-
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class AVAMailer {
 
   sendMail(recipient, subject, template, context) {
@@ -32,11 +31,11 @@ class AVAMailer {
       template: template,
       context: context
     }, function (error, results) {
-      if(error) {
+      if (error) {
         console.log("Error: ", error);
-        if(typeof callback === "function") callback(false);
+        if (typeof callback === "function") callback(false);
       } else {
-        if(typeof callback === "function") callback(true);
+        if (typeof callback === "function") callback(true);
       }
     });
   }
@@ -44,5 +43,5 @@ class AVAMailer {
 }
 
 
-
 module.exports = AVAMailer;
+export default AVAMailer;

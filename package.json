@@ -1,11 +1,12 @@
 {
   "name": "avacore",
-  "version": "0.4.32",
+  "version": "0.4.44",
   "description": "Node MVC OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
   "homepage": "https://github.com/noriasoft/Avalanche",
   "bugs": "https://github.com/noriasoft/Avalanche/issues",
+  "type": "module",
   "author": {
     "name": "Lawrence Bensaid",
     "email": "lawrencebensaid@icloud.com",
@@ -35,6 +36,7 @@
     "ava": "core/CLI.js"
   },
   "dependencies": {
+    "apn": "^2.2.0",
     "cli-table": "^0.3.1",
     "connect-mysql": "^2.2.5",
     "cookie-parser": "^1.4.3",

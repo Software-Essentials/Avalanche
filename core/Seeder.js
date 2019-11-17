@@ -1,14 +1,17 @@
-const fs = require("fs");
-const CoreUtil = require("./CoreUtil");
-const AVADatabase = require("../foundation/AVADatabase");
-const AVAStorage = require("../foundation/AVAStorage");
+import fs from "fs";
+import { terminalPrefix, getSeedFilesNames } from "./CoreUtil";
+import AVADatabase from "../foundation/AVADatabase";
+import AVAStorage from "../foundation/AVAStorage";
 
 
+/**
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
+ */
 class Seeder {
 
   constructor() {
     this.seeds = [];
-    const seedFiles = CoreUtil.getSeedFilesNames();
+    const seedFiles = getSeedFilesNames();
     for (const i in seedFiles) {
       const fileName = seedFiles[i];
       const path = `${projectPWD}/app/migrations/seeds/${fileName}.json`;
@@ -37,7 +40,7 @@ class Seeder {
   execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
+    console.log(`${terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
     var permissionIssue = false;
     const database = new AVADatabase();
     database.foreignKeyChecks = false;
@@ -48,13 +51,13 @@ class Seeder {
         onSuccess: proceed
       });
       try {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
         AVAStorage.wipe();
       } catch (error) {
         if (error.code === "EPERM") {
           // permissionIssue = true; // Should be uncommented, BUT the issue can't be resolved and the warning is very annoying.
         } else {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error)\x1b[0m ${error}`);
+          console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m ${error}`);
         }
       }
     } else {
@@ -83,16 +86,16 @@ class Seeder {
                 seedStats[table] = false;
                 switch (error.code) {
                   case "ER_NOT_SUPPORTED_AUTH_MODE":
-                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
                     break;
                   case "ER_ACCESS_DENIED_ERROR":
-                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
                     break;
                   case "ER_NO_SUCH_TABLE":
-                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
                     break;
                   default:
-                    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
                 }
                 update();
               }
@@ -104,7 +107,7 @@ class Seeder {
         update();
       }
       if (permissionIssue) {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
       }
     }
     function update() {
@@ -115,7 +118,7 @@ class Seeder {
         if (seedStats[key]) successful++;
       }
       if (completed === Object.keys(seedStats).length) {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Seeding complete. (${completed}/${successful} tables seeded)\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[32m Seeding complete. (${completed}/${successful} tables seeded)\x1b[0m`);
         ready(true);
       }
     }
@@ -125,3 +128,4 @@ class Seeder {
 
 
 module.exports = Seeder;
+export default Seeder;

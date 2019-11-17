@@ -1,12 +1,12 @@
-const package = require(`${__dirname}/../../package.json`);
+const pkg = require(`${__dirname}/../../package.json`);
 
 
 /**
  * @description Prints the version.
  */
 function version() {
-  if (package && package.version) {
-    console.log(`v${package.version}`);
+  if (pkg && pkg.version) {
+    console.log(`v${pkg.version}`);
   }
 }
 

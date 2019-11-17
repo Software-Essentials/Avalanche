@@ -1,8 +1,9 @@
-const fs = require("fs");
-const Table = require("cli-table");
-const CoreUtil = require("../CoreUtil");
+import fs from "fs";
+import Table from "cli-table";
+import * as CoreUtil from "../CoreUtil";
+
 const avalanchePackage = require("../../package.json");
-const package = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
 
 /**
@@ -28,7 +29,7 @@ function info() {
     ["Is Avalanche project:", `\x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m`]
   );
   if(CoreUtil.isAVACoreInstalled()) {
-    const version = package.dependencies.avacore;
+    const version = pkg.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     table2.push(
       ["AVACore version:", `\x1b[34m\x1b[1mv${projectVersion}\x1b[0m`]
@@ -64,7 +65,7 @@ function info() {
   string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m\n`;
   string += `  \x1b[1m||\x1b[0m   Is Avalanche project:\t  \x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m\n`;
   if(CoreUtil.isAVACoreInstalled()) {
-    const version = package.dependencies.avacore;
+    const version = pkg.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[34m\x1b[1mv${projectVersion}\x1b[0m\n`;
   } else {

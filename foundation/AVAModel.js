@@ -1,8 +1,9 @@
-const { AVAStorage, AVARecordZone, AVADatabase, AVAError } = require("../index");
+import { AVAStorage, AVARecordZone, AVADatabase, AVAError } from "../index";
 
 
 /**
- * Super model
+ * @description Super model
+ * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
 class AVAModel {
 
@@ -137,7 +138,7 @@ class AVAModel {
           failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
           this.DRAFT = false;
-          success({result: this});
+          success({ result: this });
         }
       });
     }
@@ -163,7 +164,7 @@ class AVAModel {
         zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data);
       }
       storage.save(zone);
-      success({result: this});
+      success({ result: this });
     }
   }
 
@@ -435,3 +436,4 @@ AVAModel.register = (Model) => {
 
 
 module.exports = AVAModel.register(AVAModel);
+export default AVAModel.register(AVAModel);
