@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.4.42] - 2019-11-16
+## [0.4.44] - 2019-11-17
 ### Added
 - Added CoreUtil to AVAFoundation.
 - Added AVAPushNotification class for iOS remote notifications.

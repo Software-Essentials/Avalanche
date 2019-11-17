@@ -4,8 +4,8 @@ global.projectPWD = process.cwd();
 
 require = require("esm")(module);
 const AVAEnvironment = require("../foundation/AVAEnvironment");
-import express from "express";
-import { terminalPrefix } from "./CoreUtil";
+const express = require("express");
+const { terminalPrefix } = require("./CoreUtil");
 
 const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
