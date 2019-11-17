@@ -1,12 +1,12 @@
 import fs from "fs";
-import { terminalPrefix, getSeedFilesNames } from "./CoreUtil";
+import { terminalPrefix, getSeedFilesNames } from "./ACUtil";
 import { AVADatabase, AVAStorage } from "../AVAFoundation/index";
 
 
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Seeder {
+class ACSeeder {
 
   constructor() {
     this.seeds = [];
@@ -126,5 +126,4 @@ class Seeder {
 }
 
 
-module.exports = Seeder;
-export default Seeder;
+export default ACSeeder;

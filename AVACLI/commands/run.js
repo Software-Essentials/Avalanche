@@ -3,7 +3,7 @@ import path from "path";
 import { exec } from "child_process";
 import { AVAEnvironment } from "../../AVAFoundation/index";
 import { directoryLooper } from "../../AVAFoundation/AVAUtil";
-import * as CoreUtil from "../../AVACore/CoreUtil";
+import * as ACUtil from "../../AVACore/ACUtil";
 
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
@@ -12,8 +12,8 @@ const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}
  * @description Runs your Avalanche application.
  */
 function run() {
-  if (CoreUtil.getRoutes().length < 1) {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
+  if (ACUtil.getRoutes().length < 1) {
+    console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
   var environmentName = null;
   if (typeof arguments[0] === "string") {
@@ -38,7 +38,7 @@ function run() {
           const file = files[i];
           const path = `${folder}/${file}`;
           if (fs.lstatSync(path).isFile()) {
-            CoreUtil.startWatchingSession(path, () => {
+            ACUtil.startWatchingSession(path, () => {
               cProcess.kill("SIGQUIT")
               cProcess = start(environmentName);
             });
@@ -69,10 +69,10 @@ function start(environment) {
     console.log(data.toString().trim());
   });
   cProcess.stderr.on("data", (data) => {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (FAILURE) \n\n\n\x1b[33m${data.toString().trim()}\n\n\x1b[0m`);
+    console.log(`${ACUtil.terminalPrefix()}\x1b[31m (FAILURE) \n\n\n\x1b[33m${data.toString().trim()}\n\n\x1b[0m`);
   });
   cProcess.on("close", (code, signal) => {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m Server stopped. \x1b[1m(${signal})\x1b[0m`);
+    console.log(`${ACUtil.terminalPrefix()}\x1b[31m Server stopped. \x1b[1m(${signal})\x1b[0m`);
   });
   return cProcess;
 }

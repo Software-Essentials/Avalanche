@@ -1,12 +1,12 @@
 import fs from "fs";
-import { terminalPrefix, getModels } from "./CoreUtil";
+import { terminalPrefix, getModels } from "./ACUtil";
 import { AVADatabase, AVAStorage, AVARecordZone } from "../AVAFoundation/index";
 
 
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class Migrator {
+class ACMigrator {
 
   constructor() {
 
@@ -113,5 +113,4 @@ class Migrator {
 }
 
 
-module.exports = Migrator;
-export default Migrator;
+export default ACMigrator;

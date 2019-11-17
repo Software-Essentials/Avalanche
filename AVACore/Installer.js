@@ -1,6 +1,6 @@
 import fs from "fs";
 import { execSync } from "child_process";
-import { getProjectPackage } from "./CoreUtil";
+import { getProjectPackage } from "./ACUtil";
 
 
 /**
@@ -44,12 +44,12 @@ class Installer {
             }
           }
           if (fs.existsSync(filePath)) {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) "${file.path}" overwritten.\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) "${file.path}" overwritten.\x1b[0m`);
           }
           fs.copyFileSync(templatePath, filePath, fs.COPYFILE_EXCL);
         } catch (error) {
           if (error.code === "ENOENT") {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) Unable to copy "${file.path}"!\x1b[0m`);
           }
         }
       }

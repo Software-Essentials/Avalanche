@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.4.56",
+  "version": "0.4.57",
   "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",

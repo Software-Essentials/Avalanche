@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 require = require("esm")(module);
 const { isSemVer } = require("../AVAFoundation/AVAUtil");
-const { terminalPrefix, isAVAProject, isAVACoreInstalled } = require("../AVACore/CoreUtil");
+const { terminalPrefix, isAVAProject, isAVACoreInstalled } = require("../AVACore/ACUtil");
 
 global.projectPWD = process.cwd();
 const npmRegistryAPIURI = "https://registry.npmjs.com/-/package/avacore/dist-tags";

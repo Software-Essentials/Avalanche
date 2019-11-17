@@ -1,5 +1,5 @@
 import Table from "cli-table";
-import { terminalPrefix, getRoutes } from "../../AVACore/CoreUtil";
+import { terminalPrefix, getRoutes } from "../../AVACore/ACUtil";
 
 
 /**

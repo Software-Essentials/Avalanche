@@ -1,5 +1,5 @@
 import { AVAStorage, AVARecordZone, AVADatabase, AVAError } from "../index";
-import * as CoreUtil from "../AVACore/CoreUtil";
+import * as ACUtil from "../AVACore/ACUtil";
 
 
 /**
@@ -129,13 +129,13 @@ class AVAModel {
       database.connection.query(query, parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
           if (error.code === "ER_DUP_ENTRY") {
             failure({ errors: [{ error: "duplicateEntry", message: "Record already exists." }] });
             return;
           }
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+          console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
           this.DRAFT = false;
@@ -183,9 +183,9 @@ class AVAModel {
       database.connection.query(query, parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           } else {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
@@ -221,7 +221,7 @@ class AVAModel {
         database.connection.query(query, parameters, (error, results, fields) => {
           if (error) {
             if (error.code === "ECONNREFUSED") {
-              console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+              console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
             }
             reject({ error: error });
           } else {
@@ -340,9 +340,9 @@ AVAModel.register = (Model) => {
       database.connection.query(query, parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           } else {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError", message: error.code }] });
           return;
@@ -391,9 +391,9 @@ AVAModel.register = (Model) => {
       database.connection.query(query, parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           } else {
-            console.log(`${CoreUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
           }
           failure({ errors: [{ error: "databaseError", message: error.code }] });
           return;

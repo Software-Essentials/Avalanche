@@ -5,7 +5,7 @@ import exphbs from "express-handlebars";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { AVADatabase } from "../index";
-import { terminalPrefix } from "./CoreUtil";
+import { terminalPrefix } from "./ACUtil";
 import Router from "./Router";
 import SocketKernel from "./SocketKernel";
 import csrf from "csurf";

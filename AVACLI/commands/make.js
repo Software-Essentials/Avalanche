@@ -3,7 +3,7 @@ import path from "path";
 import inquirer from "inquirer";
 import { AVAError } from "../../AVAFoundation/index";
 import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AVAUtil";
-import * as CoreUtil from "../../AVACore/CoreUtil";
+import * as ACUtil from "../../AVACore/ACUtil";
 
 const { COPYFILE_EXCL } = fs.constants;
 
@@ -59,7 +59,7 @@ function make_default() {
     name: "component",
     message: "What would you like to make?",
     choices: choices,
-    prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+    prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
     suffix: "\x1b[0m"
   };
   inquirer.prompt(prompt).then(answers => {
@@ -78,7 +78,7 @@ function make_controller() {
       type: "input",
       name: "name",
       message: "Name your controller:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (!answer.endsWith("Controller"))
@@ -137,7 +137,7 @@ function make_environment() {
       name: "filename",
       message: "Name your environment file:",
       default: "development",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
@@ -149,7 +149,7 @@ function make_environment() {
       type: "input",
       name: "name",
       message: "Name your application title for this environment:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
@@ -185,7 +185,7 @@ function make_middleware() {
       type: "input",
       name: "name",
       message: "Name your environment:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/middleware/${answer}.js`))
@@ -214,7 +214,7 @@ function make_model() {
       type: "input",
       name: "name",
       message: "Name your model:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/models/${answer}.js`))
@@ -226,7 +226,7 @@ function make_model() {
       type: "input",
       name: "table",
       message: "Name your zone/table:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       default: (answers) => {
         return answers.name;
@@ -240,7 +240,7 @@ function make_model() {
       name: "method",
       choices: ["AVAStorage", "AVADatabase"],
       message: "Choose a storage method:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"
     }
   ];
@@ -267,7 +267,7 @@ function make_routes() {
       type: "input",
       name: "filename",
       message: "Name your routes file:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/routes/${answer}.json`))
@@ -294,7 +294,7 @@ function make_seeds() {
       type: "input",
       name: "filename",
       message: "Name your seeds file:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
@@ -305,9 +305,9 @@ function make_seeds() {
     {
       type: "list",
       name: "model",
-      choices: CoreUtil.getModels(),
+      choices: ACUtil.getModels(),
       message: "Choose a model:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"
     }
   ];
@@ -333,7 +333,7 @@ function make_view() {
       type: "input",
       name: "name",
       message: "Name your view:",
-      prefix: `${CoreUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (!answer.endsWith("ViewController"))
@@ -367,7 +367,7 @@ function makeTemplate(variables, template, projectPath) {
       ensureDirectoryExistence(dest);
       fs.copyFile(src, dest, COPYFILE_EXCL, (error) => {
         if (error) {
-          console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) ${error.message}\x1b[0m`);
+          console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}\x1b[0m`);
           return;
         }
         var content = fs.readFileSync(dest).toString();
@@ -376,13 +376,13 @@ function makeTemplate(variables, template, projectPath) {
           content = content.split(`<#${key}?>`).join(variable);
         }
         fs.writeFileSync(dest, content, { encoding: "utf8" });
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
       });
     } else {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
     }
   } else {
-    console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
+    console.log(`${ACUtil.terminalPrefix()}\x1b[31m (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);
     process.exit(AVAError.INCOMPLETECORE);
   }
 }

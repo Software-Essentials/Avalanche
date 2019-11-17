@@ -1,13 +1,13 @@
 import inquirer from "inquirer";
-import Seeder from "../../AVACore/Seeder";
-import { terminalPrefix } from "../../AVACore/CoreUtil";
+import ACSeeder from "../../AVACore/ACSeeder";
+import { terminalPrefix } from "../../AVACore/ACUtil";
 
 
 /**
  * @description Migrate.
  */
 function seed() {
-  const seeder = new Seeder();
+  const seeder = new ACSeeder();
   const choices = [
     "\x1b[32m\x1b[1mSAFE\x1b[0m \x1b[3m(Only seeds records that don't exist yet)\x1b[0m",
     "\x1b[33m\x1b[1mOVERWRITE\x1b[0m \x1b[3m(Seeds over your existing records)\x1b[0m",

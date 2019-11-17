@@ -1,6 +1,6 @@
 import fs from "fs";
 import Table from "cli-table";
-import * as CoreUtil from "../../AVACore/CoreUtil";
+import * as ACUtil from "../../AVACore/ACUtil";
 
 const avalanchePackage = require("../../package.json");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -25,10 +25,10 @@ function info() {
   );
  
   table2.push(
-    ["Is NPM project:", `\x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m`],
-    ["Is Avalanche project:", `\x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m`]
+    ["Is NPM project:", `\x1b[33m\x1b[1m${ACUtil.isNodeProject()}\x1b[0m`],
+    ["Is Avalanche project:", `\x1b[33m\x1b[1m${ACUtil.isAVAProject()}\x1b[0m`]
   );
-  if(CoreUtil.isAVACoreInstalled()) {
+  if(ACUtil.isAVACoreInstalled()) {
     const version = pkg.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     table2.push(
@@ -39,16 +39,16 @@ function info() {
       ["AVACore version:", `\x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m`]
     );
   }
-  if(CoreUtil.isAVAProject()) {
+  if(ACUtil.isAVAProject()) {
     table2.push(
-      ["Models:", `\x1b[32m\x1b[1m${CoreUtil.getModels().length}\x1b[0m`],
-      ["Controllers:", `\x1b[32m\x1b[1m${CoreUtil.getControllers().length}\x1b[0m`],
-      ["Routes:", `\x1b[32m\x1b[1m${CoreUtil.getRoutes().length}\x1b[0m`],
-      ["Middleware:", `\x1b[32m\x1b[1m${CoreUtil.getMiddleware().length}\x1b[0m`],
-      ["Localisations:", `\x1b[32m\x1b[1m${CoreUtil.getLocalisations().length}\x1b[0m`],
-      ["Translations:", `\x1b[32m\x1b[1m${CoreUtil.getTranslations().length}\x1b[0m`],
-      ["Helpers:", `\x1b[32m\x1b[1m${Object.keys(CoreUtil.getHelpers()).length}\x1b[0m`],
-      ["Migrations:", `\x1b[32m\x1b[1m${Object.keys(CoreUtil.getMigrations()).length}\x1b[0m`]
+      ["Models:", `\x1b[32m\x1b[1m${ACUtil.getModels().length}\x1b[0m`],
+      ["Controllers:", `\x1b[32m\x1b[1m${ACUtil.getControllers().length}\x1b[0m`],
+      ["Routes:", `\x1b[32m\x1b[1m${ACUtil.getRoutes().length}\x1b[0m`],
+      ["Middleware:", `\x1b[32m\x1b[1m${ACUtil.getMiddleware().length}\x1b[0m`],
+      ["Localisations:", `\x1b[32m\x1b[1m${ACUtil.getLocalisations().length}\x1b[0m`],
+      ["Translations:", `\x1b[32m\x1b[1m${ACUtil.getTranslations().length}\x1b[0m`],
+      ["Helpers:", `\x1b[32m\x1b[1m${Object.keys(ACUtil.getHelpers()).length}\x1b[0m`],
+      ["Migrations:", `\x1b[32m\x1b[1m${Object.keys(ACUtil.getMigrations()).length}\x1b[0m`]
     );
   }
    
@@ -62,24 +62,24 @@ function info() {
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++===============================[Project info]===============================\n`;
   string += `  \x1b[1m||\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${CoreUtil.isNodeProject()}\x1b[0m\n`;
-  string += `  \x1b[1m||\x1b[0m   Is Avalanche project:\t  \x1b[33m\x1b[1m${CoreUtil.isAVAProject()}\x1b[0m\n`;
-  if(CoreUtil.isAVACoreInstalled()) {
+  string += `  \x1b[1m||\x1b[0m   Is NPM project:\t\t  \x1b[33m\x1b[1m${ACUtil.isNodeProject()}\x1b[0m\n`;
+  string += `  \x1b[1m||\x1b[0m   Is Avalanche project:\t  \x1b[33m\x1b[1m${ACUtil.isAVAProject()}\x1b[0m\n`;
+  if(ACUtil.isAVACoreInstalled()) {
     const version = pkg.dependencies.avacore;
     const projectVersion = version.substring(0, 1) === "^" ? version.substring(1) : version;
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[34m\x1b[1mv${projectVersion}\x1b[0m\n`;
   } else {
     string += `  \x1b[1m||\x1b[0m   AVACore version:\t\t  \x1b[31m\x1b[1m(NOT INSTALLED)\x1b[0m\n`;
   }
-  if(CoreUtil.isAVAProject()) {
-    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${CoreUtil.getModels().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${CoreUtil.getControllers().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${CoreUtil.getRoutes().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${CoreUtil.getMiddleware().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${CoreUtil.getLocalisations().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${CoreUtil.getTranslations().length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(CoreUtil.getHelpers()).length}\x1b[0m\n`;
-    string += `  \x1b[1m||\x1b[0m   Migrations:\t\t  \x1b[32m\x1b[1m${Object.keys(CoreUtil.getMigrations()).length}\x1b[0m\n`;
+  if(ACUtil.isAVAProject()) {
+    string += `  \x1b[1m||\x1b[0m   Models:\t\t\t  \x1b[32m\x1b[1m${ACUtil.getModels().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Controllers:\t\t  \x1b[32m\x1b[1m${ACUtil.getControllers().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Routes:\t\t\t  \x1b[32m\x1b[1m${ACUtil.getRoutes().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Middleware:\t\t  \x1b[32m\x1b[1m${ACUtil.getMiddleware().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Localisations:\t\t  \x1b[32m\x1b[1m${ACUtil.getLocalisations().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Translations:\t\t  \x1b[32m\x1b[1m${ACUtil.getTranslations().length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Helpers:\t\t\t  \x1b[32m\x1b[1m${Object.keys(ACUtil.getHelpers()).length}\x1b[0m\n`;
+    string += `  \x1b[1m||\x1b[0m   Migrations:\t\t  \x1b[32m\x1b[1m${Object.keys(ACUtil.getMigrations()).length}\x1b[0m\n`;
   }
   string += `  \x1b[1m||\x1b[0m\n`;
   string += `  \x1b[1m++============================================================================\x1b[0m\n`;

@@ -1,5 +1,5 @@
 import mysql from "mysql";
-import { terminalPrefix } from "../AVACore/CoreUtil";
+import { terminalPrefix } from "../AVACore/ACUtil";
 
 const DATATYPES = {
   "INT": { type: "int", length: true, unsignable: true, incrementable: true },

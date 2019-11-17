@@ -1,6 +1,6 @@
 import fs from "fs";
 import AVAError from "../AVAFoundation/AVAError";
-import * as CoreUtil from "../AVACore/CoreUtil";
+import * as ACUtil from "../AVACore/ACUtil";
 
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 
@@ -27,7 +27,7 @@ class AVAEnvironment {
     }
 
     if (Object.keys(environments).length <= 0) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment file missing!\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment file missing!\x1b[0m`);
       process.exit(AVAError.NOENV);
     }
 
@@ -51,7 +51,7 @@ class AVAEnvironment {
       }
     }
     if (!prefferedEnvironmentLoaded) {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
       this.loadEnvironment(selectedEnvironment);
     }
   }
@@ -69,24 +69,24 @@ class AVAEnvironment {
       if (typeof (env.network.domain) === "string") {
         this.domain = env.network.domain;
       } else {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
         this.domain = "localhost";
       }
       if (typeof (env.network.host) === "string") {
         this.host = env.network.host;
       } else {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
         this.host = "127.0.0.1";
       }
       if (typeof (env.network.port) === "number") {
         this.port = env.network.port;
       } else {
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
         this.port = 80;
       }
     } else {
       isValid = false
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing network credentials.\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing network credentials.\x1b[0m`);
     }
 
     this.debug = {};
@@ -105,14 +105,14 @@ class AVAEnvironment {
         this.auth.secret = env.auth.secret;
       } else {
         isValid = false;
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
       }
       this.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
       this.auth.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
       this.auth.sessionStore = typeof env.auth.sessionStore === "string" ? env.auth.sessionStore : null;
     } else {
       isValid = false
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
     }
 
     this.security = {};
@@ -134,7 +134,7 @@ class AVAEnvironment {
     if (typeof (env.email) === "object") {
       this.email = env.email;
     } else {
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[34m (notice): Environment is missing mail server credentials.\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Environment is missing mail server credentials.\x1b[0m`);
     }
 
     this.database = {};
@@ -143,32 +143,32 @@ class AVAEnvironment {
         this.database.host = env.database.host;
       } else {
         isValid = false
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database host.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database host.\x1b[0m`);
       }
       if (typeof (env.database.user) === "string") {
         this.database.user = env.database.user;
       } else {
         isValid = false
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database user.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database user.\x1b[0m`);
       }
       if (typeof (env.database.password) === "string") {
         this.database.password = env.database.password;
       } else {
         isValid = false
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database password.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database password.\x1b[0m`);
       }
       if (typeof (env.database.database) === "string") {
         this.database.database = env.database.database;
       } else {
         isValid = false
-        console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
       }
       if (typeof (env.database.connectionLimit) === "number")
         this.database.connectionLimit = env.database.connectionLimit;
       this.database.multipleStatements = true;
     } else {
       isValid = false
-      console.log(`${CoreUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database credentials.\x1b[0m`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database credentials.\x1b[0m`);
     }
 
     this.useMapKit = typeof env.useMapKit === "boolean" ? env.useMapKit : false;
