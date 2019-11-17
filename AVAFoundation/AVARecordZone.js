@@ -1,4 +1,4 @@
-import AVARecordZoneType from "../foundation/AVARecordZoneType";
+import AVARecordZoneType from "../AVAFoundation/AVARecordZoneType";
 
 
 /**

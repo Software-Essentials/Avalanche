@@ -1,5 +1,5 @@
 import { AVAStorage, AVARecordZone, AVADatabase, AVAError } from "../index";
-import * as CoreUtil from "../core/CoreUtil";
+import * as CoreUtil from "../AVACore/CoreUtil";
 
 
 /**

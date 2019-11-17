@@ -1,6 +1,6 @@
 import fs from "fs";
 import inquirer from "inquirer";
-import AVAError from "../../foundation/AVAError";
+import AVAError from "../../AVAFoundation/AVAError";
 import * as CoreUtil from "../CoreUtil";
 import path from "path";
 import { UUID } from "../Util";

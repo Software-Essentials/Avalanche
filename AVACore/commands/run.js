@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import AVAEnvironment from "../../foundation/AVAEnvironment";
+import AVAEnvironment from "../../AVAFoundation/AVAEnvironment";
 import * as CoreUtil from "../CoreUtil";
 import { exec } from "child_process";
 

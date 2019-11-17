@@ -1,8 +1,8 @@
 import fs from "fs";
 import { terminalPrefix, getModels } from "./CoreUtil";
-import AVADatabase from "../foundation/AVADatabase";
-import AVAStorage from "../foundation/AVAStorage";
-import AVARecordZone from "../foundation/AVARecordZone";
+import AVADatabase from "../AVAFoundation/AVADatabase";
+import AVAStorage from "../AVAFoundation/AVAStorage";
+import AVARecordZone from "../AVAFoundation/AVARecordZone";
 
 
 /**

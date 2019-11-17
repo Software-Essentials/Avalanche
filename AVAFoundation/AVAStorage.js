@@ -1,6 +1,6 @@
 import fs from "fs";
-import AVARecordZone from "../foundation/AVARecordZone";
-import { directoryLooper } from "../core/CoreUtil";
+import AVARecordZone from "../AVAFoundation/AVARecordZone";
+import { directoryLooper } from "../AVACore/CoreUtil";
 
 
 /**

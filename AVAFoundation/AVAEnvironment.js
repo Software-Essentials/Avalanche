@@ -1,6 +1,6 @@
 import fs from "fs";
-import AVAError from "../foundation/AVAError";
-import * as CoreUtil from "../core/CoreUtil";
+import AVAError from "../AVAFoundation/AVAError";
+import * as CoreUtil from "../AVACore/CoreUtil";
 
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 

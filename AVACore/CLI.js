@@ -9,8 +9,8 @@ const https = require("https");
 const Table = require("cli-table");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
-const AVAEnvironment = require("../foundation/AVAEnvironment").default;
-const AVAError = require("../foundation/AVAError").default;
+const AVAEnvironment = require("../AVAFoundation/AVAEnvironment").default;
+const AVAError = require("../AVAFoundation/AVAError").default;
 
 const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
 const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];

@@ -1,5 +1,5 @@
 import { terminalPrefix } from "../CoreUtil";
-import AVAError from "../../foundation/AVAError";
+import AVAError from "../../AVAFoundation/AVAError";
 import Installer from "../Installer";
 
 

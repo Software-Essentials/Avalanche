@@ -1,7 +1,7 @@
 import fs from "fs";
 import { terminalPrefix, getSeedFilesNames } from "./CoreUtil";
-import AVADatabase from "../foundation/AVADatabase";
-import AVAStorage from "../foundation/AVAStorage";
+import AVADatabase from "../AVAFoundation/AVADatabase";
+import AVAStorage from "../AVAFoundation/AVAStorage";
 
 
 /**

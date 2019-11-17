@@ -2,7 +2,7 @@ import * as CoreUtil from "../CoreUtil";
 import fs from "fs";
 import inquirer from "inquirer";
 import { exec, execSync } from "child_process";
-import AVAError from "../../foundation/AVAError";
+import AVAError from "../../AVAFoundation/AVAError";
 import Installer from "../Installer";
 
 var npmPackage = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;

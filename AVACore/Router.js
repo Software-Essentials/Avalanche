@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import url from "url";
 import { AVAValidator } from "../index";
-import { terminalPrefix } from "../core/CoreUtil";
+import { terminalPrefix } from "../AVACore/CoreUtil";
 
 const ExRouter = express.Router();
 
