@@ -1,6 +1,7 @@
 // AVAFoundation
 export const AFController = require("./AFController").default;
 export const AFDatabase = require("./AFDatabase").default;
+export const AFEMail = require("./AFEMail").default;
 export const AFEnvironment = require("./AFEnvironment").default;
 export const AFError = require("./AFError").default;
 export const AFLocalisation = require("./AFLocalisation").default;
