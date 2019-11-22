@@ -11,7 +11,7 @@ export const AFStorage = require("./AVAFoundation/AFStorage").default;
 export const AFMailer = require("./AVAFoundation/AFMailer").default;
 export const AFEMail = require("./AVAFoundation/AFEMail").default;
 export const AFError = require("./AVAFoundation/AFError").default;
-export const AFUtil = require("./AVAFoundation/AFUtil");
+export const AFUtil = require("./AVAFoundation/AFUtil").default;
 
 // Super components
 export const AFViewController = require("./AVAFoundation/AFViewController").default;
