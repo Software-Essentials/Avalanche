@@ -1,8 +1,6 @@
 import nodemailer from "nodemailer";
 import hbs from "nodemailer-express-handlebars";
-import { AFUtil } from "../index";
-
-const { isEmail } = AFUtil;
+import { isEmail } from "./AFUtil";
 
 
 /**
