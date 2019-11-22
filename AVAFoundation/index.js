@@ -13,7 +13,7 @@ export const AFQueryBuilder = require("./AFQueryBuilder").default;
 export const AFRecordZone = require("./AFRecordZone").default;
 export const AFRecordZoneType = require("./AFRecordZoneType").default;
 export const AFStorage = require("./AFStorage").default;
-export const AFUtil = require("./AFUtil").default;
+export const AFUtil = require("./AFUtil");
 export const AFValidator = require("./AFValidator").default;
 export const AFViewController = require("./AFViewController").default;
 
