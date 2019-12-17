@@ -81,7 +81,9 @@ class ACMigrator {
             if (Model.PROPERTIES[Model.IDENTIFIER]) {
               options.primaryKey = Model.PROPERTIES[Model.IDENTIFIER].name;
             }
+            options.propertyKeys = {};
             for (const key of Object.keys(Model.PROPERTIES)) {
+              options.propertyKeys[Model.PROPERTIES[key].name] = key
               properties.push(Model.PROPERTIES[key]);
             }
             database.createTable(Model.NAME, properties, options);

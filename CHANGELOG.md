@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.7] - 2019-12-17
+### Added
+- Added Apple app association file.
+
+### Fixed
+- Fixed a bug where it was not possible to have 2 relations of the same table.
+
 ## [0.5.0] - 2019-11-17
 ### Added
 - Added AFPushNotification class for iOS remote notifications.

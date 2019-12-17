@@ -71,6 +71,10 @@
       "path": "/app/migration/seeds/DummyData.json"
     },
     {
+      "template": "example1_environment",
+      "path": "/app/public/.well-known/apple-app-site-association"
+    },
+    {
       "template": "example1_assets_logo",
       "path": "/app/public/assets/img/logo.svg"
     },

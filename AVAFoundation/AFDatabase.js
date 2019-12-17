@@ -159,6 +159,7 @@ class AFDatabase {
    */
   createTable(tablename, columns, options) {
     const force = options ? options.force ? true : false : false;
+    const propertyKeys = options ? options.propertyKeys ? options.propertyKeys : {} : {};
     const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
@@ -182,7 +183,7 @@ class AFDatabase {
         const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
         const foreignTable = foreignModel.NAME;
         const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
-        const constraintName = `${tablename} ${foreignTable}`;
+        const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
         columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
         columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
       }
