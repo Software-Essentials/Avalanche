@@ -19,7 +19,8 @@ const DATATYPES = {
   "TEXT": { type: "text", string: true },
   "TINYTEXT": { type: "tinytext", string: true },
   "MEDIUMTEXT": { type: "mediumtext", string: true },
-  "LONGTEXT": { type: "longtext", string: true }
+  "LONGTEXT": { type: "longtext", string: true },
+  "UUID": { type: "CHAR", string: true }
 };
 
 const CONSTRAINT_BEHAVIOUR = {
@@ -167,7 +168,7 @@ class AFDatabase {
     var columnStrings = [];
     for (const column of columns) {
       const typeProperty = DATATYPES[column.type];
-      const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : " "}`;
+      const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : column.type === "UUID" ? "(36) " : " "}`;
       const name = column.name;
       const defaultVal = column.default;
       const required = !!column.required;

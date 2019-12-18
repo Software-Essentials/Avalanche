@@ -1,21 +1,89 @@
 import { AFModel } from "avacore";
 
 
-/**
- * @description Manages posts.
- */
+/********************************************************************************************************************\
+|*                                                                                                                  *|
+|*  This is a 'model'. Models are important because they define the structure of your entities.                     *|
+|*  You can utilize the model in your controllers to fetch data.                                                    *|
+|*                                                                                                                  *|
+|*  For more documentation please refer to the Github Wiki: https://github.com/Software-Essentials/Avalanche/wiki.  *|
+|*                                                                                                                  *|
+\********************************************************************************************************************/
+
 class Post extends AFModel {
 
-  /**
-   * @throws AFError
-   */
   constructor() {
     super();
-    // Model configuration.
-    this.NAME = "Post"; // Name of the Storage Zone / Database Table.
-    this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
-    this.METHOD = "DATABASE"; // Lets the model know we want to use the Storage. If you want to use a database replace this value with "DATABASE".
+
+
+    /**********************************************************************\
+    |*                                                                    *|
+    |*  'NAME' defines the name of your model.                            *|
+    |*  This will also be the name of your corresponding database table.  *|
+    |*                                                                    *|
+    \**********************************************************************/
+
+    this.NAME = "Post";
+
+
+    /**********************************************************************************\
+    |*                                                                                *|
+    |*  'IDENTIFIER' defines the primary key by which your record can be identified.  *|
+    |*  This value is usually "ID".                                                   *|
+    |*                                                                                *|
+    \**********************************************************************************/
+
+    this.IDENTIFIER = "ID";
+
+
+    /**************************************************************************\
+    |*                                                                        *|
+    |*  'METHOD' defines how the model data should be stored.                 *|
+    |*  The value should be set to "DATABASE" since "STORAGE" is deprecated.  *|
+    |*  Once the value is set to "DATABASE" the migrator will create a        *|
+    |*  database table to store records of the model type in                  *|
+    |*                                                                        *|
+    \**************************************************************************/
+
+    this.METHOD = "DATABASE";
+
+
+    /***************************************************************************\
+    |*                                                                         *|
+    |*  'PROPERTIES' defines the structure of the model properties.            *|
+    |*  There are a couple of standard keys in this list:                      *|
+    |*  'ID', 'createdBy, updatedBy, createdAt, updatedAt                      *|
+    |*  Ofcourse you don't have to add these properties if they don't fit      *|
+    |*  your use case, it is just a best practice in the Avalanche framework.  *|
+    |*                                                                         *|
+    \***************************************************************************/
+
     this.PROPERTIES = {
+
+
+      /**********************************************************************************************\
+      |*                                                                                            *|
+      |*  Our first property is 'ID'. it has a few settings that we are going to go over.           *|
+      |*                                                                                            *|
+      |*  'name'             Our property might be called 'ID' but that is not a format we want to  *|
+      |*                     use in our database, since column names need to be lower-snake-case.   *|
+      |*                     So that's what 'name' is for.                                          *|
+      |*                                                                                            *|
+      |*  'type'             This specifies what the datatype of this property is. A list of        *|
+      |*                     types can be found at the end of this file.                            *|
+      |*                                                                                            *|
+      |*  'length'           Determines the length of the datatype.                                 *|
+      |*                                                                                            *|
+      |*  'required'         When set to true it marks the column "NOT NULL" in an SQL database.    *|
+      |*                                                                                            *|
+      |*  'relatable'        Marks the column "unsigned" in an SQL database.                        *|
+      |*                                                                                            *|
+      |*  'relation'         Creates a relation constraint between two entities.                    *|
+      |*                                                                                            *|
+      |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                   *|
+      |*                                                                                            *|
+      \**********************************************************************************************/
+
       "ID": {
         name: "post_id",
         type: "INT",
@@ -24,18 +92,51 @@ class Post extends AFModel {
         relatable: true,
         autoIncrement: true
       },
+
+
       "name": {
         name: "post_name",
-        type: "CHAR",
+        type: "VARCHAR",
         length: 32,
         required: true
       },
       "body": {
         name: "post_body",
-        type: "TEXT",
+        type: "VARCHAR",
         length: 255,
         required: true
       },
+
+
+      /*************************************************************\
+      |*                                                           *|
+      |*  Since there is no User table in this boilerplate, there  *|
+      |*  is no use for the createdBy and updatedBy properties.    *|
+      |*                                                           *|
+      \*************************************************************/
+
+      // "createdBy": {
+      //   name: "created_by",
+      //   type: "INT",
+      //   length: 10,
+      //   relation: {
+      //     table: "User",
+      //     onDelete: "set null",
+      //     onUpdate: "cascade"
+      //   }
+      // },
+      // "updatedBy": {
+      //   name: "updated_by",
+      //   type: "INT",
+      //   length: 10,
+      //   relation: {
+      //     table: "User",
+      //     onDelete: "set null",
+      //     onUpdate: "cascade"
+      //   }
+      // },
+
+
       "createdAt": {
         name: "created_at",
         type: "BIGINT",
@@ -47,13 +148,59 @@ class Post extends AFModel {
         type: "BIGINT",
         length: 1
       }
-    }; // Format: "<model key>": { <properties> }
-    this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
-    // Default values.
-    this.createdAt = new Date().valueOf();
+
+      
+    };
+    this.setupDone(arguments[0]); // Lets the AFModel (super model) know that we are done with the setup of this entity model.
+
+
+    /*****************************************************************************************************\
+    |*                                                                                                   *|
+    |*  This is where you would define all your computed default value.                                  *|
+    |*  As an example we choose a unix-timestamp which strictly doesnt have MySQL function or datatype.  *|
+    |*  Therefor it needs a computed default value:                                                      *|
+    |*                                                                                                   *|
+    \*****************************************************************************************************/
+
+    this.createdAt = new Date().valueOf() / 1000;
+
   }
 
 }
 
 
+/*********************************************************************************\
+|*                                                                               *|
+|*  Don't touch this line. It registers the model with the AVACore.              *|
+|*  Then it exports the registered model so you can use it in your controllers.  *|
+|*                                                                               *|
+\*********************************************************************************/
+
 export default AFModel.register(Post);
+
+
+/****************************************************************************\
+|*                                                                          *|
+|*  Here is a list of datatypes that you can use in your model properties:  *|
+|*                                                                          *|
+|*   - INT                                                                  *|
+|*   - TINYINT                                                              *|
+|*   - SMALLINT                                                             *|
+|*   - MEDIUMINT                                                            *|
+|*   - BIGINT                                                               *|
+|*   - FLOAT                                                                *|
+|*   - DECIMAL                                                              *|
+|*   - DOUBLE                                                               *|
+|*   - BIT                                                                  *|
+|*   - CHAR                                                                 *|
+|*   - VARCHAR                                                              *|
+|*   - DATETIME                                                             *|
+|*   - DATE                                                                 *|
+|*   - TIMESTAMP                                                            *|
+|*   - TEXT                                                                 *|
+|*   - TINYTEXT                                                             *|
+|*   - MEDIUMTEXT                                                           *|
+|*   - LONGTEXT                                                             *|
+|*   - UUID                                                                 *|
+|*                                                                          *|
+\****************************************************************************/

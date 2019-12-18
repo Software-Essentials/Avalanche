@@ -39,6 +39,6 @@
     <p>Building an Sign Up/Sign In authentication system can take long. That's why we've already done the hard work for you. The Auth package is one of the packages that you can install and modify to your liking. Use the command <kbd>$ avalanche install Auth</kbd> to install the Auth package.</p>
     <hr />
     <h2 class="text-center">More info on the Wiki</h2>
-    <p>The above was only a brief tutorial to help you get started. But please make use of the documentation on the <a href="https://github.com/noriasoft/Avalanche/wiki">GitHub Wiki</a>.</p>
+    <p>The above was only a brief tutorial to help you get started. But please make use of the documentation on the <a href="https://github.com/Software-Essentials/Avalanche/wiki">GitHub Wiki</a>.</p>
   </div>
 </div>

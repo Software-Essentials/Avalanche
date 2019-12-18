@@ -36,7 +36,7 @@ $ avalanche init
 ```
 $ avalanche run
 ```
-Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/noriasoft/Avalanche/wiki).
+Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/Software-Essentials/Avalanche/wiki).
 
 
 ## Troubleshooting
