@@ -1,7 +1,5 @@
-import { AFModel, Util } from "avacore";
-
-const { UUID } = Util;
-
+<#line_import_avacore?>
+<#line_const_uuid?>
 
 /********************************************************************************************************************\
 |*                                                                                                                  *|
@@ -43,7 +41,7 @@ class <#name?> extends AFModel {
     |*                                                                                *|
     \**********************************************************************************/
 
-    this.IDENTIFIER = "ID";
+<#line_idenifier?>
 
 
     /**************************************************************************\
@@ -92,12 +90,7 @@ class <#name?> extends AFModel {
       |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                   *|
       |*                                                                                            *|
       \**********************************************************************************************/
-  
-      "ID": {
-        name: "<#name_lower?>_id",
-        type: "UUID",
-        required: true
-      },
+<#line_property_id?>
       "name": {
         name: "<#name_lower?>_name",
         type: "VARCHAR",
@@ -158,9 +151,7 @@ class <#name?> extends AFModel {
     |*  Therefor it needs a computed default value:                                                      *|
     |*                                                                                                   *|
     \*****************************************************************************************************/
-
-    this.ID = new UUID().string;
-    this.createdAt = new Date().valueOf() / 1000;
+<#line_computed_default?>
 
   }
 

@@ -225,7 +225,7 @@ function make_model() {
     {
       type: "input",
       name: "table",
-      message: "Name your zone/table:",
+      message: "Name your table:",
       prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       default: (answers) => {
@@ -237,8 +237,16 @@ function make_model() {
     },
     {
       type: "list",
+      name: "identificationMethod",
+      choices: ["ID (Auto increment)", "UUID", "none"],
+      message: "Choose model identifier:",
+      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      suffix: "\x1b[0m"
+    },
+    {
+      type: "list",
       name: "method",
-      choices: ["AFStorage", "AFDatabase"],
+      choices: ["AFDatabase", "AFStorage (deprecated)"],
       message: "Choose a storage method:",
       prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"
@@ -247,11 +255,34 @@ function make_model() {
   inquirer.prompt(questions).then(answers => {
     const path = `app/models/${answers.name}.js`;
     const template = "TEMPLATE_model";
+    const identificationMethod = answers.identificationMethod === "ID (Auto increment)" ? "ID" : answers.identificationMethod
+    const name = answers.name;
+    var lineImportAvacore = `import { AFModel } from "avacore";`;
+    var lineConstUUID = ``;
+    var lineIdenifier = `    // this.IDENTIFIER = "ID";`;
+    var lineComputedDefault = "\n    this.createdAt = new Date().valueOf() / 1000;";
+    var linePropertyID = "";
+    if (identificationMethod === "UUID") {
+      lineImportAvacore = `import { AFModel, Util } from "avacore";`;
+      lineConstUUID = `\nconst { UUID } = Util;\n`;
+      lineIdenifier = `    this.IDENTIFIER = "ID";`;
+      lineComputedDefault = "\n    this.ID = new UUID().string;\n    this.createdAt = new Date().valueOf() / 1000;";
+      linePropertyID = `\n      "ID": {\n        name: "${name}_id",\n        type: "UUID",\n        required: true\n      },`;
+    }
+    if (identificationMethod === "ID") {
+      lineIdenifier = `    this.IDENTIFIER = "ID";`;
+      linePropertyID = `\n      "ID": {\n        name: "${name}_id",\n        type: "INT",\n        length: 10,\n        relatable: true,\n        autoIncrement: true,\n        required: true\n      },`;
+    }
     const variables = {
-      name: answers.name,
-      name_lower: answers.name.toLowerCase(),
+      name: name,
+      name_lower: name.toLowerCase(),
       method: answers.method,
-      method_key: answers.method === "AFStorage" ? "STORAGE" : "DATABASE"
+      method_key: answers.method === "AFStorage (deprecated)" ? "STORAGE" : "DATABASE",
+      line_import_avacore: lineImportAvacore,
+      line_const_uuid: lineConstUUID,
+      line_idenifier: lineIdenifier,
+      line_computed_default: lineComputedDefault,
+      line_property_id: linePropertyID
     };
     makeTemplate(variables, template, path);
   });
