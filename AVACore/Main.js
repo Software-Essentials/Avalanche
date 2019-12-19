@@ -20,8 +20,6 @@ if (cmdValue !== "run") {
 
   const app = express();
 
-  console.log(`${terminalPrefix()}\x1b[32m Starting server.\x1b[0m`);
-
   const server = new ACWebServer(app);
   const stream = server.getStream();
   new ACKernel(app, stream);

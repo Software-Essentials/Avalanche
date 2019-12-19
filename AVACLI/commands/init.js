@@ -46,15 +46,7 @@ function installAVACoreIfNeeded() {
   const ready = typeof arguments[0] === "function" ? arguments[0] : () => { };
   if (!ACUtil.isAVACoreInstalled()) {
     process.stdout.clearLine();
-    var i = 0, total = 10;
-    const animation = setInterval(() => {
-      process.stdout.clearLine();
-      i = (i + 1) % total;
-      const r = total - i;
-      var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
-      process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m Downloading AVACore ${dots}\x1b[0m`)
-      process.stdout.cursorTo(0);
-    }, 50);
+    const animation = progressAnimation("Downloading AVACore");
     const iProcess = exec("npm install avacore", (error, stout, sterr) => { });
     iProcess.on("error", (error) => {
       clearInterval(animation);
@@ -74,6 +66,18 @@ function installAVACoreIfNeeded() {
   } else {
     ready();
   }
+}
+
+function progressAnimation(title) {
+  var i = 0, total = 10;
+  return setInterval(() => {
+    process.stdout.clearLine();
+    i = (i + 1) % total;
+    const r = total - i;
+    var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
+    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`)
+    process.stdout.cursorTo(0);
+  }, 50);
 }
 
 

@@ -1,5 +1,6 @@
 import http from "http";
 import { terminalPrefix } from "./ACUtil";
+import inquirer from "inquirer";
 
 
 /**
@@ -31,11 +32,11 @@ class ACWebServer {
     this.stream.on("error", (error) => {
       const message = error.message;
       if (message.includes("EACCES")) {
-        console.log(`${terminalPrefix()}\x1b[31m Unable to start server because Avalanche doesn't have permission to use port '${global.environment.port}' on IP '${global.environment.host}'.\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[31m\x1b[2m [EACCESS]\x1b[0m\x1b[31m Unable to start server because Avalanche doesn't have permission to use port '${global.environment.port}' on IP '${global.environment.host}'.\x1b[0m`);
         return;
       }
       if (message.includes("EADDRINUSE")) {
-        console.log(`${terminalPrefix()}\x1b[31m Unable to start server because port '${global.environment.port}' on IP '${global.environment.host}' is already in use.\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[31m\x1b[2m [EADDRINUSE]\x1b[0m\x1b[31m Unable to start server because port '${global.environment.port}' on IP '${global.environment.host}' is already in use.\x1b[0m`);
         return;
       }
       console.log(`${terminalPrefix()}\x1b[31m An unknown error occured: \x1b[0m${error.message}`);

@@ -61,7 +61,7 @@ export function getProjectPackage() {
 export function startWatchingSession(filePath, callback) {
   let md5Previous = null;
   let fsWait = false;
-  fs.watch(filePath, (event, filename) => {
+  return fs.watch(filePath, (event, filename) => {
     if (filename) {
       if (fsWait) return;
       fsWait = setTimeout(() => {

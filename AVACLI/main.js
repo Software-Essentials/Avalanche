@@ -58,7 +58,7 @@ function main() {
 function checkForUpdate() {
   https.get(npmRegistryAPIURI, (response) => {
     var body = "";
-    response.on("data", function(chunk){
+    response.on("data", (chunk) => {
       body += chunk;
     });
     response.on("end", () => {
@@ -73,7 +73,9 @@ function checkForUpdate() {
         fs.writeFileSync(`${__dirname}/../package.json`, JSON.stringify(json, null, 2), "utf8");
       }
     });
-  })
+  }).on("error", (error) => {
+
+  });
 }
 
 

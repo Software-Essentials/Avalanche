@@ -184,7 +184,7 @@ function make_middleware() {
     {
       type: "input",
       name: "name",
-      message: "Name your environment:",
+      message: "Name your middleware:",
       prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m",
       validate: (answer) => {

@@ -6,7 +6,12 @@ import fs from "fs";
  */
 class AFLocalisation {
 
-  constructor(locale) {
+  /**
+   * 
+   * @param {String} language For example: en
+   * @param {String} region For example: UK
+   */
+  constructor(language, region) {
     var normalizedPath = `${projectPWD}/app/localisations`;
     var localisations = [];
     if (fs.existsSync(normalizedPath)) {
@@ -16,7 +21,7 @@ class AFLocalisation {
           if (extensions[extensions.length - 1].toUpperCase() === "JSON")
             localisations[extensions[0]] = require(`${projectPWD}/app/localisations/${file}`);
       });
-      this.list = localisations[locale];
+      this.list = localisations[language];
     } else {
       this.list = null;
     }
@@ -27,11 +32,17 @@ class AFLocalisation {
     return this.list;
   }
 
+
+  _(context) {
+    console.log(context, "=>", context);
+    return typeof this.list[context] === "string" ? this.list[context] : context;
+  };
+
 }
 
 
 export function translate(context) {
-  const localisation = new AFLocalisation("en_GB");
+  const localisation = new AFLocalisation("en");
   const locale = localisation.getList();
   return typeof locale[context] === "string" ? locale[context] : context;
 };
