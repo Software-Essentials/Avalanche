@@ -5,6 +5,16 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.11] - 2019-12-20
+### Added
+- Added troubleshooters to 'run' command.
+- Added static function dataset to AFModel.
+- Added ID method option to 'make model' command
+
+### Changes
+- Changed syntax for linking models to eachother.
+- Updated model explenation comments.
+
 ## [0.5.7] - 2019-12-17
 ### Added
 - Added Apple app association file.

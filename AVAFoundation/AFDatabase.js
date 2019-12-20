@@ -165,29 +165,46 @@ class AFDatabase {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     const that = this;
+    var foreignModelIdentifier;
     var columnStrings = [];
     for (const column of columns) {
-      const typeProperty = DATATYPES[column.type];
-      const datatype = `${typeProperty.type}${typeProperty.length ? `(${column.length}) ` : column.type === "UUID" ? "(36) " : " "}`;
       const name = column.name;
-      const defaultVal = column.default;
-      const required = !!column.required;
-      const unique = !!column.unique;
-      const unsigned = typeProperty.unsignable ? column.relatable : false;
-      const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
-      const relation = column.relation;
-      if (typeof relation === "string" || typeof relation === "object") {
-        const options = typeof relation === "object" ? relation : {};
-        const onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
-        const onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
-        const foreignClass = typeof relation === "object" ? options.table : relation;
+      // Relation
+      if (typeof column.model === "string" || typeof column.relation === "string" || typeof column.relation === "object") {
+        var foreignClass, onDelete, onUpdate;
+        // Model link
+        if (typeof column.model === "string") {
+          onDelete = typeof column.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[column.onDelete.toUpperCase().split(" ").join("_")] : null;
+          onUpdate = typeof column.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[column.onUpdate.toUpperCase().split(" ").join("_")] : null;
+          foreignClass = column.model;
+        }
+        // Relation (old linking method)
+        const relation = column.relation;
+        if (typeof relation === "string" || typeof relation === "object") {
+          const options = typeof relation === "object" ? relation : {};
+          onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
+          onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
+          foreignClass = typeof relation === "object" ? options.hasOwnProperty("model") ? options.model : options.hasOwnProperty("table") ? options.table : relation : relation;
+        }
         const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
         const foreignTable = foreignModel.NAME;
         const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
         const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
         columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
         columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+        if (typeof column.model === "string") {
+          foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+        }
       }
+      const length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
+      const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
+      const typeProperty = DATATYPES[type];
+      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}) ` : type === "UUID" ? "(36) " : " "}`;
+      const defaultVal = column.default;
+      const required = !!column.required;
+      const unique = !!column.unique;
+      const unsigned = typeProperty.unsignable ? column.relatable : false;
+      const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
       columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
       if (unique) {
         columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);

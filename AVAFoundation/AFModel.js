@@ -1,5 +1,6 @@
 import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
 import * as ACUtil from "../AVACore/ACUtil";
+import { callbackPromise } from "nodemailer/lib/shared";
 
 
 /**
@@ -313,7 +314,63 @@ AFModel.register = (Model) => {
 
 
   /**
+   */
+  function dataset(array, conditions, onReady) {
+    var query = "SELECT ";
+    var columns = [];
+    var wheres = [];
+    var values = [];
+    const properties = Model.PROPERTIES;
+    for(const key of array) {
+      if (properties.hasOwnProperty(key)) {
+        columns.push(`${properties[key].name} AS '${key}'`);
+      } else {
+        const parts = key.split(".");
+        if (properties.hasOwnProperty(parts[0]) && parts.length > 1) {
+          const property = properties[parts[0]];
+          if (property.hasOwnProperty("model")) {
+            const foreign = parts[0];
+            const column = parts[1];
+            const foreignKey = properties[foreign].name;
+            const model = property.model;
+            const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
+            if(foreignModel.PROPERTIES.hasOwnProperty(column)) {
+              const subquery = `(SELECT ${foreignModel.PROPERTIES[column].name} FROM ${foreignModel.NAME} WHERE ${foreignKey} = ${Model.NAME}.${foreignKey})`;
+              columns.push(`${subquery} AS '${key}'`);
+            }
+          }
+        } else {
+          console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) dataset contains key '${key}' that is not part of '${Model.NAME}'.\x1b[0m`);
+        }
+      }
+    }
+    for(const condition of conditions) {
+      wheres.push(`${condition.key} = ?`);
+      values.push(condition.value);
+    }
+    query += columns.join(", ");
+    query += ` FROM ${Model.NAME}`;
+    if (wheres.length > 0) {
+      query += ` WHERE `;
+      query += wheres.join(" AND ");
+    }
+    if (properties.hasOwnProperty("createdAt")) {
+      query += `ORDER BY ${properties["createdAt"].name} DESC`;
+    }
+    // console.log(query);
+    database.query(query, values, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+      }
+      onReady(error, results);
+    });
+  }
+  Model.dataset = dataset;
+
+
+  /**
    * @description Returns JSON representation.
+   * @deprecated
    * @param {[AFModel]}
    * @returns {Object}
    */
@@ -329,6 +386,7 @@ AFModel.register = (Model) => {
 
   /**
    * @description Returns all records.
+   * @deprecated
    */
   function all(options) {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
@@ -378,6 +436,7 @@ AFModel.register = (Model) => {
 
   /**
    * @description Returns all records matching this key-value condition.
+   * @deprecated
    * @param {String} key 
    * @param {any} value 
    */

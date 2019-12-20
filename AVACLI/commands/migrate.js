@@ -28,7 +28,7 @@ function migrate() {
     {
       type: "confirm",
       name: "seed",
-      message: "Also seed?",
+      message: "Also populate?",
       default: true,
       prefix: `${terminalPrefix()}\x1b[3m`,
       suffix: "\x1b[0m"

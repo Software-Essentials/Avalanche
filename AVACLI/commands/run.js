@@ -135,15 +135,15 @@ function start(environment, onStop) {
 }
 
 function progressAnimation(title) {
-  var i = 0, total = 10;
+  var i = 0, total = 30;
   return setInterval(() => {
     process.stdout.clearLine();
     i = (i + 1) % total;
     const r = total - i;
-    var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
+    var dots = "" + new Array(i + 1).join("█") + (new Array(r).join("░")) + "";
     process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`);
     process.stdout.cursorTo(0);
-  }, 50);
+  }, 25);
 }
 
 function troubleshootHost(environment, error, cProcess, onStop) {
