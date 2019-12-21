@@ -11,6 +11,8 @@ const DATATYPES = {
   "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
   "DOUBLE": { type: "double", unsignable: true, incrementable: true },
   "BIT": { type: "bit", length: true },
+  "BOOL": { type: "bool" },
+  "BOOLEAN": { type: "boolean" },
   "CHAR": { type: "char", string: true, length: true },
   "VARCHAR": { type: "varchar", string: true, length: true },
   "DATETIME": { type: "varchar", string: true },
@@ -20,7 +22,7 @@ const DATATYPES = {
   "TINYTEXT": { type: "tinytext", string: true },
   "MEDIUMTEXT": { type: "mediumtext", string: true },
   "LONGTEXT": { type: "longtext", string: true },
-  "UUID": { type: "CHAR", string: true }
+  "UUID": { type: "char", string: true }
 };
 
 const CONSTRAINT_BEHAVIOUR = {

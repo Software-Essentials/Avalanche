@@ -132,7 +132,7 @@ class ACKernel {
     next();
 
     // Request logger
-    if (global.environment.logHTTPRequestsToConsole) {
+    if (environment.debug.logHTTPRequestsToConsole) {
       const now = new Date();
       const method = request.method;
       const status = response.statusCode;

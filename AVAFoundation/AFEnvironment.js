@@ -91,11 +91,13 @@ class AFEnvironment {
 
     this.debug = {};
     if (typeof (env.debug) === "object") {
-      this.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
-      this.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
+      this.debug.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.debug.logQueriesToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.debug.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
     } else {
-      this.logHTTPRequestsToConsole = false;
-      this.restartOnFileChange = false;
+      this.debug.logHTTPRequestsToConsole = false;
+      this.debug.logQueriesToConsole = false;
+      this.debug.restartOnFileChange = false;
     }
 
     this.auth = {};

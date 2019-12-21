@@ -5,15 +5,17 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.11] - 2019-12-20
+## [0.5.12] - 2019-12-21
 ### Added
 - Added troubleshooters to 'run' command.
-- Added static function dataset to AFModel.
-- Added ID method option to 'make model' command
+- Added static function select to AFModel.
+- Added ID method option to 'make model' command.
+- Added BOOL & BOOLEAN datatypes to AFModel.
 
 ### Changes
 - Changed syntax for linking models to eachother.
 - Updated model explenation comments.
+- Optimised querybuilder.
 
 ## [0.5.7] - 2019-12-17
 ### Added

@@ -36,7 +36,7 @@ function run() {
   };
   var cProcess = start(environmentName, stopP);
   setTimeout(() => {
-    if (environment.restartOnFileChange) {
+    if (environment.debug.restartOnFileChange) {
       const directory = `${projectPWD}/app`;
       const folders = directoryLooper(directory, []).children;
       for (const i in folders) {

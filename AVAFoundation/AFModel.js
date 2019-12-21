@@ -315,57 +315,114 @@ AFModel.register = (Model) => {
 
   /**
    */
-  function dataset(array, conditions, onReady) {
-    var query = "SELECT ";
-    var columns = [];
+  function select(array, conditions, onReady) {
+    var queryParts = ["SELECT"];
+    var datasetProperties = {};
     var wheres = [];
-    var values = [];
+    var parameters = [];
     const properties = Model.PROPERTIES;
-    for(const key of array) {
-      if (properties.hasOwnProperty(key)) {
-        columns.push(`${properties[key].name} AS '${key}'`);
-      } else {
-        const parts = key.split(".");
-        if (properties.hasOwnProperty(parts[0]) && parts.length > 1) {
-          const property = properties[parts[0]];
+    for (const key of array) {
+      const keyParts = key.split(".");
+      if (properties.hasOwnProperty(keyParts[0])) {
+        const property = properties[keyParts[0]];
+        if (keyParts.length === 1) {
+          let alias = key;
           if (property.hasOwnProperty("model")) {
-            const foreign = parts[0];
-            const column = parts[1];
+            const model = property.model;
+            const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
+            if (foreignModel.PROPERTIES.hasOwnProperty("ID")) {
+              alias = `${key}.ID`;
+            }
+          }
+          datasetProperties[alias] = {};
+          datasetProperties[alias].query = `${properties[key].name} AS '${alias}'`;
+          datasetProperties[alias].structure = properties[key];
+        } else if (keyParts.length > 1) {
+          let alias = key;
+          if (property.hasOwnProperty("model")) {
+            const foreign = keyParts[0];
+            const column = keyParts[1];
             const foreignKey = properties[foreign].name;
             const model = property.model;
             const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
-            if(foreignModel.PROPERTIES.hasOwnProperty(column)) {
-              const subquery = `(SELECT ${foreignModel.PROPERTIES[column].name} FROM ${foreignModel.NAME} WHERE ${foreignKey} = ${Model.NAME}.${foreignKey})`;
-              columns.push(`${subquery} AS '${key}'`);
+            const foreignIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+            if (foreignModel.PROPERTIES.hasOwnProperty(column)) {
+              const subquery = `(SELECT ${foreignModel.PROPERTIES[column].name} FROM ${foreignModel.NAME} WHERE ${foreignIdentifier.name} = ${Model.NAME}.${foreignKey})`;
+              datasetProperties[alias] = {};
+              datasetProperties[alias].query = `${subquery} AS '${alias}'`;
+              datasetProperties[alias].structure = foreignModel.PROPERTIES[column];
             }
           }
-        } else {
-          console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) dataset contains key '${key}' that is not part of '${Model.NAME}'.\x1b[0m`);
         }
+        continue;
       }
+      console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) select contains key '${key}' that is not part of '${Model.NAME}'.\x1b[0m`);
     }
-    for(const condition of conditions) {
-      wheres.push(`${condition.key} = ?`);
-      values.push(condition.value);
+    const columns = [];
+    for (const key in datasetProperties) {
+      columns.push(datasetProperties[key].query);
     }
-    query += columns.join(", ");
-    query += ` FROM ${Model.NAME}`;
+    queryParts.push(columns.join(", "));
+    queryParts.push(`FROM ${Model.NAME}`);
+    for (const condition of conditions) {
+      const keyParts = condition.key.split(".");
+      if (properties.hasOwnProperty(keyParts[0])) {
+        const property = properties[keyParts[0]];
+        if (keyParts.length === 1) {
+          if (Model.PROPERTIES.hasOwnProperty(keyParts[0])) {
+            wheres.push(`${Model.PROPERTIES[condition.key].name} = ?`);
+            parameters.push(condition.value);
+          }
+        } else if (keyParts.length > 1) {
+          const foreignProperty = keyParts[1];
+          if (property.hasOwnProperty("model")) {
+            const model = property.model;
+            const linkName = property.name;
+            const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
+            if (foreignModel.PROPERTIES.hasOwnProperty(foreignProperty)) {
+              const foreignPropertyName = foreignModel.PROPERTIES[foreignProperty].name;
+              const foreignIdentifierName = foreignModel.PROPERTIES[foreignModel.IDENTIFIER].name;
+              if (foreignIdentifierName === foreignPropertyName) {
+                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+              } else {
+                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+              }
+              parameters.push(condition.value);
+            }
+          }
+        }
+        continue;
+      }
+      console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) select (where) contains key '${condition.key}' that is not part of '${Model.NAME}'.\x1b[0m`);
+    }
     if (wheres.length > 0) {
-      query += ` WHERE `;
-      query += wheres.join(" AND ");
+      queryParts.push("WHERE");
+      queryParts.push(wheres.join(" AND "));
     }
     if (properties.hasOwnProperty("createdAt")) {
-      query += `ORDER BY ${properties["createdAt"].name} DESC`;
+      queryParts.push(`ORDER BY ${properties["createdAt"].name} DESC`);
     }
-    // console.log(query);
-    database.query(query, values, (error, results, fields) => {
+    queryParts.push(";");
+    if (environment.debug.logQueriesToConsole) {
+      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")}\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+    }
+    database.query(queryParts.join(" "), parameters, (error, results, fields) => {
       if (error) {
-        console.log(error);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
+      }
+      for (var i in results) {
+        const result = results[i];
+        for (var key in result) {
+          const type = datasetProperties[key].structure.type;
+          if (type === "BOOL" || type === "BOOLEAN") {
+            results[i][key] = results[i][key] ? true : false
+          }
+        }
       }
       onReady(error, results);
     });
   }
-  Model.dataset = dataset;
+  Model.select = select;
 
 
   /**

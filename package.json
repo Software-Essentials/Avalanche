@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -56,6 +56,6 @@
     "socket.io": "^2.2.0"
   },
   "avalancheCache": {
-    "latestUpdate": "0.5.10"
+    "latestUpdate": "0.5.11"
   }
 }
