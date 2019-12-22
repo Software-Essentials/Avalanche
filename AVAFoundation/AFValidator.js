@@ -25,7 +25,7 @@ class AFValidator {
       this.value = request.params[key];
       return this;
     }
-    request.validate = ({ onFailure }) => {
+    request.validate = ({ onFailure, onSuccess }) => {
       var failures = [];
       for (const method of Object.keys(this.invalid)) {
         for (const key in this.invalid[method]) {
@@ -53,13 +53,13 @@ class AFValidator {
         }
       }
       if (failures.length <= 0) return true;
-      onFailure({ error: new Error("Validation failed"), errors: failures })
+      onFailure({ error: new Error("Validation failed"), errors: failures });
       return false;
     }
   }
 
   type(type) {
-    if (type === "number" && parseInt(this.value) !== NaN) {
+    if (type === "number" && !isNaN(parseInt(this.value))) {
       return this;
     }
     if (type === "string" && typeof this.value === "string") {
@@ -87,7 +87,7 @@ class AFValidator {
       }
     }
     const value = parseInt(this.value);
-    if (value !== NaN) {
+    if (!isNaN(value)) {
       if (value >= min && value <= max) {
         return this;
       }

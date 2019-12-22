@@ -61,28 +61,36 @@ class Post extends AFModel {
     this.PROPERTIES = {
 
 
-      /**********************************************************************************************\
-      |*                                                                                            *|
-      |*  Our first property is 'ID'. it has a few settings that we are going to go over.           *|
-      |*                                                                                            *|
-      |*  'name'             Our property might be called 'ID' but that is not a format we want to  *|
-      |*                     use in our database, since column names need to be lower-snake-case.   *|
-      |*                     So that's what 'name' is for.                                          *|
-      |*                                                                                            *|
-      |*  'type'             This specifies what the datatype of this property is. A list of        *|
-      |*                     types can be found at the end of this file.                            *|
-      |*                                                                                            *|
-      |*  'length'           Determines the length of the datatype.                                 *|
-      |*                                                                                            *|
-      |*  'required'         When set to true it marks the column "NOT NULL" in an SQL database.    *|
-      |*                                                                                            *|
-      |*  'relatable'        Marks the column "unsigned" in an SQL database.                        *|
-      |*                                                                                            *|
-      |*  'relation'         Creates a relation constraint between two entities.                    *|
-      |*                                                                                            *|
-      |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                   *|
-      |*                                                                                            *|
-      \**********************************************************************************************/
+      /***********************************************************************************************\
+      |*                                                                                             *|
+      |*  Our first property is 'ID'. it has a few settings that we are going to go over.            *|
+      |*                                                                                             *|
+      |*  'name'             Our property might be called 'ID' but that is not a format we want to   *|
+      |*                     use in our database, since column names need to be lower-snake-case.    *|
+      |*                     So that's what 'name' is for.                                           *|
+      |*                                                                                             *|
+      |*  'type'             This specifies what the datatype of this property is. A list of         *|
+      |*                     types can be found at the end of this file.                             *|
+      |*                                                                                             *|
+      |*  'length'           Determines the length of the datatype.                                  *|
+      |*                                                                                             *|
+      |*  'required'         When set to true it marks the column "NOT NULL" in a MySQL database.    *|
+      |*                                                                                             *|
+      |*  'relatable'        Marks the column "unsigned" in a MySQL database.                        *|
+      |*                                                                                             *|
+      |*  'model'            Creates a relation constraint between two entities.                     *|
+      |*                                                                                             *|
+      |*  'onDelete'         Determines the behaviour of the record when the parent gets deleted.    *|
+      |*                     Can be set to "set null", "cascade", "restrict", "no action".           *|
+      |*                     Can only be used when the property is connected to a foreign model.     *|
+      |*                                                                                             *|
+      |*  'onUpdate'         Determines the behaviour of the record when the parent value changes.   *|
+      |*                     Can be set to "set null", "cascade", "restrict", "no action".           *|
+      |*                     Can only be used when the property is connected to a foreign model.     *|
+      |*                                                                                             *|
+      |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                    *|
+      |*                                                                                             *|
+      \***********************************************************************************************/
 
       "ID": {
         name: "post_id",
@@ -117,23 +125,15 @@ class Post extends AFModel {
 
       // "createdBy": {
       //   name: "created_by",
-      //   type: "INT",
-      //   length: 10,
-      //   relation: {
-      //     table: "User",
-      //     onDelete: "set null",
-      //     onUpdate: "cascade"
-      //   }
+      //   model: "User",
+      //   onDelete: "set null",
+      //   onUpdate: "cascade"
       // },
       // "updatedBy": {
       //   name: "updated_by",
-      //   type: "INT",
-      //   length: 10,
-      //   relation: {
-      //     table: "User",
-      //     onDelete: "set null",
-      //     onUpdate: "cascade"
-      //   }
+      //   model: "User",
+      //   onDelete: "set null",
+      //   onUpdate: "cascade"
       // },
 
 
@@ -192,6 +192,8 @@ export default AFModel.register(Post);
 |*   - DECIMAL                                                              *|
 |*   - DOUBLE                                                               *|
 |*   - BIT                                                                  *|
+|*   - BOOL                                                                 *|
+|*   - BOOLEAN                                                              *|
 |*   - CHAR                                                                 *|
 |*   - VARCHAR                                                              *|
 |*   - DATETIME                                                             *|

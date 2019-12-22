@@ -1,6 +1,5 @@
 import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
 import * as ACUtil from "../AVACore/ACUtil";
-import { callbackPromise } from "nodemailer/lib/shared";
 
 
 /**
@@ -13,22 +12,22 @@ class AFModel {
    * @param {String} name Name of the resource.
    */
   constructor() {
-    if (typeof arguments[0] === "string" && typeof arguments[1] === "string" && typeof arguments[2] === "object") {
-      this.NAME = arguments[0];
-      this.IDENTIFIER = arguments[1];
-      this.PROPERTIES = arguments[2];
-      this.METHOD = "STORAGE";
-      this.DRAFT = false;
-    }
-    if (typeof arguments[0] === "object" && arguments[0] instanceof AFModel, typeof arguments[1] === "function") {
-      const self = arguments[0];
-      this.NAME = self.NAME;
-      this.IDENTIFIER = self.IDENTIFIER;
-      this.PROPERTIES = self.PROPERTIES;
-      this.METHOD = self.METHOD;
-      this.DRAFT = self.DRAFT
-      this.PROMISE = arguments[1];
-    }
+    // if (typeof arguments[0] === "string" && typeof arguments[1] === "string" && typeof arguments[2] === "object") {
+    //   this.NAME = arguments[0];
+    //   this.IDENTIFIER = arguments[1];
+    //   this.PROPERTIES = arguments[2];
+    //   this.METHOD = "STORAGE";
+    //   this.DRAFT = false;
+    // }
+    // if (typeof arguments[0] === "object" && arguments[0] instanceof AFModel, typeof arguments[1] === "function") {
+    //   const self = arguments[0];
+    //   this.NAME = self.NAME;
+    //   this.IDENTIFIER = self.IDENTIFIER;
+    //   this.PROPERTIES = self.PROPERTIES;
+    //   this.METHOD = self.METHOD;
+    //   this.DRAFT = self.DRAFT
+    //   this.PROMISE = arguments[1];
+    // }
   }
 
 
@@ -83,52 +82,41 @@ class AFModel {
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (this.METHOD === "DATABASE") {
       const database = new AFDatabase();
-      var keys = [];
-      var values = [];
+      var queryParts = [this.DRAFT ? `INSERT INTO \`${this.NAME}\`` : `UPDATE \`${this.NAME}\` SET`];
       var parameters = [];
-      for (const key in this.PROPERTIES) {
-        const value = this[key];
-        switch (typeof value) {
-          case "string":
-            parameters.push(value);
-            values.push("?");
-            break;
-          case "number":
-            parameters.push(value);
-            values.push("?");
-            break;
-          case "boolean":
-            parameters.push(value ? 1 : 0);
-            values.push("?");
-            break;
-          default:
-            continue;
-        }
-        keys.push(this.PROPERTIES[key].name);
-      }
-      var setString = "";
-      var merged = keys.reduce((object, key, index) => {
-        object[key] = values[index];
-        return object;
-      }, {});
-      for (const key in merged) {
-        if (key !== this.PROPERTIES[this.IDENTIFIER].name) {
-          parameters.push(merged[key]);
-          if (setString === "") {
-            setString = `${key} = ?`;
-          } else {
-            setString = `${setString}, ${key} = ?`;
-          }
-        }
-      }
-      var query = "";
       if (this.DRAFT) {
-        query = `INSERT INTO \`${this.NAME}\` (${keys.join(", ")}) VALUES (${values.join(", ")})`;
+        var columns = [];
+        var values = [];
+        for (const key in this.PROPERTIES) {
+          const property = this.PROPERTIES[key];
+          if (property.autoIncrement) {
+            continue;
+          }
+          columns.push(property.name);
+          values.push("?");
+          parameters.push(this[key]);
+        }
+        queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
       } else {
-        query = `UPDATE \`${this.NAME}\` SET ${setString} WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ${this[this.IDENTIFIER]}`;
+        var keyValues = [];
+        for (const key in this.PROPERTIES) {
+          if (key === this.IDENTIFIER) {
+            continue;
+          }
+          const property = this.PROPERTIES[key];
+          keyValues.push(`${property.name} = ?`);
+          parameters.push(this[key]);
+        }
+        queryParts.push(keyValues.join(", "));
       }
-      database.connection.query(query, parameters, (error, results, fields) => {
+      if (!this.DRAFT) {
+        queryParts.push(`WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ?`);
+        parameters.push(this[this.IDENTIFIER]);
+      }
+      console.log(queryParts);
+      database.connection.query(queryParts.join(" "), parameters, (error, results, fields) => {
         if (error) {
+          console.log(error);
           if (error.code === "ECONNREFUSED") {
             console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
           }
@@ -140,7 +128,11 @@ class AFModel {
           failure({ errors: [{ error: "databaseError", message: error.code }] });
         } else {
           this.DRAFT = false;
-          success({ result: this });
+          if (results.affectedRows === 1) {
+            success({ result: this });
+          } else {
+            failure({ errors: [{ error: "nothingUpdated", message: "Nothing updated." }] });
+          }
         }
       });
     }
@@ -206,101 +198,6 @@ class AFModel {
     }
   }
 
-
-  /**
-   * @description Returns all records matching this key-value condition.
-   * @param {String} key 
-   * @param {any} value 
-   */
-  where(key, value) {
-    this.DRAFT = false;
-    if (this.METHOD === "DATABASE") {
-      const database = new AFDatabase();
-      const query = `SELECT * FROM \`${this.NAME}\` WHERE \`${key}\` = ?`;
-      const parameters = [value];
-      return new AFModel(this, (resolve, reject) => {
-        database.connection.query(query, parameters, (error, results, fields) => {
-          if (error) {
-            if (error.code === "ECONNREFUSED") {
-              console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
-            }
-            reject({ error: error });
-          } else {
-            if (results.length === 1) {
-              const result = results[0];
-              for (const key in this.PROPERTIES) {
-                this[key] = result[this.PROPERTIES[key].name];
-              }
-              resolve({ self: this });
-            } else {
-              reject({ error: new Error("Targets is not singular.") });
-            }
-          }
-        });
-      });
-    }
-    if (this.METHOD === "STORAGE") {
-      var results = [];
-      const storage = new AFStorage();
-      const zone = storage.getRecordZone(this.NAME);
-      return new AFModel(this, (resolve, reject) => {
-        if (zone === null) {
-          reject({ error: new Error("Zone not found.") });
-        }
-        const records = zone.getRecords();
-        for (const i in records) {
-          if (records[i].hasOwnProperty(key)) {
-            const recordValue = records[i][key];
-            if (recordValue === value) {
-              results.push(records[i]);
-            }
-          }
-        }
-        if (results.length === 1) {
-          const result = results[0];
-          for (const key in this.PROPERTIES) {
-            this[key] = result[this.PROPERTIES[key].name];
-          }
-          resolve({ self: this });
-        } else {
-          reject({ error: new Error("Targets is not singular.") });
-        }
-      });
-    }
-  }
-
-
-  /**
-   * @description Returns this in the form of a callback, but asyncronous.
-   */
-  fetch(selfCallback) {
-    const onFetch = selfCallback ? typeof selfCallback === "function" ? selfCallback : () => { } : () => { };
-    this.PROMISE(({ self }) => {
-      if (this.PROMISE !== null) {
-        onFetch({ self, error: null });
-        this.PROMISE = null;
-      }
-    }, ({ error }) => {
-      if (this.PROMISE !== null) {
-        onFetch({ self: null, error });
-        this.PROMISE = null;
-      }
-    });
-  }
-
-
-  /**
-   * @description Returns JSON representation.
-   * @returns {Object}
-   */
-  get() {
-    var structure = {};
-    for (const key in this.PROPERTIES) {
-      structure[key] = this[key];
-    }
-    return structure;
-  }
-
 }
 
 
@@ -315,16 +212,20 @@ AFModel.register = (Model) => {
 
   /**
    */
-  function select(array, conditions, onReady) {
+  Model.select = ({ properties, conditions, onSuccess, onFailure }) => {
+    const propertiesArray = Array.isArray(properties) ? properties : [];
+    const conditionsArray = Array.isArray(conditions) ? conditions : [];
+    const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
+    const didFail = typeof onFailure === "function" ? onFailure : () => { };
     var queryParts = ["SELECT"];
     var datasetProperties = {};
     var wheres = [];
     var parameters = [];
-    const properties = Model.PROPERTIES;
-    for (const key of array) {
+    const modelProperties = Model.PROPERTIES;
+    for (const key of propertiesArray) {
       const keyParts = key.split(".");
-      if (properties.hasOwnProperty(keyParts[0])) {
-        const property = properties[keyParts[0]];
+      if (modelProperties.hasOwnProperty(keyParts[0])) {
+        const property = modelProperties[keyParts[0]];
         if (keyParts.length === 1) {
           let alias = key;
           if (property.hasOwnProperty("model")) {
@@ -335,14 +236,14 @@ AFModel.register = (Model) => {
             }
           }
           datasetProperties[alias] = {};
-          datasetProperties[alias].query = `${properties[key].name} AS '${alias}'`;
-          datasetProperties[alias].structure = properties[key];
+          datasetProperties[alias].query = `${modelProperties[key].name} AS '${alias}'`;
+          datasetProperties[alias].structure = modelProperties[key];
         } else if (keyParts.length > 1) {
           let alias = key;
           if (property.hasOwnProperty("model")) {
             const foreign = keyParts[0];
             const column = keyParts[1];
-            const foreignKey = properties[foreign].name;
+            const foreignKey = modelProperties[foreign].name;
             const model = property.model;
             const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
             const foreignIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
@@ -364,14 +265,20 @@ AFModel.register = (Model) => {
     }
     queryParts.push(columns.join(", "));
     queryParts.push(`FROM ${Model.NAME}`);
-    for (const condition of conditions) {
+    for (const condition of conditionsArray) {
       const keyParts = condition.key.split(".");
-      if (properties.hasOwnProperty(keyParts[0])) {
-        const property = properties[keyParts[0]];
+      if (modelProperties.hasOwnProperty(keyParts[0])) {
+        const property = modelProperties[keyParts[0]];
         if (keyParts.length === 1) {
           if (Model.PROPERTIES.hasOwnProperty(keyParts[0])) {
-            wheres.push(`${Model.PROPERTIES[condition.key].name} = ?`);
-            parameters.push(condition.value);
+            const key = condition.key;
+            const value = condition.value === null ? "NULL" : condition.value;
+            if (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL") {
+              wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
+            } else {
+              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              parameters.push(value);
+            }
           }
         } else if (keyParts.length > 1) {
           const foreignProperty = keyParts[1];
@@ -399,8 +306,8 @@ AFModel.register = (Model) => {
       queryParts.push("WHERE");
       queryParts.push(wheres.join(" AND "));
     }
-    if (properties.hasOwnProperty("createdAt")) {
-      queryParts.push(`ORDER BY ${properties["createdAt"].name} DESC`);
+    if (modelProperties.hasOwnProperty("createdAt")) {
+      queryParts.push(`ORDER BY ${modelProperties["createdAt"].name} DESC`);
     }
     queryParts.push(";");
     if (environment.debug.logQueriesToConsole) {
@@ -409,6 +316,8 @@ AFModel.register = (Model) => {
     database.query(queryParts.join(" "), parameters, (error, results, fields) => {
       if (error) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
+        didFail({ errors: [{ error: error.code, message: error.message }] });
+        return;
       }
       for (var i in results) {
         const result = results[i];
@@ -419,133 +328,103 @@ AFModel.register = (Model) => {
           }
         }
       }
-      onReady(error, results);
+      didSucceed({ results });
     });
   }
-  Model.select = select;
 
 
   /**
-   * @description Returns JSON representation.
-   * @deprecated
-   * @param {[AFModel]}
-   * @returns {Object}
    */
-  function get(array) {
-    var data = [];
-    for (const row of array) {
-      data.push(row.get());
-    }
-    return data
-  }
-  Model.get = get;
-
-
-  /**
-   * @description Returns all records.
-   * @deprecated
-   */
-  function all(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    if (Model.METHOD === "DATABASE") {
-      const database = new AFDatabase();
-      const query = `SELECT * FROM \`${Model.NAME}\``;
-      const parameters = [];
-      database.connection.query(query, parameters, (error, results, fields) => {
-        if (error) {
-          if (error.code === "ECONNREFUSED") {
-            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
-          } else {
-            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
+  Model.delete = ({ conditions, onSuccess, onFailure }) => {
+    const conditionsArray = Array.isArray(conditions) ? conditions : [];
+    const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
+    const didFail = typeof onFailure === "function" ? onFailure : () => { };
+    var queryParts = [`DELETE FROM \`${Model.NAME}\``];
+    var wheres = [];
+    var parameters = [];
+    const modelProperties = Model.PROPERTIES;
+    for (const condition of conditionsArray) {
+      const keyParts = condition.key.split(".");
+      if (modelProperties.hasOwnProperty(keyParts[0])) {
+        const property = modelProperties[keyParts[0]];
+        if (keyParts.length === 1) {
+          if (Model.PROPERTIES.hasOwnProperty(keyParts[0])) {
+            const key = condition.key;
+            const value = condition.value === null ? "NULL" : condition.value;
+            if (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL") {
+              wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
+            } else {
+              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              parameters.push(value);
+            }
           }
-          failure({ errors: [{ error: "databaseError", message: error.code }] });
-          return;
+        } else if (keyParts.length > 1) {
+          const foreignProperty = keyParts[1];
+          if (property.hasOwnProperty("model")) {
+            const model = property.model;
+            const linkName = property.name;
+            const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
+            if (foreignModel.PROPERTIES.hasOwnProperty(foreignProperty)) {
+              const foreignPropertyName = foreignModel.PROPERTIES[foreignProperty].name;
+              const foreignIdentifierName = foreignModel.PROPERTIES[foreignModel.IDENTIFIER].name;
+              if (foreignIdentifierName === foreignPropertyName) {
+                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+              } else {
+                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+              }
+              parameters.push(condition.value);
+            }
+          }
+        }
+        continue;
+      }
+      console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) select (where) contains key '${condition.key}' that is not part of '${Model.NAME}'.\x1b[0m`);
+    }
+    if (wheres.length > 0) {
+      queryParts.push("WHERE");
+      queryParts.push(wheres.join(" AND "));
+    }
+    queryParts.push(";");
+    if (environment.debug.logQueriesToConsole) {
+      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")}\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+    }
+    database.query(queryParts.join(" "), parameters, (error, results, fields) => {
+      if (error) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
+        didFail({ errors: [{ error: error.code, message: error.message }] });
+        return;
+      }
+      didSucceed({ results });
+    });
+  }
+
+
+  /**
+   * @description Returns AFModel.
+   * @param {Int|UUID}
+   * @param {Function}
+   */
+  Model.get = (ID, { onSuccess, onFailure }) => {
+    const model = new Model();
+    Model.select({
+      properties: Object.keys(Model.PROPERTIES),
+      conditions: [{ key: Model.IDENTIFIER, value: ID }],
+      onFailure,
+      onSuccess: ({ results }) => {
+        // NOTE: If results is empty it can't update because it doesnt exist. Therefor the request never completes. (goto /activity/update)
+        if (results.length === 1) {
+          const result = results[0];
+          for (const property in result) {
+            model[property.split(".")[0]] = result[property];
+          }
+          model.DRAFT = false;
+          onSuccess(model);
         } else {
-          var data = [];
-          for (const result of results) {
-            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
-            model.setupDone(result);
-            data.push(model);
-          }
-          success({ results: data });
+          onFailure({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
         }
-      });
-    }
-    if (Model.METHOD === "STORAGE") {
-      const storage = new AFStorage();
-      const zone = storage.getRecordZone(Model.NAME);
-      if (zone === null) {
-        success({ results: [] })
       }
-      const records = zone.getRecords();
-      var results = [];
-      for (const record in records) {
-        const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
-        model.setupDone(records[record]);
-        results.push(model);
-      }
-      success({ results: results })
-    }
+    });
   }
-  Model.all = all;
-
-
-  /**
-   * @description Returns all records matching this key-value condition.
-   * @deprecated
-   * @param {String} key 
-   * @param {any} value 
-   */
-  function where(key, value, options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    if (Model.METHOD === "DATABASE") {
-      const database = new AFDatabase();
-      const query = `SELECT * FROM \`${Model.NAME}\` WHERE \`${key}\` = ?`;
-      const parameters = [value];
-      database.connection.query(query, parameters, (error, results, fields) => {
-        if (error) {
-          if (error.code === "ECONNREFUSED") {
-            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
-          } else {
-            console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
-          }
-          failure({ errors: [{ error: "databaseError", message: error.code }] });
-          return;
-        } else {
-          var data = [];
-          for (const result of results) {
-            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
-            model.setupDone(result);
-            data.push(model);
-          }
-          success({ results: data });
-        }
-      });
-    }
-    if (Model.METHOD === "STORAGE") {
-      var results = [];
-      const storage = new AFStorage();
-      const zone = storage.getRecordZone(Model.NAME);
-      if (zone === null) {
-        success({ results: [] })
-      }
-      const records = zone.getRecords();
-      for (const record in records) {
-        if (records[record].hasOwnProperty(key)) {
-          const recordValue = records[record][key];
-          if (recordValue === value) {
-            const model = new AFModel(Model.NAME, Model.IDENTIFIER, Model.PROPERTIES);
-            model.setupDone(records[record]);
-            results.push(model);
-          }
-        }
-      }
-      success({ results: results });
-    }
-  }
-  Model.where = where;
 
 
   return Model;
