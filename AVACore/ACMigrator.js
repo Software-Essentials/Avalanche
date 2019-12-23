@@ -1,4 +1,5 @@
 import fs from "fs";
+import readline from "readline";
 import { terminalPrefix, getModels } from "./ACUtil";
 import { AFDatabase, AFStorage, AFRecordZone } from "../AVAFoundation/index";
 
@@ -32,7 +33,8 @@ class ACMigrator {
     const storage = new AFStorage();
     var migrations = {};
     if (wipe) {
-      console.log(`${terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
+      process.stdout.write(`${terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
+      readline.cursorTo(process.stdout, 0);
       database.dropAllTables({
         onSuccess: ({ total, success }) => {
           console.log(`${terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
@@ -55,7 +57,8 @@ class ACMigrator {
       migrate();
     }
     function migrate() {
-      console.log(`${terminalPrefix()}\x1b[32m Migrating...\x1b[0m`)
+      process.stdout.write(`${terminalPrefix()}\x1b[32m Migrating...\x1b[0m`);
+      readline.cursorTo(process.stdout, 0);
       for (const i in models) {
         const model = models[i];
         migrations[model] = null;

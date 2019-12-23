@@ -12,7 +12,7 @@ const { COPYFILE_EXCL } = fs.constants;
  * @description Makes template.
  */
 function make(component) {
-  switch (component) {
+  switch ((component || "").replace("\x1b[32m\x1b[1m", "")) {
     case "controller":
       make_controller();
       return;
@@ -28,10 +28,25 @@ function make(component) {
     case "routes":
       make_routes();
       return;
-    case "seeds":
-      make_seeds();
+    case "route":
+      make_routes();
       return;
-    case "view (DEPRECATED)":
+    case "routing":
+      make_routes();
+      return;
+    case "seeds":
+      make_population();
+      return;
+    case "seed":
+      make_population();
+      return;
+    case "population":
+      make_population();
+      return;
+    case "localisation":
+      make_localisation();
+      return;
+    case "view":
       make_view();
       return;
     default:
@@ -46,20 +61,20 @@ function make(component) {
  */
 function make_default() {
   var choices = [
-    "controller",
-    "environment",
-    "middleware",
-    "model",
-    "routes",
-    "seeds",
-    "view (DEPRECATED)"
+    "\x1b[32m\x1b[1mmodel",
+    "\x1b[32m\x1b[1mcontroller",
+    "\x1b[32m\x1b[1mrouting",
+    "\x1b[32m\x1b[1mmiddleware",
+    "\x1b[32m\x1b[1mpopulation",
+    "\x1b[32m\x1b[1mlocalisation",
+    "\x1b[32m\x1b[1menvironment"
   ];
   const prompt = {
     type: "list",
     name: "component",
     message: "What would you like to make?",
     choices: choices,
-    prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+    prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
     suffix: "\x1b[0m"
   };
   inquirer.prompt(prompt).then(answers => {
@@ -78,7 +93,7 @@ function make_controller() {
       type: "input",
       name: "name",
       message: "Name your controller:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (!answer.endsWith("Controller"))
@@ -137,7 +152,7 @@ function make_environment() {
       name: "filename",
       message: "Name your environment file:",
       default: "development",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
@@ -149,7 +164,7 @@ function make_environment() {
       type: "input",
       name: "name",
       message: "Name your application title for this environment:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/environments/${answer}.environment.json`))
@@ -185,7 +200,7 @@ function make_middleware() {
       type: "input",
       name: "name",
       message: "Name your middleware:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/middleware/${answer}.js`))
@@ -298,7 +313,7 @@ function make_routes() {
       type: "input",
       name: "filename",
       message: "Name your routes file:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/routes/${answer}.json`))
@@ -319,17 +334,17 @@ function make_routes() {
 /**
  * 
  */
-function make_seeds() {
+function make_population() {
   const questions = [
     {
       type: "input",
       name: "filename",
-      message: "Name your seeds file:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      message: "Name your population file:",
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
         if (fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
-          return "\x1b[31mA seeds file with this name already exists.\x1b[0m"
+          return "\x1b[31mA population file with this name already exists.\x1b[0m"
         return true;
       }
     },
@@ -338,7 +353,7 @@ function make_seeds() {
       name: "model",
       choices: ACUtil.getModels(),
       message: "Choose a model:",
-      prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m"
     }
   ];
@@ -350,6 +365,34 @@ function make_seeds() {
       model: answers.model,
       method: new DummyClass().METHOD === "DATABASE" ? "table" : "zone"
     };
+    makeTemplate(variables, template, path);
+  });
+}
+
+
+/**
+ * 
+ */
+function make_localisation() {
+  const questions = [
+    {
+      type: "input",
+      name: "filename",
+      message: "Name your localisation file:",
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
+      default: "en_GB",
+      suffix: "\x1b[0m",
+      validate: (answer) => {
+        if (fs.existsSync(`${projectPWD}/app/localisations/${answer}.json`))
+          return "\x1b[31mThis localisation already exists in your project.\x1b[0m"
+        return true;
+      }
+    }
+  ];
+  inquirer.prompt(questions).then(answers => {
+    const path = `app/localisations/${answers.filename}.json`;
+    const template = "TEMPLATE_localisation";
+    const variables = {};
     makeTemplate(variables, template, path);
   });
 }

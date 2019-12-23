@@ -16,6 +16,3 @@ export const AFStorage = require("./AFStorage").default;
 export const AFUtil = require("./AFUtil");
 export const AFValidator = require("./AFValidator").default;
 export const AFViewController = require("./AFViewController").default;
-
-// Other
-export const _ = require("./AFLocalisation").translate;

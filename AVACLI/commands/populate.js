@@ -6,20 +6,20 @@ import { terminalPrefix } from "../../AVACore/ACUtil";
 /**
  * @description Migrate.
  */
-function seed() {
+function populate() {
   const seeder = new ACSeeder();
   const choices = [
-    "\x1b[32m\x1b[1mSAFE\x1b[0m \x1b[3m(Only seeds records that don't exist yet)\x1b[0m",
-    "\x1b[33m\x1b[1mOVERWRITE\x1b[0m \x1b[3m(Seeds over your existing records)\x1b[0m",
-    "\x1b[31m\x1b[1mWIPE\x1b[0m \x1b[3m(Wipes your data and then seeds)\x1b[0m"
+    "\x1b[32m\x1b[1mSAFE\x1b[0m       \x1b[3m(Only creates records that don't exist yet)\x1b[0m",
+    "\x1b[33m\x1b[1mOVERWRITE\x1b[0m  \x1b[3m(Merges population over your existing records)\x1b[0m",
+    "\x1b[31m\x1b[1mWIPE\x1b[0m       \x1b[3m(Wipes your data and then populates)\x1b[0m"
   ];
   const questions = [
     {
       type: "list",
       name: "mode",
-      message: "Choose a seeding mode:",
+      message: "Choose a populating mode:",
       default: 0,
-      prefix: `${terminalPrefix()}\x1b[3m`,
+      prefix: `${terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       choices: choices
     }
@@ -43,8 +43,8 @@ function seed() {
 }
 
 
-module.exports.execute = seed;
+module.exports.execute = populate;
 module.exports.enabled = true;
 module.exports.scope = "PROJECT";
-module.exports.command = "seed";
-module.exports.description = "Seeds your storage or database.";
+module.exports.command = "populate";
+module.exports.description = "Populates your database with seed data.";

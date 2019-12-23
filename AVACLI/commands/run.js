@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import inquirer from "inquirer";
+import readline from "readline";
 import { exec, execSync } from "child_process";
 import { AFEnvironment } from "../../AVAFoundation/index";
 import { directoryLooper } from "../../AVAFoundation/AFUtil";
@@ -83,14 +84,11 @@ function start(environment, onStop) {
   });
   cProcess.stdout.on("data", (data) => {
     if (data.includes("Webserver served")) {
-      process.stdout.cursorTo(0);
-      process.stdout.clearScreenDown();
+      readline.cursorTo(process.stdout, 0);
       clearInterval(animation);
     }
     if (data.includes("Unable to start server")) {
-      process.stdout.moveCursor(0, -1);
-      process.stdout.cursorTo(0);
-      process.stdout.clearScreenDown();
+      readline.cursorTo(process.stdout, 0);
       clearInterval(animation);
     }
     if (data.includes("[EACCESS]")) {
@@ -137,12 +135,13 @@ function start(environment, onStop) {
 function progressAnimation(title) {
   var i = 0, total = 30;
   return setInterval(() => {
-    process.stdout.clearLine();
+    // process.stdout.clearLine();
     i = (i + 1) % total;
     const r = total - i;
     var dots = "" + new Array(i + 1).join("█") + (new Array(r).join("░")) + "";
     process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`);
-    process.stdout.cursorTo(0);
+    // process.stdout.cursorTo(0);
+    readline.cursorTo(process.stdout, 0);
   }, 25);
 }
 
@@ -247,7 +246,7 @@ function troubleshootPort(environment, error, cProcess, onStop) {
 
 function killAllNodeProcesses(port) {
   try {
-    const output = execSync(`lsof -i tcp:${port}`).toString();
+    const output = execSync(`lsof -i tcp:${port}`, { stdio: "ignore" }).toString();
     const rows = output.split("\n");
     var pids = [];
     for (const row of rows) {

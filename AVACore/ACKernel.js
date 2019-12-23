@@ -50,7 +50,7 @@ class ACKernel {
     // Session configuration
     this.sessionConfiguration = {
       name: "Auth",
-      secret: global.environment.secret,
+      secret: environment.secret,
       resave: false,
       saveUninitialized: true,
       cookie: {

@@ -18,6 +18,3 @@ export const AFViewController = require("./AVAFoundation/AFViewController").defa
 export const AFController = require("./AVAFoundation/AFController").default;
 export const AFMiddleware = require("./AVAFoundation/AFMiddleware").default;
 export const AFModel = require("./AVAFoundation/AFModel").default;
-
-// Other
-export const _ = require("./AVAFoundation/AFLocalisation").translate;

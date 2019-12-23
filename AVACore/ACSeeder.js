@@ -1,4 +1,5 @@
 import fs from "fs";
+import readline from "readline";
 import { terminalPrefix, getSeedFilesNames } from "./ACUtil";
 import { AFDatabase, AFStorage } from "../AVAFoundation/index";
 
@@ -39,7 +40,8 @@ class ACSeeder {
   execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
-    console.log(`${terminalPrefix()}\x1b[32m Seeding...\x1b[0m`);
+    process.stdout.write(`${terminalPrefix()}\x1b[32m Populating...\x1b[0m`);
+    readline.cursorTo(process.stdout, 0);
     var permissionIssue = false;
     const database = new AFDatabase();
     database.foreignKeyChecks = false;
@@ -50,7 +52,8 @@ class ACSeeder {
         onSuccess: proceed
       });
       try {
-        console.log(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
+        readline.cursorTo(process.stdout, 0);
+        process.stdout.write(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
         AFStorage.wipe();
       } catch (error) {
         if (error.code === "EPERM") {
@@ -91,7 +94,7 @@ class ACSeeder {
                     console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
                     break;
                   case "ER_NO_SUCH_TABLE":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Table not found. Migrate before seeding.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Table not found. Migrate before populating.\x1b[0m`);
                     break;
                   default:
                     console.log(`${terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
@@ -117,7 +120,8 @@ class ACSeeder {
         if (seedStats[key]) successful++;
       }
       if (completed === Object.keys(seedStats).length) {
-        console.log(`${terminalPrefix()}\x1b[32m Seeding complete. (${completed}/${successful} tables seeded)\x1b[0m`);
+        readline.cursorTo(process.stdout, 0);
+        console.log(`${terminalPrefix()}\x1b[32m Populating complete. (${completed}/${successful} tables populated)\x1b[0m`);
         ready(true);
       }
     }

@@ -1,6 +1,5 @@
 import http from "http";
 import { terminalPrefix } from "./ACUtil";
-import inquirer from "inquirer";
 
 
 /**
@@ -16,7 +15,7 @@ class ACWebServer {
 
     instance = http.createServer(app);
 
-    if (global.environment.port === 443) {
+    if (environment.port === 443) {
       // If running on https we need to redirect http to https
       const httpServer = http.createServer((request, response) => {
         response.writeHead(301, { Location: `https://${request.headers.host}${request.url}` });

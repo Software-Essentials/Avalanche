@@ -5,10 +5,18 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.17] - 2019-12-22
+### Added
+- Added static functions 'select', 'delete' and 'get' to AFModel.
+- Added global localisation.
+
+### Changes
+- Changed the term 'seed' to 'populate'
+- Optimised terminal output.
+
 ## [0.5.12] - 2019-12-21
 ### Added
 - Added troubleshooters to 'run' command.
-- Added static function select to AFModel.
 - Added ID method option to 'make model' command.
 - Added BOOL & BOOLEAN datatypes to AFModel.
 

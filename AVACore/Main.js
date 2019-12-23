@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 
 require = require("esm")(module);
-const { AFEnvironment } = require("../AVAFoundation/index");
+const { AFEnvironment, AFLocalisation } = require("../AVAFoundation/index");
 const express = require("express");
 const { terminalPrefix } = require("./ACUtil");
 
@@ -14,6 +14,8 @@ if (cmdValue !== "run") {
   process.exit(0);
 } else {
   global.environment = new AFEnvironment(envValue);
+  global.localisation = new AFLocalisation("en_GB");
+  global._ = global.localisation.translate;
 
   const ACKernel = require("./ACKernel.js").default;
   const ACWebServer = require("./ACWebServer.js").default;
