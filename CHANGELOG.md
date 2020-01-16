@@ -5,8 +5,9 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.18] - 2020-01-16
+## [0.5.19] - 2020-01-16
 ### Added
+- Added 'localise' command to the Avalanche CLI.
 - Added 'alias', 'notEmpty', 'not' & 'equals' functions to AVAValidator.
 
 ### Fixed

@@ -64,7 +64,7 @@ class ACWebServer {
         const connection = connections[key];
         connection.socket.emit("reload");
       }
-    }, 2000);
+    }, 3000);
   }
 
 }
