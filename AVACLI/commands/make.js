@@ -278,15 +278,15 @@ function make_model() {
     var lineComputedDefault = "\n    this.createdAt = new Date().valueOf() / 1000;";
     var linePropertyID = "";
     if (identificationMethod === "UUID") {
-      lineImportAvacore = `import { AFModel, Util } from "avacore";`;
-      lineConstUUID = `\nconst { UUID } = Util;\n`;
+      lineImportAvacore = `import { AFModel, AFUtil } from "avacore";`;
+      lineConstUUID = `\nconst { UUID } = AFUtil;\n`;
       lineIdenifier = `    this.IDENTIFIER = "ID";`;
       lineComputedDefault = "\n    this.ID = new UUID().string;\n    this.createdAt = new Date().valueOf() / 1000;";
-      linePropertyID = `\n      "ID": {\n        name: "${name}_id",\n        type: "UUID",\n        required: true\n      },`;
+      linePropertyID = `\n      "ID": {\n        name: "${name.toLowerCase()}_id",\n        type: "UUID",\n        required: true\n      },`;
     }
     if (identificationMethod === "ID") {
       lineIdenifier = `    this.IDENTIFIER = "ID";`;
-      linePropertyID = `\n      "ID": {\n        name: "${name}_id",\n        type: "INT",\n        length: 10,\n        relatable: true,\n        autoIncrement: true,\n        required: true\n      },`;
+      linePropertyID = `\n      "ID": {\n        name: "${name.toLowerCase()}_id",\n        type: "INT",\n        length: 10,\n        relatable: true,\n        autoIncrement: true,\n        required: true\n      },`;
     }
     const variables = {
       name: name,

@@ -74,7 +74,6 @@ class AFDatabase {
           wipes[table] = null;
           const query = `DELETE FROM \`${result.name}\`;`;
           this.query(this.preQuery() + query, [], (error, _results, fields) => {
-            const results = _results.slice(1);
             if (error) {
               wipes[table] = false;
               failure({ error });

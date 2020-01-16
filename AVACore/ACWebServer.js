@@ -48,7 +48,7 @@ class ACWebServer {
 
   didStart(webserver) {
     console.log(`${terminalPrefix()}\x1b[32m Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}\x1b[0m`);
-    if (global.environment.reloadClientsAfterRestart) {
+    if (environment.debug.reloadClientsAfterRestart) {
       webserver.reloadConnectedClients();
     }
   }

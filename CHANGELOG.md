@@ -5,6 +5,14 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.18] - 2020-01-16
+### Added
+- Added 'alias', 'notEmpty', 'not' & 'equals' functions to AVAValidator.
+
+### Fixed
+- Fixed bugs in existing templates.
+- Fixed ACSocketKernel.
+
 ## [0.5.17] - 2019-12-22
 ### Added
 - Added static functions 'select', 'delete' and 'get' to AFModel.

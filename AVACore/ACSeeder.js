@@ -94,10 +94,10 @@ class ACSeeder {
                     console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
                     break;
                   case "ER_NO_SUCH_TABLE":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Table not found. Migrate before populating.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Table '${table}' not found. Migrate before populating.\x1b[0m`);
                     break;
                   default:
-                    console.log(`${terminalPrefix()}\x1b[31m (error) \x1b[0m${error.message}`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Error while populating '${table}':\x1b[0m ${error.message}`);
                 }
                 update();
               }

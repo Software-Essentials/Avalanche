@@ -93,11 +93,15 @@ class AFEnvironment {
     if (typeof (env.debug) === "object") {
       this.debug.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
       this.debug.logQueriesToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.debug.logWebSocket = typeof env.debug.logWebSocket === "boolean" ? env.debug.logWebSocket : false;
       this.debug.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
+      this.debug.reloadClientsAfterRestart = typeof env.debug.reloadClientsAfterRestart === "boolean" ? env.debug.reloadClientsAfterRestart : false;
     } else {
       this.debug.logHTTPRequestsToConsole = false;
       this.debug.logQueriesToConsole = false;
+      this.debug.logWebSocket = false;
       this.debug.restartOnFileChange = false;
+      this.debug.reloadClientsAfterRestart = false;
     }
 
     this.auth = {};
@@ -127,9 +131,12 @@ class AFEnvironment {
     this.capabilities = {};
     if (typeof (env.capabilities) === "object") {
       this.capabilities.isUsingSSL = typeof env.capabilities.isUsingSSL === "boolean" ? env.capabilities.isUsingSSL : true;
-      this.capabilities.useWebSockets = typeof env.capabilities.useWebSockets === "boolean" ? env.capabilities.useWebSockets : false;
-      this.capabilities.useMiddleware = typeof env.capabilities.useMiddleware === "boolean" ? env.capabilities.useMiddleware : true;
-      this.capabilities.useEmail = typeof env.capabilities.useEmail === "boolean" ? env.capabilities.useEmail : false;
+      this.capabilities.webSockets = typeof env.capabilities.useWebSockets === "boolean" ? env.capabilities.useWebSockets : false; // Deprecated
+      this.capabilities.webSockets = typeof env.capabilities.webSockets === "boolean" ? env.capabilities.webSockets : false;
+      this.capabilities.middleware = typeof env.capabilities.useMiddleware === "boolean" ? env.capabilities.useMiddleware : true; // Deprecated
+      this.capabilities.middleware = typeof env.capabilities.middleware === "boolean" ? env.capabilities.middleware : true;
+      this.capabilities.email = typeof env.capabilities.useEmail === "boolean" ? env.capabilities.useEmail : false; // Deprecated
+      this.capabilities.email = typeof env.capabilities.email === "boolean" ? env.capabilities.email : false;
     }
 
     this.email = {};
@@ -176,7 +183,6 @@ class AFEnvironment {
     this.useMapKit = typeof env.useMapKit === "boolean" ? env.useMapKit : false;
     this.allowRegister = typeof env.allowRegister === "boolean" ? env.allowRegister : false;
     this.restrictMapsToDomain = typeof env.restrictMapsToDomain === "boolean" ? env.restrictMapsToDomain : true;
-    this.reloadClientsAfterRestart = typeof env.reloadClientsAfterRestart === "boolean" ? env.reloadClientsAfterRestart : false;
 
     this.title = typeof env.info.title === "string" ? env.info.title : packageConfig.name;
     this.version = typeof env.info.version === "string" ? env.info.version : packageConfig.version;

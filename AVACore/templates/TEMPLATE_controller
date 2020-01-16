@@ -1,4 +1,5 @@
 import { AFController } from "avacore";
+// import { Record } from "../models/Record";
 
 
 /**
@@ -16,10 +17,26 @@ class <#name?> extends AFController {
    * @param {Object} response
    */
   index(request, response) {
-    response.json({
-      success: true,
-      message: "Showing all records.",
-      data: [ { ID: 1, name: "Test1" }, { ID: 2, name: "Test2" } ]
+    const onSuccess = ({ results }) => {
+      const isEmpty = results.length <= 0;
+      response.json({
+        success: !isEmpty,
+        message: isEmpty ? "No records to display." : "Displaying records.",
+        data: isEmpty ? undefined : results
+      });
+    }
+    const onFailure = ({ errors }) => {
+      response.json({
+        success: false,
+        message: "Unable to display records.",
+        errors
+      });
+    }
+    Record.select({ // Don't forget to replace "Record" with your own model.
+      properties: ["ID", "name", "description", "createdAt", "updatedAt"],
+      conditions: [],
+      onSuccess,
+      onFailure
     });
   }
 
@@ -29,12 +46,30 @@ class <#name?> extends AFController {
    * @param {Object} response
    */
   show(request, response) {
-    const ID = request.params.ID;
-    response.json({
-      success: true,
-      message: "Showing record.",
-      data: { ID: 1, name: "Test1" }
-    });
+    const onSuccess = ({ results }) => {
+      const isEmpty = results.length <= 0;
+      response.json({
+        success: !isEmpty,
+        message: isEmpty ? "Record doesn't exist." : "Displaying record.",
+        data: isEmpty ? undefined : results[0]
+      });
+    }
+    const onFailure = () => {
+      response.json({
+        success: false,
+        message: "Record doesn't exist."
+      });
+    }
+    request.params.validate("ID").type("number");
+    if (request.validate({ onFailure })) {
+      const { ID } = request.params;
+      Record.select({
+        properties: ["ID", "name", "description", "createdAt", "updatedAt"],
+        conditions: [{ key: "ID", value: ID }],
+        onSuccess,
+        onFailure
+      });
+    }
   }
 
 
@@ -43,10 +78,35 @@ class <#name?> extends AFController {
    * @param {Object} response
    */
   store(request, response) {
-    response.json({
-      success: true,
-      message: "Record added."
-    });
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        message: "Record created.",
+        data: results[0]
+      });
+    }
+    const onFailure = ({ errors }) => {
+      response.json({
+        success: false,
+        message: "Unable to create record.",
+        errors
+      });
+    }
+    request.body.validate("name").range(4, 64);
+    request.body.validate("name").type("string");
+    request.body.validate("description").range(0, 255);
+    request.body.validate("description").type("string");
+    if (request.validate({ onFailure })) {
+      const { name, description } = request.body;
+      const record = new Record();
+      record.name = name;
+      record.description = description;
+      record.save({
+        onFailure, onSuccess: () => {
+          onSuccess({ results: [{ ID: record.ID }] });
+        }
+      });
+    };
   }
 
 
@@ -55,11 +115,38 @@ class <#name?> extends AFController {
    * @param {Object} response
    */
   update(request, response) {
-    const ID = request.body.ID;
-    response.json({
-      success: true,
-      message: "Record updated."
-    });
+    const onSuccess = () => {
+      response.json({
+        success: true,
+        message: "Record saved."
+      });
+    }
+    const onFailure = ({ errors }) => {
+      response.json({
+        success: false,
+        message: "Unable to save record.",
+        errors
+      });
+    }
+    request.body.validate("ID").length(36);
+    request.body.validate("ID").type("string");
+    request.body.validate("name").range(4, 64);
+    request.body.validate("name").type("string");
+    request.body.validate("description").range(0, 255);
+    request.body.validate("description").type("string");
+    if (request.validate({ onFailure })) {
+      const { ID, name, description } = request.body;
+      Record.get(ID, {
+        onFailure: ({ errors }) => {
+          onFailure({ errors });
+        },
+        onSuccess: (record) => {
+          record.name = name;
+          record.description = description;
+          record.save({ onFailure, onSuccess });
+        }
+      });
+    }
   }
 
 
@@ -68,10 +155,36 @@ class <#name?> extends AFController {
    * @param {Object} response
    */
   destroy(request, response) {
-    response.json({
-      success: true,
-      message: "Record deleted."
-    });
+    const onSuccess = () => {
+      response.json({
+        success: true,
+        message: "Record deleted."
+      });
+    }
+    const onFailure = ({ errors }) => {
+      response.json({
+        success: false,
+        message: "Unable to delete record.",
+        errors
+      });
+    }
+    request.body.validate("ID").length(36);
+    request.body.validate("ID").type("string");
+    if (request.validate({ onFailure })) {
+      const { userID } = request.auth;
+      const { ID } = request.body;
+      Activity.delete({
+        conditions: [{ key: "ID", value: ID }],
+        onFailure,
+        onSuccess: ({ results }) => {
+          if (results.affectedRows === 1) {
+            onSuccess();
+          } else {
+            onFailure({ errors: [{ error: "notExist", message: "Record does not exist." }] });
+          }
+        }
+      });
+    }
   }
 
 }
