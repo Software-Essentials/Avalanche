@@ -12,6 +12,7 @@ class MainViewController extends AFViewController {
 
 
   willLoad(request, response, self) {
+    self.layout = "app";
     self.template = "landing";
     super.willLoad(request, response, self);
   }

@@ -89,7 +89,7 @@ export function getRoutes() {
   if (!fs.existsSync(normalizedPath)) {
     return routes;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -111,7 +111,7 @@ export function getControllers() {
   if (!fs.existsSync(normalizedPath)) {
     return controllers;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -132,7 +132,7 @@ export function getMiddleware() {
   if (!fs.existsSync(normalizedPath)) {
     return middleware;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -153,7 +153,7 @@ export function getLocalisations() {
   if (!fs.existsSync(normalizedPath)) {
     return localisations;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -174,7 +174,7 @@ export function getTranslations() {
   if (!fs.existsSync(normalizedPath)) {
     return translations;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -198,7 +198,7 @@ export function getModels() {
   if (!fs.existsSync(normalizedPath)) {
     return models;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -207,6 +207,29 @@ export function getModels() {
     }
   });
   return models;
+}
+
+
+/**
+ * @returns {Object}
+ */
+export function getEnvironments() {
+  const normalizedPath = `${projectPWD}/app/environments`;
+  var environments = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return environments;
+  }
+  fs.readdirSync(normalizedPath).forEach((file) => {
+    const extensions = file.split(".");
+    if (extensions.length === 3) {
+      if (extensions[extensions.length - 2].toUpperCase() === "ENVIRONMENT") {
+        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+          environments.push(extensions[0]);
+        }
+      }
+    }
+  });
+  return environments;
 }
 
 
@@ -241,7 +264,7 @@ export function getMigrations() {
   if (!fs.existsSync(normalizedPath)) {
     return models;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     if (fs.lstatSync(normalizedPath).isFile()) {
       const extensions = file.split(".");
       if (extensions.length === 2) {
@@ -264,7 +287,7 @@ export function getSeedFilesNames() {
   if (!fs.existsSync(normalizedPath)) {
     return controllers;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {

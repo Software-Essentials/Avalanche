@@ -48,23 +48,11 @@ class ACWebServer {
 
   didStart(webserver) {
     console.log(`${terminalPrefix()}\x1b[32m Webserver served on ${global.environment.port === 443 ? "https://" : "http://"}${global.environment.host}:${global.environment.port}\x1b[0m`);
-    if (environment.debug.reloadClientsAfterRestart) {
-      webserver.reloadConnectedClients();
-    }
+    global.socket.upSince = Math.round(new Date().valueOf() / 1000);
   }
 
   getStream() {
     return this.stream;
-  }
-
-  reloadConnectedClients() {
-    setTimeout(() => {
-      const connections = global.socket.connections;
-      for (const key in connections) {
-        const connection = connections[key];
-        connection.socket.emit("reload");
-      }
-    }, 3000);
   }
 
 }

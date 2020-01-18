@@ -5,6 +5,7 @@ import { AFError } from "../../AVAFoundation/index";
 import { UUID, ensureDirectoryExistence } from "../../AVAFoundation/AFUtil";
 import * as ACUtil from "../../AVACore/ACUtil";
 
+const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const { COPYFILE_EXCL } = fs.constants;
 
 
@@ -88,6 +89,8 @@ function make_default() {
  * 
  */
 function make_controller() {
+  var lastTry = "";
+  var overwrite = false;
   const questions = [
     {
       type: "input",
@@ -98,10 +101,24 @@ function make_controller() {
       validate: (answer) => {
         if (!answer.endsWith("Controller"))
           return `\x1b[31mA controller name should end with "Controller". For example: "UserController".\x1b[0m`;
-        if (fs.existsSync(`${projectPWD}/app/controllers/${answer}.js`))
-          return "\x1b[31mA controller with this name already exists.\x1b[0m";
+        if (fs.existsSync(`${projectPWD}/app/controllers/${answer}.js`)) {
+          if (lastTry === answer) {
+            overwrite = true;
+          } else {
+            lastTry = answer;
+            return "\x1b[31mA controller with this name already exists. \x1b[1m(Press enter again to overwrite)\x1b[0m";
+          }
+        }
         return true;
       }
+    },
+    {
+      type: "list",
+      name: "model",
+      choices: ["\x1b[1m\x1b[3m\x1b[33mDon't base off a model\x1b[0m"].concat(ACUtil.getModels()),
+      message: "Choose a model:",
+      prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
+      suffix: "\x1b[0m"
     }//,
     // {
     //   type: "checkbox",
@@ -134,10 +151,21 @@ function make_controller() {
     // }
   ];
   inquirer.prompt(questions).then(answers => {
-    const path = `app/controllers/${answers.name}.js`;
-    const template = "TEMPLATE_controller";
-    const variables = { name: answers.name };
-    makeTemplate(variables, template, path);
+    const model = ACUtil.getModels().includes(answers.model) ? answers.model : null;
+    const modelName = model == null ? "Entity" : model.split("-").join("_");
+    const importLine = model == null ? `// import { Entity } from "../models/Entity";` : `import { ${modelName} } from "../models/${model}";`;
+    const descriptionLine = `\n * @description ${model == null ? "Manages requests" : `Manages requests regarding the ${model} model`}.`;
+    const authorLine = pkg.author ? `\n * @author ${pkg.author}` : "";
+    const variables = {
+      import: importLine,
+      description: descriptionLine,
+      author: authorLine,
+      name: answers.name,
+      model: modelName,
+      model_lowercase: modelName.toLowerCase()
+    };
+    makeTemplate(variables, "TEMPLATE_controller", `app/controllers/${answers.name}.js`, true);
+    // makeTemplate(variables, "TEMPLATE_route", `app/controllers/${answers.name}.js`);
   });
 }
 
@@ -434,9 +462,13 @@ function make_view() {
  * @param {String} path 
  */
 function makeTemplate(variables, template, projectPath) {
+  const overwrite = arguments[3] === true ? true : false;
   const src = path.normalize(`${__dirname}/../../AVACore/templates/${template}`);
   const dest = path.normalize(`${projectPWD}/${projectPath}`);
   if (fs.existsSync(src)) {
+    if (fs.existsSync(dest) && overwrite) {
+      fs.unlinkSync(dest);
+    }
     if (!fs.existsSync(dest)) {
       ensureDirectoryExistence(dest);
       fs.copyFile(src, dest, COPYFILE_EXCL, (error) => {
@@ -453,7 +485,11 @@ function makeTemplate(variables, template, projectPath) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);
       });
     } else {
-      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
+      if (overwrite) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) Unable to replace file!\x1b[0m`);
+      } else {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) This file already exists!\x1b[0m`);
+      }
     }
   } else {
     console.log(`${ACUtil.terminalPrefix()}\x1b[31m (fatal error) No prefabs found. You might need to reinstall Avalanche.\x1b[0m`);

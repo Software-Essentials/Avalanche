@@ -1,16 +1,10 @@
 import { AFController } from "avacore";
-// import { Record } from "../models/Record";
+<#import?>
 
 
-/**
- * @description Manages requests.
+/**<#author?><#description?>
  */
 class <#name?> extends AFController {
-
-  constructor() {
-    super()
-  }
-
 
   /**
    * @param {Object} request
@@ -18,22 +12,20 @@ class <#name?> extends AFController {
    */
   index(request, response) {
     const onSuccess = ({ results }) => {
-      const isEmpty = results.length <= 0;
       response.json({
-        success: !isEmpty,
-        message: isEmpty ? "No records to display." : "Displaying records.",
-        data: isEmpty ? undefined : results
+        success: true,
+        data: results
       });
     }
     const onFailure = ({ errors }) => {
       response.json({
         success: false,
-        message: "Unable to display records.",
+        message: "Unable to display <#model_lowercase?>s.",
         errors
       });
     }
-    Record.select({ // Don't forget to replace "Record" with your own model.
-      properties: ["ID", "name", "description", "createdAt", "updatedAt"],
+    <#model?>.select({
+      properties: ["ID", "name", "createdAt", "updatedAt"],
       conditions: [],
       onSuccess,
       onFailure
@@ -50,21 +42,21 @@ class <#name?> extends AFController {
       const isEmpty = results.length <= 0;
       response.json({
         success: !isEmpty,
-        message: isEmpty ? "Record doesn't exist." : "Displaying record.",
+        message: isEmpty ? "<#model?> doesn't exist." : "Displaying <#model_lowercase?>.",
         data: isEmpty ? undefined : results[0]
       });
     }
     const onFailure = () => {
       response.json({
         success: false,
-        message: "Record doesn't exist."
+        message: "<#model?> doesn't exist."
       });
     }
     request.params.validate("ID").type("number");
     if (request.validate({ onFailure })) {
       const { ID } = request.params;
-      Record.select({
-        properties: ["ID", "name", "description", "createdAt", "updatedAt"],
+      <#model?>.select({
+        properties: ["ID", "name", "createdAt", "updatedAt"],
         conditions: [{ key: "ID", value: ID }],
         onSuccess,
         onFailure
@@ -81,29 +73,26 @@ class <#name?> extends AFController {
     const onSuccess = ({ results }) => {
       response.json({
         success: true,
-        message: "Record created.",
+        message: "<#model?> created.",
         data: results[0]
       });
     }
     const onFailure = ({ errors }) => {
       response.json({
         success: false,
-        message: "Unable to create record.",
+        message: "Unable to create <#model_lowercase?>.",
         errors
       });
     }
     request.body.validate("name").range(4, 64);
     request.body.validate("name").type("string");
-    request.body.validate("description").range(0, 255);
-    request.body.validate("description").type("string");
     if (request.validate({ onFailure })) {
-      const { name, description } = request.body;
-      const record = new Record();
-      record.name = name;
-      record.description = description;
-      record.save({
+      const { name } = request.body;
+      const <#model_lowercase?> = new <#model?>();
+      <#model_lowercase?>.name = name;
+      <#model_lowercase?>.save({
         onFailure, onSuccess: () => {
-          onSuccess({ results: [{ ID: record.ID }] });
+          onSuccess({ results: [{ ID: <#model_lowercase?>.ID }] });
         }
       });
     };
@@ -118,13 +107,13 @@ class <#name?> extends AFController {
     const onSuccess = () => {
       response.json({
         success: true,
-        message: "Record saved."
+        message: "<#model?> saved."
       });
     }
     const onFailure = ({ errors }) => {
       response.json({
         success: false,
-        message: "Unable to save record.",
+        message: "Unable to save <#model_lowercase?>.",
         errors
       });
     }
@@ -132,18 +121,15 @@ class <#name?> extends AFController {
     request.body.validate("ID").type("string");
     request.body.validate("name").range(4, 64);
     request.body.validate("name").type("string");
-    request.body.validate("description").range(0, 255);
-    request.body.validate("description").type("string");
     if (request.validate({ onFailure })) {
-      const { ID, name, description } = request.body;
-      Record.get(ID, {
+      const { ID, name } = request.body;
+      <#model?>.get(ID, {
         onFailure: ({ errors }) => {
           onFailure({ errors });
         },
-        onSuccess: (record) => {
-          record.name = name;
-          record.description = description;
-          record.save({ onFailure, onSuccess });
+        onSuccess: (<#model_lowercase?>) => {
+          <#model_lowercase?>.name = name;
+          <#model_lowercase?>.save({ onFailure, onSuccess });
         }
       });
     }
@@ -158,13 +144,13 @@ class <#name?> extends AFController {
     const onSuccess = () => {
       response.json({
         success: true,
-        message: "Record deleted."
+        message: "<#model?> deleted."
       });
     }
     const onFailure = ({ errors }) => {
       response.json({
         success: false,
-        message: "Unable to delete record.",
+        message: "Unable to delete <#model_lowercase?>.",
         errors
       });
     }
@@ -173,14 +159,14 @@ class <#name?> extends AFController {
     if (request.validate({ onFailure })) {
       const { userID } = request.auth;
       const { ID } = request.body;
-      Activity.delete({
+      <#model?>.delete({
         conditions: [{ key: "ID", value: ID }],
         onFailure,
         onSuccess: ({ results }) => {
           if (results.affectedRows === 1) {
             onSuccess();
           } else {
-            onFailure({ errors: [{ error: "notExist", message: "Record does not exist." }] });
+            onFailure({ errors: [{ error: "notExist", message: "<#model?> does not exist." }] });
           }
         }
       });

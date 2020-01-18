@@ -1,0 +1,265 @@
+var socket = typeof(io) === "function" ? io() : null;
+var upSince = null;
+var hasBeenDisconnected = false;
+
+if(typeof io === "function") {
+  socket.on("connect", function() {
+    console.log("Connected to server!");
+    if (hasBeenDisconnected) {
+      hasBeenDisconnected = false;
+      alert("Back online!", "success");
+    }
+  })
+  socket.on("disconnect", function() {
+    console.warn("Disconnected from server!");
+    hasBeenDisconnected = true;
+    alert("The connection with the server has been lost!", "warning");
+  })
+  socket.on("update", function(data) {
+    console.log("Update (" + data.upSince + ", " + data.reloadIfUpDiff + ")");
+    if (upSince != null) {
+      if (data.reloadIfUpDiff && data.upSince !== upSince) {
+        console.log("Reloading due to service restart");
+        upSince = data.upSince;
+        const currentHref = window.location.href.split("#")[0];
+        if(typeof window.restore.ID === "string") {
+          modalID = parseInt(window.restore.ID);
+        }
+        if(typeof window.restore.modal === "string") {
+          modalName = window.restore.modal;
+        }
+        if(typeof window.restore.modal === "string") {
+          tabName = window.restore.tab;
+        }
+        const newHrefWithTab = typeof tabName === "string" ? appendQueryStringToHref(currentHref, "tab", tabName) : currentHref;
+        const newHrefWithModal = typeof modalName === "string" ? appendQueryStringToHref(newHrefWithTab, "modal", modalName) : currentHref;
+        const newHrefWithID = typeof modalID === "number" ? appendQueryStringToHref(newHrefWithModal, "modalID", modalID) : currentHref;
+        window.location.href = newHrefWithID;
+      }
+    } else {
+      upSince = data.upSince;
+    }
+  });
+}
+
+/**
+ * 
+ * @param {String} element 
+ */
+function toprinter(element) {
+  var generator = window.open('one', 'two', 'three');
+  generator.document.write($(element).html());
+  generator.document.close();
+  generator.print();
+  generator.close();
+}
+
+/**
+ *
+ */
+function fntsize() {
+  var size = 16;
+  if(typeof(window.chrt1) != 'undefined') {
+    size = Math.round(window.chrt1.width / 30);
+  }
+  return size;
+}
+
+/**
+ *
+ */
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+/**
+ *
+ */
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+/**
+ * Empties an array
+ * 
+ * @param {Object} array 
+ */
+function clearArray(array) {
+  while (array.length) {
+    array.pop();
+  }
+}
+
+/**
+ * Checks if a host is reachable
+ * 
+ * @param {String} url 
+ * @param {Function} callback 
+ */
+function urlExists(url, callback){
+  jQuery.ajax({
+    url: url,
+    dataType: "text",
+    type: "GET",
+    complete: (xhr) => {
+      if(typeof callback === 'function') {
+        callback.apply(this, [xhr.status]);
+      }
+    }
+  });
+}
+
+/**
+ * 
+ * @param {Date} date 
+ */
+function timeSince(date) {
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var interval = Math.floor(seconds / 31536000);
+  if (interval > 1) {
+    return interval + " years";
+  }
+  interval = Math.floor(seconds / 2592000);
+  if (interval > 1) {
+    return interval + " months";
+  }
+  interval = Math.floor(seconds / 86400);
+  if (interval > 1) {
+    return interval + " days";
+  }
+  interval = Math.floor(seconds / 3600);
+  if (interval > 1) {
+    return interval + " hours";
+  }
+  interval = Math.floor(seconds / 60);
+  if (interval > 1) {
+    return interval + " minutes";
+  }
+  return Math.floor(seconds) + " seconds";
+}
+
+/**
+ * 
+ * @param {Date} date 
+ */
+function timestampToInputTypeDate(date) {
+  const year = date.getFullYear()
+  const day = ("0" + date.getDate()).slice(-2);
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  return (day) + "-" + (month) + "-" + (year);
+}
+
+/**
+ * 
+ * @param {Date} date 
+ */
+function timestampToInputTypeDatetime(date) {
+  const year = date.getFullYear()
+  const day = ("0" + date.getDate()).slice(-2);
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const hour = ("0" + date.getHours()).slice(-2);
+  const minute = ("0" + date.getMinutes()).slice(-2);
+  const second = ("0" + date.getSeconds()).slice(-2);
+  return (day) + "-" + (month) + "-" + (year) + " " + (hour) + ":"+ (minute) + ":" + (second);
+}
+
+/**
+ * 
+ * @param {Date} date 
+ */
+function timestampToInputTypeTime(date) {
+  const hour = ("0" + date.getHours()).slice(-2);
+  const minute = ("0" + date.getMinutes()).slice(-2);
+  const second = ("0" + date.getSeconds()).slice(-2);
+  return (hour) + ":"+ (minute) + ":" + (second);
+}
+
+/**
+ * 
+ * @param {String} dateString 
+ */
+function inputDateToSQLDate(dateString) {
+  var p = dateString.split("-")
+  return [p[2], p[1], p[0]].join("-")
+}
+
+/**
+ *
+ */
+function Timer(action) {
+  this.counter = 0;
+  this.interval = null;
+  this.action = action || function() {};
+  this.step = () => {
+    this.counter += 0.1;
+    this.action(this.counter)
+  };
+  this.reset = () => {
+    this.counter = 0;
+  };
+  this.start = () => {
+    this.interval = setInterval(this.step, 100)
+  };
+  this.stop = () => {
+    window.clearInterval(this.interval)
+  };
+};
+
+
+/**
+ *
+ */
+function UUID() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  ).toUpperCase()
+}
+
+
+/**
+ *
+ */
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+/**
+ * 
+ * @param {Object} file 
+ * @param {Function} callback 
+ */
+function getBase64(file, callback) {
+  new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () { resolve(reader.result) };
+    reader.onerror = function (error) { reject(error) };
+  }).then(callback);
+}
+
+/**
+ * 
+ * @param {String} href Base url
+ * @param {String} key Key of query parameter that needs no be appended to the baseurl
+ * @param {String} value Value of query parameter that needs no be appended to the baseurl
+ */
+function appendQueryStringToHref(href, key, value) {
+  var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+  var separator = href.indexOf('?') !== -1 ? "&" : "?";
+  if (href.match(re)) {
+    return href.replace(re, '$1' + key + "=" + value + '$2');
+  } else {
+    return href + separator + key + "=" + value;
+  }
+}

@@ -7,6 +7,14 @@
   ],
   "files": [
     {
+      "template": "ava_public_js",
+      "path": "/app/public/assets/vendor/Avalanche/js/avalanche.js"
+    },
+    {
+      "template": "ava_layout",
+      "path": "/app/templates/layouts/layout.hbs"
+    },
+    {
       "template": "empty_environment",
       "path": "/app/environments/development.environment.json"
     }
