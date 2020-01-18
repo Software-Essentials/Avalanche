@@ -1,5 +1,6 @@
+import fs from "fs";
 import { exec } from "child_process";
-import { terminalPrefix } from "../../AVACore/ACUtil";
+import { ACUtil } from "../../AVACore";
 
 
 /**
@@ -14,20 +15,24 @@ function upgrade() {
     i = (i + 1) % total;
     const r = total - i;
     var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
-    process.stdout.write(`${terminalPrefix()}\x1b[32m Upgrading Avalanche project ${dots}\x1b[0m`)
+    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m Upgrading Avalanche project ${dots}\x1b[0m`)
     process.stdout.cursorTo(0);
   }, 50);
-  const version = require(`${projectPWD}/package.json`).dependencies.avacore.split("^")[1];
+  const versionBefore = require(`${projectPWD}/package.json`).dependencies.avacore.split("^")[1];
   const iProcess = exec("npm uninstall avacore && npm install avacore", (error, stout, sterr) => { });
   iProcess.on("error", (error) => {
     clearInterval(animation);
-    console.log(`${terminalPrefix()}\x1b[34m Sorry! I was unable to fix any issues :(\x1b[0m`);
+    console.log(`${ACUtil.terminalPrefix()}\x1b[34m Sorry! I was unable to fix any issues :(\x1b[0m`);
   });
   iProcess.on("exit", (code, signal) => {
     clearInterval(animation);
     process.stdout.clearLine();
-    const currentVersion = require(`${projectPWD}/package.json`).dependencies.avacore.split("^")[1];
-    process.stdout.write(`\n${terminalPrefix()}\x1b[32m Avalanche project has been upgraded to the latest stable version (${currentVersion}).\n\x1b[0m`);
+    const versionAfter = JSON.parse(fs.readFileSync(`${projectPWD}/package.json`, "utf8")).dependencies.avacore.split("^")[1];
+    if (versionBefore === versionAfter) {
+      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[31m Failed to upgrade your project! (This could be a permissions issue).\n\x1b[0m`);
+    } else {
+      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[32m Avalanche project has been upgraded to the latest stable version (v${versionBefore} > v${versionAfter}).\n\x1b[0m`);
+    }
     ready();
   });
 }

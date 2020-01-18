@@ -133,16 +133,23 @@ function start(environment, onStop) {
 }
 
 function progressAnimation(title) {
-  var i = 0, total = 30;
+  var iteration = 0;
+  const name = "avalanche"
   return setInterval(() => {
-    // process.stdout.clearLine();
-    i = (i + 1) % total;
-    const r = total - i;
-    var dots = "" + new Array(i + 1).join("█") + (new Array(r).join("░")) + "";
-    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`);
-    // process.stdout.cursorTo(0);
+    var progressBar = "";
+    iteration = (iteration + 1) % (name.length + 1);
+    // const barPos = (name.length + 1) - iteration; // Reverse direction
+
+    for (let i = 0; i < iteration; i++) {
+      progressBar += name[i].toUpperCase();
+    }
+    for (let i = iteration; i < name.length; i++) {
+      progressBar += name[i];
+    }
+
+    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m \x1b[32m${title}\x1b[0m`);
     readline.cursorTo(process.stdout, 0);
-  }, 25);
+  }, 100);
 }
 
 function troubleshootHost(environment, error, cProcess, onStop) {
@@ -151,8 +158,8 @@ function troubleshootHost(environment, error, cProcess, onStop) {
   const port = JSON.parse(fs.readFileSync(filePath, "utf8")).network.port;
   var choices = [
     "Change host IP to 0.0.0.0",
-    "retry",
-    "exit"
+    "retry"//,
+    // "exit"
   ];
   if (error === "EADDRINUSE" && (process.platform === "darwin" || process.platform === "linux")) {
     choices.splice(1, 0, `Kill process on port ${port}`);
@@ -199,8 +206,8 @@ function troubleshootPort(environment, error, cProcess, onStop) {
   const port = JSON.parse(fs.readFileSync(filePath, "utf8")).network.port;
   var choices = [
     // "Change port to 8080", // NOTE: Doesn't work for some reason.
-    "retry",
-    "exit"
+    "retry"//,
+    // "exit"
   ];
   if (process.platform === "darwin" || process.platform === "linux") {
     choices.splice(0, 0, `Kill process on port ${port}`);
@@ -246,7 +253,7 @@ function troubleshootPort(environment, error, cProcess, onStop) {
 
 function killAllNodeProcesses(port) {
   try {
-    const output = execSync(`lsof -i tcp:${port}`, { stdio: "ignore" }).toString();
+    const output = execSync(`lsof -i tcp:${port}`, { stdio: "pipe" }).toString();
     const rows = output.split("\n");
     var pids = [];
     for (const row of rows) {
@@ -260,10 +267,10 @@ function killAllNodeProcesses(port) {
       }
     }
     for (const pid of pids) {
-      execSync(`kill ${pid}`);
+      console.log(`${ACUtil.terminalPrefix()}\x1b[33m Killing ${pid}\x1b[0m`);
+      execSync(`kill ${pid}`, { stdio: "pipe" }).toString();
     }
   } catch (error) {
-
   }
 }
 

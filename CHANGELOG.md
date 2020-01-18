@@ -5,6 +5,18 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.21] - 2020-01-18
+### Added
+- Client-side webpage reload debug option.
+
+### Fixed
+- Fixed message when using 'upgrade' command.
+- Fixed process killer.
+- Fixed loading animation.
+
+### Changes
+- Minor optimisations.
+
 ## [0.5.19] - 2020-01-16
 ### Added
 - Added 'localise' command to the Avalanche CLI.
