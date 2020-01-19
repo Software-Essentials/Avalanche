@@ -5,9 +5,10 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.22] - 2020-01-19
+## [0.5.24] - 2020-01-19
 ### Added
 - Added support for decimal datatypes like 'float', 'decimal' and 'double'.
+- Added AFUtil function 'parseBoolean'.
 
 ### Changes
 - Standardized terminal animations.

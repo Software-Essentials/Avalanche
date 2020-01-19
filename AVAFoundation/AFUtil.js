@@ -150,4 +150,14 @@ export function isEmail(email) {
 }
 
 
+/**
+ * @description Parses any value to a value of type boolean.
+ * @param {mixed} value value.
+ * @returns {boolean}
+ */
+export function parseBoolean(value) {
+  return (value === "false" || value === "0") ? false : !!value;
+}
+
+
 export default null;
