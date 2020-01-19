@@ -46,7 +46,7 @@ class <#name?> extends AFController {
         data: isEmpty ? undefined : results[0]
       });
     }
-    const onFailure = () => {
+    const onFailure = ({ errors }) => {
       response.json({
         success: false,
         message: "<#model?> doesn't exist."
@@ -157,7 +157,6 @@ class <#name?> extends AFController {
     request.body.validate("ID").length(36);
     request.body.validate("ID").type("string");
     if (request.validate({ onFailure })) {
-      const { userID } = request.auth;
       const { ID } = request.body;
       <#model?>.delete({
         conditions: [{ key: "ID", value: ID }],

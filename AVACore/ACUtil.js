@@ -1,5 +1,6 @@
 import fs from "fs";
 import md5 from "md5";
+import readline from "readline";
 
 
 /**
@@ -296,6 +297,23 @@ export function getSeedFilesNames() {
     }
   });
   return controllers;
+}
+
+export function progressAnimation(title) {
+  var iteration = 0;
+  const name = "avalanche"
+  return setInterval(() => {
+    var progressBar = "";
+    iteration = (iteration + 1) % (name.length + 1);
+    for (let i = 0; i < iteration; i++) {
+      progressBar += name[i].toUpperCase();
+    }
+    for (let i = iteration; i < name.length; i++) {
+      progressBar += name[i];
+    }
+    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m \x1b[32m${title}\x1b[0m`);
+    readline.cursorTo(process.stdout, 0);
+  }, 100);
 }
 
 

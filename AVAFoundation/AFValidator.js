@@ -113,8 +113,8 @@ class AFValidator {
       return this;
     }
     if (type === "boolean" && (
-      this.value.toLowerCase() === "false" ||
-      this.value.toLowerCase() === "true" ||
+      (typeof this.value === "string" && this.value.toLowerCase() === "false") ||
+      (typeof this.value === "string" && this.value.toLowerCase() === "true") ||
       this.value === "1" ||
       this.value === "0" ||
       this.value === 1 ||

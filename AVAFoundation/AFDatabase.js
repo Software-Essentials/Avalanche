@@ -7,9 +7,9 @@ const DATATYPES = {
   "SMALLINT": { type: "smallint", length: true, unsignable: true, incrementable: true },
   "MEDIUMINT": { type: "mediumint", length: true, unsignable: true, incrementable: true },
   "BIGINT": { type: "bigint", length: true, unsignable: true, incrementable: true },
-  "FLOAT": { type: "float", unsignable: true, incrementable: true },
-  "DECIMAL": { type: "decimal", formatLength: true, unsignable: true },
-  "DOUBLE": { type: "double", unsignable: true, incrementable: true },
+  "FLOAT": { type: "float", length: true, decimal: true, unsignable: true, incrementable: true },
+  "DECIMAL": { type: "decimal", length: true, decimal: true, unsignable: true },
+  "DOUBLE": { type: "double", length: true, decimal: true, unsignable: true, incrementable: true },
   "BIT": { type: "bit", length: true },
   "BOOL": { type: "bool" },
   "BOOLEAN": { type: "boolean" },
@@ -198,9 +198,10 @@ class AFDatabase {
         }
       }
       const length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
+      const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
       const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
       const typeProperty = DATATYPES[type];
-      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}) ` : type === "UUID" ? "(36) " : " "}`;
+      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
       const defaultVal = column.default;
       const required = !!column.required;
       const unique = !!column.unique;

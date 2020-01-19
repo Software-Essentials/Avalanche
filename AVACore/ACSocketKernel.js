@@ -28,12 +28,11 @@ class ACSocketKernel {
       if (environment.debug.logWebSocket) {
         console.log(`${ACUtil.terminalPrefix()} \x1b[34m[SOCKET]::[${uuid}]\x1b[32m Connected\x1b[0m`);
       }
-      if (environment.debug.reloadClientsAfterRestart) {
-        socket.emit("update", {
-          reloadIfUpDiff: true,
-          upSince: global.socket.upSince
-        })
-      }
+      socket.emit("update", {
+        socketID: uuid,
+        reloadIfUpDiff: environment.debug.reloadClientsAfterRestart,
+        upSince: global.socket.upSince
+      });
       this.connections[uuid] = { socket: socket };
       socket.on("disconnect", () => {
         if (environment.debug.logWebSocket) {

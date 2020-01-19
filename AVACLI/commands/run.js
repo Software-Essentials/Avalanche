@@ -70,7 +70,7 @@ function run() {
  * @param {String} environment 
  */
 function start(environment, onStop) {
-  const animation = progressAnimation("Serving");
+  const animation = ACUtil.progressAnimation("Starting server");
   const stop = typeof onStop === "function" ? onStop : () => { };
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
   const mainPath = path.normalize(`${__dirname}/../../AVACore/main.js`);
@@ -83,13 +83,12 @@ function start(environment, onStop) {
     }
   });
   cProcess.stdout.on("data", (data) => {
+    clearInterval(animation);
     if (data.includes("Webserver served")) {
       readline.cursorTo(process.stdout, 0);
-      clearInterval(animation);
     }
     if (data.includes("Unable to start server")) {
       readline.cursorTo(process.stdout, 0);
-      clearInterval(animation);
     }
     if (data.includes("[EACCESS]")) {
       setTimeout(() => {
@@ -111,7 +110,10 @@ function start(environment, onStop) {
       {
         type: "list",
         name: "action",
-        choices: ["restart", "exit"],
+        choices: [
+          "restart"//,
+          // "exit"
+        ],
         message: "\x1b[31mThe application crashed",
         prefix: `${ACUtil.terminalPrefix()}\x1b[3m`,
         suffix: "\x1b[0m"
@@ -130,26 +132,6 @@ function start(environment, onStop) {
     // console.log(`${ACUtil.terminalPrefix()}\x1b[31m Server stopped. \x1b[1m(${signal})\x1b[0m`);
   });
   return cProcess;
-}
-
-function progressAnimation(title) {
-  var iteration = 0;
-  const name = "avalanche"
-  return setInterval(() => {
-    var progressBar = "";
-    iteration = (iteration + 1) % (name.length + 1);
-    // const barPos = (name.length + 1) - iteration; // Reverse direction
-
-    for (let i = 0; i < iteration; i++) {
-      progressBar += name[i].toUpperCase();
-    }
-    for (let i = iteration; i < name.length; i++) {
-      progressBar += name[i];
-    }
-
-    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m \x1b[32m${title}\x1b[0m`);
-    readline.cursorTo(process.stdout, 0);
-  }, 100);
 }
 
 function troubleshootHost(environment, error, cProcess, onStop) {

@@ -10,8 +10,8 @@ import { isEmail } from "./AFUtil";
 class AFMailer {
 
   constructor() {
-    this.transporter = nodemailer.createTransport(global.environment.email["noreply"]);
-    this.from = `"${global.environment.email["noreply"].name}" <${global.environment.email["noreply"].auth.user}>`;
+    this.transporter = nodemailer.createTransport(environment.email["noreply"]);
+    this.from = `"${environment.email["noreply"].name}" <${environment.email["noreply"].auth.user}>`;
   }
 
   /**
@@ -96,7 +96,7 @@ class AFMailer {
    * @param {*} context 
    */
   sendMail(recipient, subject, template, context) {
-    const callback = typeof arguments[4] === "function" ? arguments[4] : null;
+    const callback = typeof arguments[4] === "function" ? arguments[4] : () => { };
 
     const options = {
       viewEngine: {
@@ -115,9 +115,8 @@ class AFMailer {
       to: recipient,
       subject: subject,
       template: template,
-      context: context,
-      attachments: attachments
-    }, function (error, results) {
+      context: context
+    }, (error, results) => {
       if (error) {
         console.log("Error: ", error);
         if (typeof callback === "function") callback(false);

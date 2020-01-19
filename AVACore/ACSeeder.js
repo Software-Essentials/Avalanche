@@ -1,6 +1,6 @@
 import fs from "fs";
 import readline from "readline";
-import { terminalPrefix, getSeedFilesNames } from "./ACUtil";
+import { terminalPrefix, getSeedFilesNames, progressAnimation } from "./ACUtil";
 import { AFDatabase, AFStorage } from "../AVAFoundation/index";
 
 
@@ -40,7 +40,6 @@ class ACSeeder {
   execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
-    process.stdout.write(`${terminalPrefix()}\x1b[32m Populating...\x1b[0m`);
     readline.cursorTo(process.stdout, 0);
     var permissionIssue = false;
     const database = new AFDatabase();
@@ -53,7 +52,7 @@ class ACSeeder {
       });
       try {
         readline.cursorTo(process.stdout, 0);
-        process.stdout.write(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
+        console.log(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
         AFStorage.wipe();
       } catch (error) {
         if (error.code === "EPERM") {
@@ -65,7 +64,9 @@ class ACSeeder {
     } else {
       proceed();
     }
+    var animation;
     function proceed() {
+      animation = progressAnimation(`Populating (0/${that.seeds.length})`);
       if (that.seeds.length > 0) {
         for (let i = 0; i < that.seeds.length; i++) {
           const seed = that.seeds[i];
@@ -117,10 +118,12 @@ class ACSeeder {
       var successful = 0;
       for (const key in seedStats) {
         if (seedStats[key] !== null) completed++;
-        if (seedStats[key]) successful++;
+        if (seedStats[key] === true) successful++;
       }
+      clearInterval(animation);
+      animation = progressAnimation(`Populating (${successful}/${completed})`);
       if (completed === Object.keys(seedStats).length) {
-        readline.cursorTo(process.stdout, 0);
+        clearInterval(animation);
         console.log(`${terminalPrefix()}\x1b[32m Populating complete. (${completed}/${successful} tables populated)\x1b[0m`);
         ready(true);
       }

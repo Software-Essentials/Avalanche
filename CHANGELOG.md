@@ -5,6 +5,16 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.22] - 2020-01-19
+### Added
+- Added support for decimal datatypes like 'float', 'decimal' and 'double'.
+
+### Changes
+- Standardized terminal animations.
+
+### Fixed
+- Many bugfixes.
+
 ## [0.5.21] - 2020-01-18
 ### Added
 - Client-side webpage reload debug option.

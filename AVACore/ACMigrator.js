@@ -1,6 +1,6 @@
 import fs from "fs";
 import readline from "readline";
-import { terminalPrefix, getModels } from "./ACUtil";
+import { terminalPrefix, getModels, progressAnimation } from "./ACUtil";
 import { AFDatabase, AFStorage, AFRecordZone } from "../AVAFoundation/index";
 
 
@@ -33,14 +33,15 @@ class ACMigrator {
     const storage = new AFStorage();
     var migrations = {};
     if (wipe) {
-      process.stdout.write(`${terminalPrefix()}\x1b[32m Wiping tables...\x1b[0m`);
-      readline.cursorTo(process.stdout, 0);
+      const animation = progressAnimation("Wiping tables");
       database.dropAllTables({
         onSuccess: ({ total, success }) => {
+          clearInterval(animation);
           console.log(`${terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
           migrate();
         },
         onFailure: ({ error }) => {
+          clearInterval(animation);
           switch (error.code) {
             case "ER_NOT_SUPPORTED_AUTH_MODE":
               console.log(`${terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
@@ -56,9 +57,9 @@ class ACMigrator {
     } else {
       migrate();
     }
+    var animation;
     function migrate() {
-      process.stdout.write(`${terminalPrefix()}\x1b[32m Migrating...\x1b[0m`);
-      readline.cursorTo(process.stdout, 0);
+      animation = progressAnimation(`Migrating (0/${models.length})`);
       for (const i in models) {
         const model = models[i];
         migrations[model] = null;
@@ -106,10 +107,13 @@ class ACMigrator {
       var successful = 0;
       for (const key in migrations) {
         if (migrations[key] !== null) completed++;
-        if (migrations[key]) successful++;
+        if (migrations[key] === true) successful++;
       }
+      clearInterval(animation);
+      animation = progressAnimation(`Migrating (${successful}/${completed})`);
       if (completed === Object.keys(migrations).length) {
-        console.log(`${terminalPrefix()}\x1b[32m Migration complete. (${completed}/${successful} tables/zones migrated)\x1b[0m`);
+        clearInterval(animation);
+        console.log(`${terminalPrefix()}\x1b[32m Migration complete. (${successful}/${completed} tables/zones migrated)\x1b[0m`);
         ready(true);
       }
     }

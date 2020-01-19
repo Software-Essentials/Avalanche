@@ -1,4 +1,5 @@
 import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
+import { parseBoolean } from "../AVAFoundation/AFUtil";
 import * as ACUtil from "../AVACore/ACUtil";
 
 
@@ -94,7 +95,11 @@ class AFModel {
           }
           columns.push(property.name);
           values.push("?");
-          parameters.push(this[key]);
+          if (property.type === "BOOLEAN") {
+            parameters.push(parseBoolean(this[key]));
+          } else {
+            parameters.push(this[key]);
+          }
         }
         queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
       } else {
@@ -105,7 +110,11 @@ class AFModel {
           }
           const property = this.PROPERTIES[key];
           keyValues.push(`${property.name} = ?`);
-          parameters.push(this[key]);
+          if (property.type === "BOOLEAN") {
+            parameters.push(parseBoolean(this[key]));
+          } else {
+            parameters.push(this[key]);
+          }
         }
         queryParts.push(keyValues.join(", "));
       }
@@ -113,7 +122,6 @@ class AFModel {
         queryParts.push(`WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ?`);
         parameters.push(this[this.IDENTIFIER]);
       }
-      console.log(queryParts);
       database.connection.query(queryParts.join(" "), parameters, (error, results, fields) => {
         if (error) {
           console.log(error);
