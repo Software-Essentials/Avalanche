@@ -5,6 +5,14 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.25] - 2020-01-20
+### Added
+- Added easyer type rules to AFValidator; 'string()', 'boolean()' & 'number()' (instead of for example: 'type("string")'.
+- Added 'stopall' command; Stops all Avalanche applications that are currently running.
+
+### Fixed
+- Many bugfixes.
+
 ## [0.5.24] - 2020-01-19
 ### Added
 - Added support for decimal datatypes like 'float', 'decimal' and 'double'.

@@ -48,6 +48,15 @@ class AFValidator {
               case "vType":
                 failures.push({ field: key, scope: method, error: "invalidType", message: `Type of '${label}' must be '${conditionValue}'.` });
                 break;
+              case "vNumber":
+                failures.push({ field: key, scope: method, error: "invalidType", message: `Type of '${label}' must be a number.` });
+                break;
+              case "vString":
+                failures.push({ field: key, scope: method, error: "invalidType", message: `Type of '${label}' must be a string.` });
+                break;
+              case "vBoolean":
+                failures.push({ field: key, scope: method, error: "invalidType", message: `Type of '${label}' must be a boolean.` });
+                break;
               case "vLength":
                 failures.push({ field: key, scope: method, error: "invalidLength", message: `Length of '${label}' must be ${conditionValue}.` });
                 break;
@@ -124,6 +133,40 @@ class AFValidator {
     }
     this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];
     this.invalid[this.scope][this.key].vType = type;
+    return this;
+  }
+
+  number() {
+    if (!isNaN(parseInt(this.value))) {
+      return this;
+    }
+    this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];
+    this.invalid[this.scope][this.key].vNumber = null;
+    return this;
+  }
+
+  string() {
+    if (typeof this.value === "string") {
+      return this;
+    }
+    this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];
+    this.invalid[this.scope][this.key].vString = null;
+    return this;
+  }
+
+  boolean() {
+    if (
+      (typeof this.value === "string" && this.value.toLowerCase() === "false") ||
+      (typeof this.value === "string" && this.value.toLowerCase() === "true") ||
+      this.value === "1" ||
+      this.value === "0" ||
+      this.value === 1 ||
+      this.value === 0
+    ) {
+      return this;
+    }
+    this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];
+    this.invalid[this.scope][this.key].vBoolean = null;
     return this;
   }
 

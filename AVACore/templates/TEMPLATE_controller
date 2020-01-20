@@ -52,9 +52,9 @@ class <#name?> extends AFController {
         message: "<#model?> doesn't exist."
       });
     }
-    request.params.validate("ID").type("number");
+    request.query.validate("ID").type("number");
     if (request.validate({ onFailure })) {
-      const { ID } = request.params;
+      const { ID } = request.query;
       <#model?>.select({
         properties: ["ID", "name", "createdAt", "updatedAt"],
         conditions: [{ key: "ID", value: ID }],

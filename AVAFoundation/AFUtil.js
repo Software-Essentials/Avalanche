@@ -156,7 +156,7 @@ export function isEmail(email) {
  * @returns {boolean}
  */
 export function parseBoolean(value) {
-  return (value === "false" || value === "0") ? false : !!value;
+  return ((typeof value === "string" && value.toLowerCase() === "false") || value === "0") ? false : !!value;
 }
 
 

@@ -256,7 +256,7 @@ AFModel.register = (Model) => {
             const foreignModel = require(`${projectPWD}/app/models/${model}.js`).default;
             const foreignIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
             if (foreignModel.PROPERTIES.hasOwnProperty(column)) {
-              const subquery = `(SELECT ${foreignModel.PROPERTIES[column].name} FROM ${foreignModel.NAME} WHERE ${foreignIdentifier.name} = ${Model.NAME}.${foreignKey})`;
+              const subquery = `(SELECT ${foreignModel.PROPERTIES[column].name} FROM \`${foreignModel.NAME}\` WHERE ${foreignIdentifier.name} = \`${Model.NAME}\`.${foreignKey})`;
               datasetProperties[alias] = {};
               datasetProperties[alias].query = `${subquery} AS '${alias}'`;
               datasetProperties[alias].structure = foreignModel.PROPERTIES[column];
@@ -272,7 +272,7 @@ AFModel.register = (Model) => {
       columns.push(datasetProperties[key].query);
     }
     queryParts.push(columns.join(", "));
-    queryParts.push(`FROM ${Model.NAME}`);
+    queryParts.push(`FROM \`${Model.NAME}\``);
     for (const condition of conditionsArray) {
       const keyParts = condition.key.split(".");
       if (modelProperties.hasOwnProperty(keyParts[0])) {
@@ -298,9 +298,9 @@ AFModel.register = (Model) => {
               const foreignPropertyName = foreignModel.PROPERTIES[foreignProperty].name;
               const foreignIdentifierName = foreignModel.PROPERTIES[foreignModel.IDENTIFIER].name;
               if (foreignIdentifierName === foreignPropertyName) {
-                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM \`${foreignModel.NAME}\` WHERE ${foreignPropertyName} = ?)`);
               } else {
-                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM \`${foreignModel.NAME}\` WHERE ${foreignPropertyName} = ?)`);
               }
               parameters.push(condition.value);
             }
@@ -376,9 +376,9 @@ AFModel.register = (Model) => {
               const foreignPropertyName = foreignModel.PROPERTIES[foreignProperty].name;
               const foreignIdentifierName = foreignModel.PROPERTIES[foreignModel.IDENTIFIER].name;
               if (foreignIdentifierName === foreignPropertyName) {
-                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+                wheres.push(`${linkName} = (SELECT ${foreignIdentifierName} FROM \`${foreignModel.NAME}\` WHERE ${foreignPropertyName} = ?)`);
               } else {
-                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM ${foreignModel.NAME} WHERE ${foreignPropertyName} = ?)`);
+                wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM \`${foreignModel.NAME}\` WHERE ${foreignPropertyName} = ?)`);
               }
               parameters.push(condition.value);
             }

@@ -153,7 +153,7 @@ function make_controller() {
   inquirer.prompt(questions).then(answers => {
     const model = ACUtil.getModels().includes(answers.model) ? answers.model : null;
     const modelName = model == null ? "Entity" : model.split("-").join("_");
-    const importLine = model == null ? `// import { Entity } from "../models/Entity";` : `import { ${modelName} } from "../models/${model}";`;
+    const importLine = model == null ? `// import Entity from "../models/Entity";` : `import ${modelName} from "../models/${model}";`;
     const descriptionLine = `\n * @description ${model == null ? "Manages requests" : `Manages requests regarding the ${model} model`}.`;
     const authorLine = pkg.author ? `\n * @author ${pkg.author}` : "";
     const variables = {
