@@ -88,6 +88,9 @@ class AFModel {
       if (this.DRAFT) {
         var columns = [];
         var values = [];
+        if (this.PROPERTIES.hasOwnProperty("createdAt")) {
+          this["createdAt"] = Math.floor(new Date() / 1000);
+        }
         for (const key in this.PROPERTIES) {
           const property = this.PROPERTIES[key];
           if (property.autoIncrement) {
@@ -104,6 +107,9 @@ class AFModel {
         queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
       } else {
         var keyValues = [];
+        if (this.PROPERTIES.hasOwnProperty("updatedAt")) {
+          this["updatedAt"] = Math.floor(new Date() / 1000);
+        }
         for (const key in this.PROPERTIES) {
           if (key === this.IDENTIFIER) {
             continue;

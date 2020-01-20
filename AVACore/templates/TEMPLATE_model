@@ -128,13 +128,13 @@ class <#name?> extends AFModel {
       //   onUpdate: "cascade"
       // },
 
-      "createdAt": {
+      "createdAt": { // If a property called 'createdAt' exists in the model. It will automatically be filled once a new record is created.
         name: "created_at",
         type: "INT",
         length: 1,
         required: true
       },
-      "updatedAt": {
+      "updatedAt": { // If a property called 'updatedAt' exists in the model. It will automatically be filled once a record changes.
         name: "updated_at",
         type: "INT",
         length: 1

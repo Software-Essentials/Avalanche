@@ -5,10 +5,12 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.25] - 2020-01-20
+## [0.5.26] - 2020-01-20
 ### Added
 - Added easyer type rules to AFValidator; 'string()', 'boolean()' & 'number()' (instead of for example: 'type("string")'.
 - Added 'stopall' command; Stops all Avalanche applications that are currently running.
+- When working with models the 'createdAt' & 'updatedAt' properties will now automatically be filled accordingly.
+- When working with models the 'unique' setting of a property can be set to a string value. All the properties with that string will be grouped as unique.
 
 ### Fixed
 - Many bugfixes.

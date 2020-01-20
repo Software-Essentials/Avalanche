@@ -168,6 +168,7 @@ class AFDatabase {
     const that = this;
     var foreignModelIdentifier;
     var columnStrings = [];
+    var uniqueKeys = {};
     for (const column of columns) {
       const name = column.name;
       // Relation
@@ -204,13 +205,23 @@ class AFDatabase {
       const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
       const defaultVal = column.default;
       const required = !!column.required;
-      const unique = !!column.unique;
+      const unique = column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
       const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
       columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
-      if (unique) {
+      if (unique === true) {
         columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
       }
+      if (typeof unique === "string") {
+        if (!Array.isArray(uniqueKeys[unique])) {
+          uniqueKeys[unique] = [];
+        }
+        uniqueKeys[unique].push(`\`${name}\``);
+      }
+    }
+    for(const key in uniqueKeys) {
+      const columns = uniqueKeys[key];
+      columnStrings.push(`UNIQUE KEY \`${key}\` (${columns.join(", ")})`);
     }
     if (primaryKey) {
       columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);

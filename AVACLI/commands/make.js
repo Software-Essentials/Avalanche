@@ -303,13 +303,13 @@ function make_model() {
     var lineImportAvacore = `import { AFModel } from "avacore";`;
     var lineConstUUID = ``;
     var lineIdenifier = `    // this.IDENTIFIER = "ID";`;
-    var lineComputedDefault = "\n    this.createdAt = new Date().valueOf() / 1000;";
+    var lineComputedDefault = "";
     var linePropertyID = "";
     if (identificationMethod === "UUID") {
       lineImportAvacore = `import { AFModel, AFUtil } from "avacore";`;
       lineConstUUID = `\nconst { UUID } = AFUtil;\n`;
       lineIdenifier = `    this.IDENTIFIER = "ID";`;
-      lineComputedDefault = "\n    this.ID = new UUID().string;\n    this.createdAt = new Date().valueOf() / 1000;";
+      lineComputedDefault = "\n    this.ID = new UUID().string;";
       linePropertyID = `\n      "ID": {\n        name: "${name.toLowerCase()}_id",\n        type: "UUID",\n        required: true\n      },`;
     }
     if (identificationMethod === "ID") {
