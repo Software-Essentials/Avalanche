@@ -18,3 +18,7 @@ export const AFViewController = require("./AVAFoundation/AFViewController").defa
 export const AFController = require("./AVAFoundation/AFController").default;
 export const AFMiddleware = require("./AVAFoundation/AFMiddleware").default;
 export const AFModel = require("./AVAFoundation/AFModel").default;
+
+// Component loaders
+export const helper = (name) => { return require(`${projectPWD}/app/helpers/${name}`).default; };
+export const structure = (name) => { return require(`${projectPWD}/app/structures/${name}`); };

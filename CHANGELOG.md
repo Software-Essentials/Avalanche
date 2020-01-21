@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.27] - 2020-01-21
+### Added
+- Added structure loader & helper loader.
+
+### Changes
+- Minor optimisations.
+
 ## [0.5.26] - 2020-01-20
 ### Added
 - Added easyer type rules to AFValidator; 'string()', 'boolean()' & 'number()' (instead of for example: 'type("string")'.

@@ -311,7 +311,7 @@ export function progressAnimation(title) {
     for (let i = iteration; i < name.length; i++) {
       progressBar += name[i];
     }
-    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m \x1b[32m${title}\x1b[0m`);
+    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m ${title}\x1b[0m`);
     readline.cursorTo(process.stdout, 0);
   }, 100);
 }
