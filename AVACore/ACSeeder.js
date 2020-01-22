@@ -2,6 +2,7 @@ import fs from "fs";
 import readline from "readline";
 import { terminalPrefix, getSeedFilesNames, progressAnimation } from "./ACUtil";
 import { AFDatabase, AFStorage } from "../AVAFoundation/index";
+import { UUID } from "../AVAFoundation/AFUtil";
 
 
 /**
@@ -78,6 +79,14 @@ class ACSeeder {
             update();
           }
           if (seed.hasOwnProperty("table")) {
+            for(const row of seed.data) {
+              for(const property in row) {
+                const value = row[property]
+                if (value === "<#UUID?>") {
+                  row[property] = new UUID().string;
+                }
+              }
+            }
             seedStats[seed.table] = null;
             const options = {
               force: true,

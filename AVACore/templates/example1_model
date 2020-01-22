@@ -139,13 +139,13 @@ class Post extends AFModel {
 
       "createdAt": {
         name: "created_at",
-        type: "BIGINT",
+        type: "INT",
         length: 1,
         required: true
       },
       "updatedAt": {
         name: "updated_at",
-        type: "BIGINT",
+        type: "INT",
         length: 1
       }
 

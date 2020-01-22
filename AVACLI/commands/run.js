@@ -70,7 +70,7 @@ function run() {
  * @param {String} environment 
  */
 function start(environment, onStop) {
-  const animation = ACUtil.progressAnimation("\x1b[34m Starting server");
+  const animation = ACUtil.progressAnimation("\x1b[34mStarting server");
   const stop = typeof onStop === "function" ? onStop : () => { };
   const environmentFormatted = typeof environment === "string" ? environment.split(" ").join("").trim() : undefined;
   const mainPath = path.normalize(`${__dirname}/../../AVACore/main.js`);

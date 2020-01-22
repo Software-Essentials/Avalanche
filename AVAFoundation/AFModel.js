@@ -365,11 +365,11 @@ AFModel.register = (Model) => {
           if (Model.PROPERTIES.hasOwnProperty(keyParts[0])) {
             const key = condition.key;
             const value = condition.value === null ? "NULL" : condition.value;
-            if (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL") {
+            if (typeof value === "string" && (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL")) {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
-              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
               parameters.push(value);
+              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
             }
           }
         } else if (keyParts.length > 1) {

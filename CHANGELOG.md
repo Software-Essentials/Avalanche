@@ -5,6 +5,10 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.28] - 2020-01-22
+### Changes
+- Minor optimisations.
+
 ## [0.5.27] - 2020-01-21
 ### Added
 - Added structure loader & helper loader.
