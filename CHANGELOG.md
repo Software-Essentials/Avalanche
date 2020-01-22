@@ -5,8 +5,10 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.28] - 2020-01-22
+## [0.5.29] - 2020-01-22
 ### Changes
+- Changed the way AFLocalisation works.
+- Made it so that unix-based platforms automatically close the current running port before trying to start the application to prevent disruptions.
 - Minor optimisations.
 
 ## [0.5.27] - 2020-01-21

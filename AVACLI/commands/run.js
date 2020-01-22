@@ -84,12 +84,12 @@ function start(environment, onStop) {
   });
   cProcess.stdout.on("data", (data) => {
     clearInterval(animation);
-    if (data.includes("Webserver served")) {
-      readline.cursorTo(process.stdout, 0);
-    }
-    if (data.includes("Unable to start server")) {
-      readline.cursorTo(process.stdout, 0);
-    }
+    // if (data.includes("Webserver served")) {
+    //   readline.cursorTo(process.stdout, 0);
+    // }
+    // if (data.includes("Unable to start server")) {
+    //   readline.cursorTo(process.stdout, 0);
+    // }
     if (data.includes("[EACCESS]")) {
       setTimeout(() => {
         cProcess.kill();
@@ -100,7 +100,15 @@ function start(environment, onStop) {
       setTimeout(() => {
         cProcess.kill();
       }, 0);
-      troubleshootPort(environment, "EADDRINUSE", cProcess, stop);
+      if (process.platform === "darwin" || process.platform === "linux") {
+        const filePath = `${projectPWD}/app/environments/${environment}.environment.json`;
+        const port = JSON.parse(fs.readFileSync(filePath, "utf8")).network.port;
+        killAllNodeProcesses(port);
+        start(environment, stop);
+        return;
+      } else {
+        troubleshootPort(environment, "EADDRINUSE", cProcess, stop);
+      }
     }
     console.log(data.toString().trim());
   });
