@@ -5,7 +5,10 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.29] - 2020-01-22
+## [0.5.30] - 2020-01-22
+### Added
+- Added ability to add middleware to the scope of a routes file instead of in the scope of an individual endpoint.
+
 ### Changes
 - Changed the way AFLocalisation works.
 - Made it so that unix-based platforms automatically close the current running port before trying to start the application to prevent disruptions.

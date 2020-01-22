@@ -22,7 +22,24 @@ class ACRouter extends Router {
                 if (extensions.length === 2) {
                     if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
                         const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
-                        routes.push.apply(routes, route);
+                        if (Array.isArray(route)) {
+                            routes.push.apply(routes, route);
+                        } else {
+                            if (typeof route === "object" && Array.isArray(route.endpoints)) {
+                                var additionalMiddleware = [];
+                                if (Array.isArray(route.middleware)) {
+                                    additionalMiddleware = route.middleware;
+                                }
+                                for (const endpoint of route.endpoints) {
+                                    if (Array.isArray(endpoint.middleware)) {
+                                        endpoint.middleware.push.apply(endpoint.middleware, additionalMiddleware);
+                                    } else {
+                                        endpoint.middleware = additionalMiddleware;
+                                    }
+                                }
+                                routes.push.apply(routes, route.endpoints);
+                            }
+                        }
                     }
                 }
             });
