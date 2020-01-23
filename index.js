@@ -1,3 +1,5 @@
+import fs from "fs";
+
 // AVAFoundation
 export const AFPushNotification = require("./AVAFoundation/AFPushNotification").default;
 export const AFRecordZoneType = require("./AVAFoundation/AFRecordZoneType").default;
@@ -21,4 +23,4 @@ export const AFModel = require("./AVAFoundation/AFModel").default;
 
 // Component loaders
 export const helper = (name) => { return require(`${projectPWD}/app/helpers/${name}`).default; };
-export const structure = (name) => { return require(`${projectPWD}/app/structures/${name}`); };
+export const structure = (name) => { return JSON.parse(fs.readFileSync(`${projectPWD}/app/structures/${name}.json`, "utf8")); };

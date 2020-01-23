@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.31] - 2020-01-23
+### Added
+- Added 'code', 'description' & 'deletedAt' as default properties to model template.
+
+### Fixed
+- Fixed bug in structure loaded.
+
 ## [0.5.30] - 2020-01-22
 ### Added
 - Added ability to add middleware to the scope of a routes file instead of in the scope of an individual endpoint.

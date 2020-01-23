@@ -1,12 +1,11 @@
 import fs from "fs";
-import https from "https";
+import http from "http";
 import inquirer from "inquirer";
 import querystring from "querystring";
 import Table from "cli-table";
 import * as ACUtil from "../../AVACore/ACUtil";
 import { request } from "express";
 import { isObject } from "util";
-import HTTPRequest from "request";
 
 const avalanchePackage = require("../../package.json");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
@@ -39,60 +38,72 @@ function localise() {
       }
     }
     const targetLine = require(`${projectPWD}/app/localisations/${masterLocalisation}.json`);
-    var interval = 0;
     for (const index in localisations) {
       const localisation = localisations[index];
       const language = localisation.split("_")[0].toLowerCase();
       const destination = `${projectPWD}/app/localisations/${localisation}.json`;
-      handleFile(destination, language, masterLanguage, targetLine, overwriteLines, interval, (newInterval) => {
-        interval = newInterval;
-      });
+      var content = {};
+      try {
+        content = require(destination);
+      } catch (exception) {
+
+      }
+      for (const line in targetLine) {
+        if (!overwriteLines && content.hasOwnProperty(line)) {
+          continue;
+        }
+        translate(targetLine[line], masterLanguage, language, (data) => {
+          update(localisation, line, data);
+        });
+      }
+      function update(localisation, key, value) {
+        content[key] = value;
+        content = Object.keys(content).sort().reduce((r, k) => (r[k] = content[k], r), {});
+        fs.writeFileSync(destination, JSON.stringify(content, null, 2), { encoding: "utf8" });
+      }
     }
   });
-}
-
-function handleFile(destination, language, masterLanguage, targetLine, overwriteLines, interval, setNewInterval) {
-  var content = {};
-  try {
-    content = require(destination);
-  } catch (exception) {
-    fs.writeFileSync(destination, JSON.stringify({}, null, 2), { encoding: "utf8" });
-  }
-  for (const line in targetLine) {
-    if (!overwriteLines && content.hasOwnProperty(line)) {
-      continue;
-    }
-    setTimeout(() => {
-      translate(targetLine[line], masterLanguage, language, (data) => {
-        update(line, data);
-      });
-    }, interval);
-    setNewInterval(interval + 1000);
-  }
-  function update(key, value) {
-    content[key] = value;
-    content = Object.keys(content).sort().reduce((r, k) => (r[k] = content[k], r), {});
-    fs.writeFileSync(destination, JSON.stringify(content, null, 2), { encoding: "utf8" });
-  }
 }
 
 function translate(text, from, to, callback) {
   const onReady = typeof callback === "function" ? callback : () => { };
 
-  HTTPRequest(`https://translate.googleapis.com/translate_a/single?client=${"gtx"}&dt=${"t"}&sl=${from}&tl=${to}&q=${encodeURIComponent(text)}`, {}, (error, resp, body) => {
-    if (error) {
-      console.log(error);
-      onReady("__FAILED__");
-      return;
+  const jsonPayload = JSON.stringify({
+    fromLang: from,
+    toLang: to,
+    text: text
+  });
+
+  const options = {
+    hostname: "api.whatsmate.net",
+    port: 80,
+    path: "/v1/translation/translate",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-WM-CLIENT-ID": clientId,
+      "X-WM-CLIENT-SECRET": clientSecret,
+      "Content-Length": Buffer.byteLength(jsonPayload)
     }
-    try {
-      onReady(JSON.parse(body)[0][0][0]);
-    } catch (error) {
-      if (resp.statusCode === 429) {
-        console.log("Google translate is blocking requests");
+  };
+
+  const request = new http.ClientRequest(options);
+  request.end(jsonPayload);
+  request.on("response", (response) => {
+    var data = "";
+    response.on("data", (chunk) => {
+      data += chunk;
+    });
+    response.on("end", () => {
+      if (response.statusCode === 200) {
+        onReady(data);
+      } else {
+        console.log("Error: ", data);
       }
-      onReady("__FAILED__");
-    }
+    });
+  });
+  request.on("error", (error) => {
+    console.log(`Error: ${error}`);
   });
 };
 
@@ -100,5 +111,5 @@ function translate(text, from, to, callback) {
 module.exports.execute = localise;
 module.exports.enabled = false;
 module.exports.scope = "PROJECT";
-module.exports.command = "localise";
+module.exports.command = "localiseold";
 module.exports.description = "Creates localisations";
