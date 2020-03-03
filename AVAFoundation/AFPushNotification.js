@@ -35,6 +35,7 @@ class AFPushNotification {
     };
     notification.payload = {};
     apnProvider.send(notification, this.tokens).then((response) => {
+      console.log("APNS: ", response);
     });
   }
 
