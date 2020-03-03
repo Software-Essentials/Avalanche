@@ -190,6 +190,7 @@ class AFEnvironment {
     this.appleDeveloperTeamID = typeof env.appleDeveloperTeamID === "string" ? env.appleDeveloperTeamID : null;
     this.mapKitJSKeyID = typeof env.mapKitJSKeyID === "string" ? env.mapKitJSKeyID : null;
     this.APNSKeyID = typeof env.APNSKeyID === "string" ? env.APNSKeyID : null;
+    this.APNSIsProduction = typeof env.APNSIsProduction === "boolean" ? env.APNSIsProduction : false;
     this.appBundleID = typeof env.appBundleID === "string" ? env.appBundleID : null;
     this.mollieAPIKey = typeof env.mollieAPIKey === "string" ? env.mollieAPIKey : null;
 
