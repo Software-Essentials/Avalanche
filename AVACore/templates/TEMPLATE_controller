@@ -18,10 +18,10 @@ class <#name?> extends AFController {
         data: results
       });
     }
-    const onFailure = ({ errors }) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to display <#model_lowercase?>s.",
+        message: message || "Unable to display <#model_lowercase?>s.",
         errors
       });
     }
@@ -47,10 +47,10 @@ class <#name?> extends AFController {
         data: isEmpty ? undefined : results[0]
       });
     }
-    const onFailure = ({ errors }) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "<#model?> doesn't exist."
+        message: message || "<#model?> doesn't exist."
       });
     }
     request.query.validate("ID").type("number");
@@ -78,10 +78,10 @@ class <#name?> extends AFController {
         data: results[0]
       });
     }
-    const onFailure = ({ errors }) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to create <#model_lowercase?>.",
+        message: message || "Unable to create <#model_lowercase?>.",
         errors
       });
     }
@@ -111,10 +111,10 @@ class <#name?> extends AFController {
         message: "<#model?> saved."
       });
     }
-    const onFailure = ({ errors }) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to save <#model_lowercase?>.",
+        message: message || "Unable to save <#model_lowercase?>.",
         errors
       });
     }
@@ -148,10 +148,10 @@ class <#name?> extends AFController {
         message: "<#model?> deleted."
       });
     }
-    const onFailure = ({ errors }) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to delete <#model_lowercase?>.",
+        message: message || "Unable to delete <#model_lowercase?>.",
         errors
       });
     }

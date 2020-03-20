@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.5.31",
+  "version": "0.5.32",
   "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -49,7 +49,7 @@
     "knex": "^0.19.5",
     "md5": "^2.2.1",
     "mysql": "^2.16.0",
-    "nodemailer": "^6.3.0",
+    "nodemailer": "^6.4.2",
     "nodemailer-express-handlebars": "^3.0.0",
     "nodemailer-mailgun-transport": "^1.4.0",
     "request": "^2.88.0",
