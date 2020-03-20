@@ -21,12 +21,12 @@ class AFPushNotification {
         keyId: environment.APNSKeyID,
         teamId: environment.appleDeveloperTeamID
       },
-      production: false
+      production: environment.APNSIsProduction
     });
     var notification = new Notification();
     notification.topic = environment.appBundleID;
     notification.expiry = Math.floor(Date.now() / 1000) + 3600;
-    notification.badge = 3;
+    notification.badge = 1;
     notification.sound = "ping.aiff";
     notification.alert = {
       title: title,
@@ -35,6 +35,7 @@ class AFPushNotification {
     };
     notification.payload = {};
     apnProvider.send(notification, this.tokens).then((response) => {
+      console.log("APNS: ", response);
     });
   }
 
