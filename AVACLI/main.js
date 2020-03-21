@@ -14,7 +14,7 @@ const avalanchePackage = require("../package.json");
 const AFEnvironment = require("../AVAFoundation/AFEnvironment").default;
 const AFError = require("../AVAFoundation/AFError").default;
 
-const arguments = [];
+const components = [];
 const flags = [];
 for (const component of process.argv) {
   if (component === "sudo") {
@@ -29,13 +29,13 @@ for (const component of process.argv) {
     flags.push(component);
     continue;
   }
-  arguments.push(component);
+  components.push(component);
 }
 
 // These three variables SHOULD not have to be needed.
-const cmdValue = arguments[0];
-const envValue = arguments[1];
-const argValue = arguments[2];
+const cmdValue = components[0];
+const envValue = components[1];
+const argValue = components[2];
 
 main();
 function main() {
@@ -66,7 +66,7 @@ function main() {
                 if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
                   global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
+                  command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
                 } else {
                   console.log(`${terminalPrefix()}\x1b[31m (fatal error) Unable to load environment because no environment was found.\x1b[0m`);
                   process.exit(AFError.NOENV);
@@ -87,14 +87,14 @@ function main() {
                 inquirer.prompt(questions).then(answers => {
                   global.environment = new AFEnvironment(answers.environment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
+                  command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
                 });
               }
             } else { // Command does not depend on an environment.
-              command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
+              command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
             }
           } else { // Command does not depend on a project.
-            command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
+            command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
           }
         } else {
           console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);

@@ -14,6 +14,7 @@ const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}
  * @description Runs your Avalanche application.
  */
 function run() {
+  const flags = arguments[3] || [];
   if (ACUtil.getRoutes().length < 1) {
     console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice) Your app has no routes. (You might want to add some)\x1b[0m`);
   }
@@ -27,7 +28,9 @@ function run() {
       environmentName = null;
     }
   }
+  const tty = !flags.includes("--notty") && !flags.includes("--tty=false") && !flags.includes("--tty=False") && !flags.includes("--tty=FALSE")
   global.environment = new AFEnvironment(environmentName);
+  environment.setTTY(tty);
   runCheckers();
   var watchers = [];
   const stopP = () => {
@@ -70,7 +73,9 @@ function runCheckers() {
     environment.capabilities.webSockets = true;
     environment.save();
     console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice) The setting 'capabilities.webSockets' has been ENABLED in environment '${environment.getName()}' because it is needed for 'debug.reloadClientsAfterRestart'.\x1b[0m`);
-    execSync(`code --goto ${projectPWD}/app/environments/${environment.getName()}.environment.json:22:5`);
+    if (environment.isTTY()) {
+      execSync(`code --goto ${projectPWD}/app/environments/${environment.getName()}.environment.json:22:5`);
+    }
   }
 }
 
