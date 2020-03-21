@@ -43,7 +43,7 @@ class ACSeeder {
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     readline.cursorTo(process.stdout, 0);
     var permissionIssue = false;
-    const database = new AFDatabase();
+    const database = new AFDatabase(environment.getDBCredentials());
     database.foreignKeyChecks = false;
     var seedStats = {};
     const that = this;

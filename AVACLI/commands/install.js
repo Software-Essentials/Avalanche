@@ -33,6 +33,7 @@ function install(pkg) {
 
 module.exports.execute = install;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "PROJECT";
 module.exports.command = "install";
 module.exports.description = "Addes auth files.";

@@ -93,6 +93,7 @@ function info() {
 
 module.exports.execute = info;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "info";
 module.exports.description = "Prints information about your Project.";

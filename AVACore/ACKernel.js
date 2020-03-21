@@ -76,7 +76,7 @@ class ACKernel {
     // Global sockets
     global.socket = new ACSocketKernel(stream);
     global.cronjobs = {};
-    global.database = new AFDatabase().connection;
+    global.database = new AFDatabase(environment.getDBCredentials()).connection;
 
     // Tell express to use EJS
     // app.set('view engine', 'ejs');

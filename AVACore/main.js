@@ -13,7 +13,7 @@ const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
 if (cmdValue !== "run") {
   process.exit(0);
 } else {
-  global.environment = new AFEnvironment(envValue);
+  global.environment = new AFEnvironment(envValue, true); // Slienced initialisation
   global.localisation = new AFLocalisation("en_GB");
   global._ = global.localisation.translate;
 

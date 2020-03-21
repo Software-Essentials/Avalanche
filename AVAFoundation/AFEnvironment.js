@@ -15,6 +15,9 @@ const DB_STORE_OPTIONS = [
 class AFEnvironment {
 
   constructor() {
+    
+    this._SILENCE = typeof arguments[1] === "boolean" ? arguments[1] : false;
+    this._TTY = true;
 
     var normalizedPath = `${projectPWD}/app/environments`;
     var environments = [];
@@ -59,7 +62,10 @@ class AFEnvironment {
       }
     }
     if (!prefferedEnvironmentLoaded) {
-      console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
+      if (!this._SILENCE) {
+        // console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}" ${process.argv}.\x1b[0m`);
+        console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
+      }
       this.loadEnvironment(selectedEnvironment);
       this._NAME = selectedEnvironment;
     }
@@ -70,11 +76,29 @@ class AFEnvironment {
     return fullURL;
   }
 
+  setTTY(value) {
+    this._TTY = !!value;
+  }
+
+  isTTY() {
+    return !!this._TTY;
+  }
+  
+  getName() {
+    return this._NAME;
+  }
+
+  getDBCredentials() {
+    return this.database;
+  }
+
   save() {
     const environment = JSON.parse(JSON.stringify(this));
     const environmentName = environment._NAME;
     // Prune environment object
     delete environment._NAME;
+    delete environment._TTY;
+    delete environment._SILENCE;
     delete environment.title;
     delete environment.version;
     delete environment.description;
@@ -82,8 +106,7 @@ class AFEnvironment {
     delete environment.host;
     delete environment.port;
     var normalizedPath = `${projectPWD}/app/environments/${environmentName}.environment.json`;
-    const results = fs.writeFileSync(normalizedPath, JSON.stringify(environment, null, 2));
-    console.log(results);
+    fs.writeFileSync(normalizedPath, JSON.stringify(environment, null, 2));
   }
 
   getSettings() {

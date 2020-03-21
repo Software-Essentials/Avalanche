@@ -82,7 +82,7 @@ class AFModel {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (this.METHOD === "DATABASE") {
-      const database = new AFDatabase();
+      const database = new AFDatabase(environment.getDBCredentials());
       var queryParts = [this.DRAFT ? `INSERT INTO \`${this.NAME}\`` : `UPDATE \`${this.NAME}\` SET`];
       var parameters = [];
       if (this.DRAFT) {
@@ -184,7 +184,7 @@ class AFModel {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     if (this.METHOD === "DATABASE") {
-      const database = new AFDatabase();
+      const database = new AFDatabase(environment.getDBCredentials());
       const query = `DELETE FROM \`${this.NAME}\` WHERE \`${this.PROPERTIES[this.IDENTIFIER].name}\` = ?`;
       const parameters = [this[this.IDENTIFIER]];
       database.connection.query(query, parameters, (error, results, fields) => {

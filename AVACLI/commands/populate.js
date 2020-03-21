@@ -45,6 +45,7 @@ function populate() {
 
 module.exports.execute = populate;
 module.exports.enabled = true;
+module.exports.requireEnvironment = true;
 module.exports.scope = "PROJECT";
 module.exports.command = "populate";
 module.exports.description = "Populates your database with seed data.";

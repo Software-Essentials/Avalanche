@@ -40,6 +40,7 @@ function stopall() {
 
 module.exports.execute = stopall;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "stopall";
 module.exports.description = "Terminates all running Avalanche application processes.";

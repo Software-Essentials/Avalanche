@@ -39,8 +39,9 @@ const CONSTRAINT_BEHAVIOUR = {
  */
 class AFDatabase {
 
-  constructor() {
-    this.connection = mysql.createPool(environment.database);
+  constructor(credentials) {
+    this.credentials = credentials;
+    this.connection = mysql.createPool(credentials);
     this.foreignKeyChecks = true;
   }
 
@@ -60,9 +61,8 @@ class AFDatabase {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
-    const dbName = environment.database.database;
     const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    this.query(this.preQuery() + query, [dbName], (error, _results, fields) => {
+    this.query(this.preQuery() + query, [this.credentials.database], (error, _results, fields) => {
       if (error) {
         failure({ error });
         return;
@@ -108,9 +108,8 @@ class AFDatabase {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
-    const dbName = environment.database.database;
     const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    this.query(this.preQuery() + query, [dbName], (error, _results, fields) => {
+    this.query(this.preQuery() + query, [this.credentials.database], (error, _results, fields) => {
       if (error) {
         failure({ error });
         return;

@@ -35,6 +35,7 @@ function fix() {
 
 module.exports.execute = fix;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "PROJECT";
 module.exports.command = "fix";
 module.exports.description = "Tries to fix your Avalanche Project.";

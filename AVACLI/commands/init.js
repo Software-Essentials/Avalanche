@@ -75,7 +75,7 @@ function progressAnimation(title) {
     i = (i + 1) % total;
     const r = total - i;
     var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
-    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`)
+    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m ${title} ${dots}\x1b[0m`);
     process.stdout.cursorTo(0);
   }, 50);
 }
@@ -142,6 +142,7 @@ function installBoilerplate(packageName) {
 
 module.exports.execute = init;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "init";
 module.exports.description = "Initializes your Avalanche Project.";

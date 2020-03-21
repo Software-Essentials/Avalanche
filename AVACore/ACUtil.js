@@ -301,19 +301,28 @@ export function getSeedFilesNames() {
 
 export function progressAnimation(title) {
   var iteration = 0;
-  const name = "avalanche"
-  return setInterval(() => {
-    var progressBar = "";
-    iteration = (iteration + 1) % (name.length + 1);
-    for (let i = 0; i < iteration; i++) {
-      progressBar += name[i].toUpperCase();
-    }
-    for (let i = iteration; i < name.length; i++) {
-      progressBar += name[i];
-    }
-    process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m ${title}\x1b[0m`);
-    readline.cursorTo(process.stdout, 0);
-  }, 100);
+  const name = "avalanche";
+  var animation;
+  if (environment.isTTY()) {
+    animation = setInterval(() => {
+      var progressBar = "";
+      iteration = (iteration + 1) % (name.length + 1);
+      for (let i = 0; i < iteration; i++) {
+        progressBar += name[i].toUpperCase();
+      }
+      for (let i = iteration; i < name.length; i++) {
+        progressBar += name[i];
+      }
+      process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m ${title}\x1b[0m`);
+      process.stdout.cursorTo(0);
+      // readline.cursorTo(process.stdout, 0);
+    }, 100);
+  } else {
+    animation = setInterval(() => { });
+    clearInterval(animation);
+    console.log(`${terminalPrefix()}\x1b[0m ${title}...\x1b[0m`);
+  }
+  return animation;
 }
 
 

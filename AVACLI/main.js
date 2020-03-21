@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 require = require("esm")(module);
 const { isSemVer } = require("../AVAFoundation/AFUtil");
-const { terminalPrefix, isAVAProject, isAVACoreInstalled } = require("../AVACore/ACUtil");
+const { terminalPrefix, isAVAProject, isAVACoreInstalled, getEnvironments } = require("../AVACore/ACUtil");
 
 global.projectPWD = process.cwd();
 const npmRegistryAPIURI = "https://registry.npmjs.com/-/package/avacore/dist-tags";
 const fs = require("fs");
 const https = require("https");
+const inquirer = require("inquirer");
 const Table = require("cli-table");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
@@ -38,11 +39,42 @@ function main() {
               return;
             }
             notifyIfExperimental();
-            // if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
-              // global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
-            // }
+            if (command.requireEnvironment) {
+              const tty = !process.argv.includes("--notty") && !process.argv.includes("--tty=false".toLowerCase())
+              if (!tty) {
+                if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
+                  global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
+                  environment.setTTY(tty);
+                  command.execute(envValue, argValue);
+                } else {
+                  console.log(`${terminalPrefix()}\x1b[31m (fatal error) Unable to load environment because no environment was found.\x1b[0m`);
+                  process.exit(AFError.NOENV);
+                }
+              } else {
+                const choices = getEnvironments();
+                const questions = [
+                  {
+                    type: "list",
+                    name: "environment",
+                    message: "Pick environment",
+                    default: 0,
+                    prefix: `${terminalPrefix()}\x1b[34m`,
+                    suffix: "\x1b[0m",
+                    choices: choices
+                  }
+                ];
+                inquirer.prompt(questions).then(answers => {
+                  global.environment = new AFEnvironment(answers.environment);
+                  environment.setTTY(tty);
+                  command.execute(envValue, argValue);
+                });
+              }
+            } else { // Command does not depend on an environment.
+              command.execute(envValue, argValue);
+            }
+          } else { // Command does not depend on a project.
+            command.execute(envValue, argValue);
           }
-          command.execute(envValue, argValue);
         } else {
           console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
           return;

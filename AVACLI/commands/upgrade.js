@@ -40,6 +40,7 @@ function upgrade() {
 
 module.exports.execute = upgrade;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "upgrade";
 module.exports.description = "Upgrades Avalanche project. (DANGEROUS)";

@@ -267,6 +267,7 @@ function killAllNodeProcesses(port) {
 
 module.exports.execute = run;
 module.exports.enabled = true;
+module.exports.requireEnvironment = true;
 module.exports.scope = "PROJECT";
 module.exports.command = "run";
 module.exports.description = "Runs your application.";

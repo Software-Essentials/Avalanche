@@ -1,43 +1,28 @@
-import { AFError } from "../../AVAFoundation/index";
-import ACInstaller from "../../AVACore/ACInstaller";
-import ACUtil, { terminalPrefix, getEnvironments } from "../../AVACore/ACUtil";
+import { terminalPrefix } from "../../AVACore/ACUtil";
 import inquirer from "inquirer";
 import AFEnvironment from "../../AVAFoundation/AFEnvironment";
 
 
 /**
- * @description Sets up the project structure
+ * @description Sets up the environment structure
  */
 function configure() {
-  promptPickEnvironment();
+  if (environment.isTTY()) {
+    promptPickSetting(null);
+  } else {
+    new AFEnvironment(environment.getName()).save();
+    console.log(`${terminalPrefix()}\x1b[32m Changes saved to file (/${environment.getName()}.environment.json)\x1b[0m`);
+  }
 }
 
-function promptPickEnvironment() {
-  const choices = getEnvironments();
-  const questions = [
-    {
-      type: "list",
-      name: "environment",
-      message: "Pick environment",
-      default: 0,
-      prefix: `${terminalPrefix()}\x1b[34m`,
-      suffix: "\x1b[0m",
-      choices: choices
-    }
-  ];
-  inquirer.prompt(questions).then(answers => {
-    promptPickSetting(null, answers.environment);
-  });
-}
-
-function promptPickSetting(existingEnvironment, environmentName) {
+function promptPickSetting(existingEnvironment) {
   // Lots of string formatting
   const saveString = "\x1b[32m\x1b[1m<< SAVE CHANGES >>";
   const discardString = "\x1b[31m\x1b[1m<< DISCARD CHANGES >>";
   const choiceMap = {};
   const choices = [];
-  const environment = existingEnvironment || new AFEnvironment(environmentName);
-  const settings = environment.getSettings(true);
+  const draftEnvironment = existingEnvironment || new AFEnvironment(environment.getName());
+  const settings = draftEnvironment.getSettings(true);
   const singleSettings = [];
   var lastDomain = null;
   for (var iterator in settings) {
@@ -66,7 +51,7 @@ function promptPickSetting(existingEnvironment, environmentName) {
           jointCharacter = "├";
         }
       }
-      const value = environment[layers[0]][layers[1]];
+      const value = draftEnvironment[layers[0]][layers[1]];
       const spacedString = `${getSpacedString(longestSettingLength, layers[1].length)}  ${value}`;
       const itemString = `│${jointCharacter}─${layers[1]}${spacedString}`;
       choiceMap[itemString] = setting;
@@ -91,19 +76,19 @@ function promptPickSetting(existingEnvironment, environmentName) {
     if (answers.setting === discardString) {
       console.log(`${terminalPrefix()}\x1b[33m No changes were made.\x1b[0m`);
     } else if (answers.setting === saveString) {
-      environment.save();
+      draftEnvironment.save();
       console.log(`${terminalPrefix()}\x1b[32m Changes saved to file.\x1b[0m`);
     } else {
       const setting = choiceMap[answers.setting];
-      promptEditSetting(environment, setting);
+      promptEditSetting(draftEnvironment, setting);
     }
   });
 }
 
 
-function promptEditSetting(environment, setting) {
+function promptEditSetting(draftEnvironment, setting) {
   const layers = setting.split(".");
-  const envSetting = environment[layers[0]][layers[1]];
+  const envSetting = draftEnvironment[layers[0]][layers[1]];
   const questions = [
     {
       type: "input",
@@ -115,9 +100,8 @@ function promptEditSetting(environment, setting) {
     }
   ];
   inquirer.prompt(questions).then(answers => {
-    environment[layers[0]][layers[1]] = answers.value;
-    console.log(environment.getSettings());
-    promptPickSetting(environment, null);
+    draftEnvironment[layers[0]][layers[1]] = answers.value;
+    promptPickSetting(draftEnvironment, null);
   });
 }
 
@@ -151,6 +135,7 @@ function getSpacedString(space, stringLength) {
 
 module.exports.execute = configure;
 module.exports.enabled = true;
+module.exports.requireEnvironment = true;
 module.exports.scope = "PROJECT";
 module.exports.command = "configure";
 module.exports.description = "Addes auth files.";

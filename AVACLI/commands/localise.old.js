@@ -110,6 +110,7 @@ function translate(text, from, to, callback) {
 
 module.exports.execute = localise;
 module.exports.enabled = false;
+module.exports.requireEnvironment = false;
 module.exports.scope = "PROJECT";
 module.exports.command = "localiseold";
 module.exports.description = "Creates localisations";

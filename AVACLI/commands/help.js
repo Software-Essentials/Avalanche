@@ -18,6 +18,7 @@ function help() {
 
 module.exports.execute = help;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "help";
 module.exports.description = "Prints the help page.";

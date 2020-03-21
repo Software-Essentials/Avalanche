@@ -500,6 +500,7 @@ function makeTemplate(variables, template, projectPath) {
 
 module.exports.execute = make;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "PROJECT";
 module.exports.command = "make";
 module.exports.description = "Creates a component.";
