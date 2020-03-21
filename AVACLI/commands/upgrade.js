@@ -15,7 +15,7 @@ function upgrade() {
     i = (i + 1) % total;
     const r = total - i;
     var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
-    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m Upgrading Avalanche project ${dots}\x1b[0m`)
+    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[34m Upgrading Avalanche project ${dots}\x1b[0m`)
     process.stdout.cursorTo(0);
   }, 50);
   const versionBefore = require(`${projectPWD}/package.json`).dependencies.avacore.split("^")[1];

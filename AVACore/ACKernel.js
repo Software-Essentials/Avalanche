@@ -65,7 +65,7 @@ class ACKernel {
       if (typeof sessionStore === "string") {
         switch (sessionStore) {
           case "MYSQL":
-            this.sessionConfiguration.store = new MySQLStore({ config: environment.database, table: environment.database.sessionTable || "_AVASession" });
+            this.sessionConfiguration.store = new MySQLStore({ config: environment.getDBCredentials(), table: environment.database.sessionTable || "_AVASession" });
             break;
         }
       }
