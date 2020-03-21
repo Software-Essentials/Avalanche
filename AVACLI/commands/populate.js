@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import ACSeeder from "../../AVACore/ACSeeder";
+import ACPopulator from "../../AVACore/ACPopulator";
 import { terminalPrefix } from "../../AVACore/ACUtil";
 
 
@@ -7,7 +7,7 @@ import { terminalPrefix } from "../../AVACore/ACUtil";
  * @description Migrate.
  */
 function populate() {
-  const seeder = new ACSeeder();
+  const seeder = new ACPopulator();
   const choices = [
     "\x1b[32m\x1b[1mSAFE\x1b[0m       \x1b[3m(Only creates records that don't exist yet)\x1b[0m",
     "\x1b[33m\x1b[1mOVERWRITE\x1b[0m  \x1b[3m(Merges population over your existing records)\x1b[0m",

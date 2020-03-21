@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.5.42",
+  "version": "0.5.43",
   "description": "Node OOP framework for APIs, & other backend solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "author": {
     "name": "Lawrence Bensaid",
     "email": "lawrencebensaid@icloud.com",
-    "url": "https://github.com/lawrencebensaid"
+    "url": "https://lawrencebensaid.nl"
   },
   "keywords": [
     "MVC",

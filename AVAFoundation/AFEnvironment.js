@@ -14,9 +14,13 @@ const DB_STORE_OPTIONS = [
  */
 class AFEnvironment {
 
+  /**
+   * TODO: If the instance should log to the console it SHOULD BE SPECIFICALLY argumented. So please add a parameter to this constructor for that.
+   */
   constructor() {
-    
     this._SILENCE = typeof arguments[1] === "boolean" ? arguments[1] : false;
+    this._DEFAULTED = false;
+    this._PREFFERED_FOUND = false;
     this._TTY = true;
 
     var normalizedPath = `${projectPWD}/app/environments`;
@@ -38,7 +42,6 @@ class AFEnvironment {
       process.exit(AFError.NOENV);
     }
 
-    var prefferedEnvironmentLoaded = false;
     const environmentKeys = Object.keys(environments);
     for (var i = 0; i < environmentKeys.length; i++) {
       const environmentKey = environmentKeys[i];
@@ -47,27 +50,24 @@ class AFEnvironment {
       selectedEnvironmentKey = environmentKey;
       if (typeof arguments[0] === "string") {
         if (environmentKey === arguments[0]) {
+          this._NAME = selectedEnvironmentKey;
           this.loadEnvironment(selectedEnvironment);
-          prefferedEnvironmentLoaded = true;
-          this._NAME = environmentKey;
+          this._PREFFERED_FOUND = true;
           break;
         }
       } else {
         if (environmentKey === packageConfig.avalancheConfig.preferredEnvironment) {
+          this._NAME = selectedEnvironmentKey;
           this.loadEnvironment(selectedEnvironment);
-          prefferedEnvironmentLoaded = true;
-          this._NAME = environmentKey;
+          this._PREFFERED_FOUND = true;
           break;
         }
       }
     }
-    if (!prefferedEnvironmentLoaded) {
-      if (!this._SILENCE) {
-        // console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}" ${process.argv}.\x1b[0m`);
-        console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
-      }
+    if (!this._PREFFERED_FOUND) { // Default to an environment if the preffered environment is not found.
+      this._DEFAULTED = true;
+      this._NAME = selectedEnvironmentKey;
       this.loadEnvironment(selectedEnvironment);
-      this._NAME = selectedEnvironment;
     }
   }
 
@@ -280,6 +280,10 @@ class AFEnvironment {
     if (!isValid) {
       this.save();
       process.exit(AFError.ENVINVALID);
+    }
+
+    if (!this._SILENCE) {
+      console.log(`${ACUtil.terminalPrefix()}\x1b[32m Loaded environment "${this._NAME}"${this._DEFAULTED ? "\x1b[34m (Because the preffered environment was not found)" : ""}\x1b[0m`);
     }
   }
 

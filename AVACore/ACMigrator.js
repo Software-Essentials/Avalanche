@@ -33,7 +33,7 @@ class ACMigrator {
     const storage = new AFStorage();
     var migrations = {};
     if (wipe) {
-      const animation = progressAnimation("\x1b[32mWiping tables");
+      const animation = progressAnimation("\x1b[34mWiping tables");
       database.dropAllTables({
         onSuccess: ({ total, success }) => {
           clearInterval(animation);
@@ -59,7 +59,7 @@ class ACMigrator {
     }
     var animation;
     function migrate() {
-      animation = progressAnimation(`\x1b[32mMigrating (0/${models.length})`);
+      animation = progressAnimation(`\x1b[34mMigrating (0/${models.length})`);
       for (const i in models) {
         const model = models[i];
         migrations[model] = null;
@@ -110,7 +110,7 @@ class ACMigrator {
         if (migrations[key] === true) successful++;
       }
       clearInterval(animation);
-      animation = progressAnimation(`\x1b[32mMigrating (${successful}/${completed})`);
+      animation = progressAnimation(`\x1b[34mMigrating (${successful}/${completed})`);
       if (completed === Object.keys(migrations).length) {
         clearInterval(animation);
         console.log(`${terminalPrefix()}\x1b[32m Migration complete. (${successful}/${completed} tables/zones migrated)\x1b[0m`);

@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
 import ACMigrator from "../../AVACore/ACMigrator";
-import ACSeeder from "../../AVACore/ACSeeder";
+import ACPopulator from "../../AVACore/ACPopulator";
 import { terminalPrefix } from "../../AVACore/ACUtil";
 
 
@@ -9,7 +9,7 @@ import { terminalPrefix } from "../../AVACore/ACUtil";
  */
 function migrate() {
   const migrator = new ACMigrator();
-  const seeder = new ACSeeder();
+  const seeder = new ACPopulator();
   const choices = [
     "\x1b[32m\x1b[1mSAFE\x1b[0m       \x1b[3m(Only migrates zones/tables or records that don't exist yet)\x1b[0m",
     "\x1b[33m\x1b[1mOVERWRITE\x1b[0m  \x1b[3m(Migrates over your existing zones/tables and records)\x1b[0m",

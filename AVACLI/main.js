@@ -14,9 +14,28 @@ const avalanchePackage = require("../package.json");
 const AFEnvironment = require("../AVAFoundation/AFEnvironment").default;
 const AFError = require("../AVAFoundation/AFError").default;
 
-const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
-const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
-const argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
+const arguments = [];
+const flags = [];
+for (const component of process.argv) {
+  if (component === "sudo") {
+    continue;
+  }
+  try {
+    if (fs.existsSync(component)) {
+      continue;
+    }
+  } catch (error) { }
+  if (component.substr(0, 1) === "-") {
+    flags.push(component);
+    continue;
+  }
+  arguments.push(component);
+}
+
+// These three variables SHOULD not have to be needed.
+const cmdValue = arguments[0];
+const envValue = arguments[1];
+const argValue = arguments[2];
 
 main();
 function main() {
@@ -42,12 +61,12 @@ function main() {
             }
             notifyIfExperimental();
             if (command.requireEnvironment) {
-              const tty = !process.argv.includes("--notty") && !process.argv.includes("--tty=false".toLowerCase())
+              const tty = !flags.includes("--notty") && !flags.includes("--tty=false") && !flags.includes("--tty=False") && !flags.includes("--tty=FALSE")
               if (!tty) {
                 if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
                   global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue);
+                  command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
                 } else {
                   console.log(`${terminalPrefix()}\x1b[31m (fatal error) Unable to load environment because no environment was found.\x1b[0m`);
                   process.exit(AFError.NOENV);
@@ -68,14 +87,14 @@ function main() {
                 inquirer.prompt(questions).then(answers => {
                   global.environment = new AFEnvironment(answers.environment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue);
+                  command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
                 });
               }
             } else { // Command does not depend on an environment.
-              command.execute(envValue, argValue);
+              command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
             }
           } else { // Command does not depend on a project.
-            command.execute(envValue, argValue);
+            command.execute(envValue, argValue); // TODO: The ONLY parameter should be 'arguments'
           }
         } else {
           console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);

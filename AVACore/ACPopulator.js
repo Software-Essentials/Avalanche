@@ -8,7 +8,7 @@ import { UUID } from "../AVAFoundation/AFUtil";
 /**
  * @author Lawrence Bensaid <lawrencebensaid@icloud.com>
  */
-class ACSeeder {
+class ACPopulator {
 
   constructor() {
     this.seeds = [];
@@ -67,7 +67,7 @@ class ACSeeder {
     }
     var animation;
     function proceed() {
-      animation = progressAnimation(`Populating (0/${that.seeds.length})`);
+      animation = progressAnimation(`\x1b[34mPopulating (0/${that.seeds.length})`);
       if (that.seeds.length > 0) {
         for (let i = 0; i < that.seeds.length; i++) {
           const seed = that.seeds[i];
@@ -142,4 +142,4 @@ class ACSeeder {
 }
 
 
-export default ACSeeder;
+export default ACPopulator;
