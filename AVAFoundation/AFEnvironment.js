@@ -98,6 +98,8 @@ class AFEnvironment {
     const environment = JSON.parse(JSON.stringify(this));
     const environmentName = environment._NAME;
     // Prune environment object
+    delete environment._DEFAULTED;
+    delete environment._PREFFERED_FOUND;
     delete environment._NAME;
     delete environment._TTY;
     delete environment._SILENCE;

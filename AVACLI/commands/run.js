@@ -28,6 +28,7 @@ function run() {
     }
   }
   global.environment = new AFEnvironment(environmentName);
+  runCheckers();
   var watchers = [];
   const stopP = () => {
     for (const watcher of watchers) {
@@ -64,6 +65,14 @@ function run() {
   }, 0);
 }
 
+function runCheckers() {
+  if (environment.debug.reloadClientsAfterRestart === true && environment.capabilities.webSockets === false) {
+    environment.capabilities.webSockets = true;
+    environment.save();
+    console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice) The setting 'capabilities.webSockets' has been ENABLED in environment '${environment.getName()}' because it is needed for 'debug.reloadClientsAfterRestart'.\x1b[0m`);
+    execSync(`code --goto ${projectPWD}/app/environments/${environment.getName()}.environment.json:22:5`);
+  }
+}
 
 /**
  * @description Starts up the server.

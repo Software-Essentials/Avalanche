@@ -5,7 +5,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.43] - 2020-03-21
+## [0.5.44] - 2020-03-21
 ### Added
 - Added '--notty' & '--tty=false' command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.
 - Added 'configure' command to configure environment files.
