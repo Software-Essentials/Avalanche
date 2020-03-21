@@ -138,4 +138,4 @@ module.exports.enabled = true;
 module.exports.requireEnvironment = true;
 module.exports.scope = "PROJECT";
 module.exports.command = "configure";
-module.exports.description = "Addes auth files.";
+module.exports.description = "Configure environment files.";
