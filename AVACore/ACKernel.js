@@ -50,7 +50,7 @@ class ACKernel {
     // Session configuration
     this.sessionConfiguration = {
       name: "Auth",
-      secret: environment.secret,
+      secret: environment.security.secret,
       resave: false,
       saveUninitialized: true,
       cookie: {
@@ -61,11 +61,11 @@ class ACKernel {
       }
     };
     try {
-      const sessionStore = environment.auth.sessionStore;
+      const sessionStore = environment.database.sessionStore;
       if (typeof sessionStore === "string") {
         switch (sessionStore) {
           case "MYSQL":
-            this.sessionConfiguration.store = new MySQLStore({ config: environment.database, table: "_AVASession" });
+            this.sessionConfiguration.store = new MySQLStore({ config: environment.database, table: environment.database.sessionTable || "_AVASession" });
             break;
         }
       }
@@ -92,10 +92,10 @@ class ACKernel {
     app.use(this.middleware);
 
     // Upload file size limit
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json());
-    // app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
-    // app.use(bodyParser.json({ limit: "50mb" }));
+    // app.use(bodyParser.urlencoded({ extended: false }));
+    // app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ limit: environment.security.payloadLimit, extended: false }));
+    app.use(bodyParser.json({ limit: environment.security.payloadLimit }));
 
     // Setup static folder
     app.use(express.static("app/public"));

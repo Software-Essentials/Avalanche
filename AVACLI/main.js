@@ -38,9 +38,9 @@ function main() {
               return;
             }
             notifyIfExperimental();
-            if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
-              global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
-            }
+            // if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
+              // global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
+            // }
           }
           command.execute(envValue, argValue);
         } else {

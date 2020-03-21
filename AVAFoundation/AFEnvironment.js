@@ -1,8 +1,12 @@
 import fs from "fs";
 import AFError from "../AVAFoundation/AFError";
 import * as ACUtil from "../AVACore/ACUtil";
+import { UUID } from "./AFUtil";
 
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const DB_STORE_OPTIONS = [
+  "MYSQL"
+];
 
 
 /**
@@ -19,7 +23,7 @@ class AFEnvironment {
     if (fs.existsSync(normalizedPath)) {
       fs.readdirSync(normalizedPath).forEach(function (file) {
         const extensions = file.split(".");
-        if (extensions.length = 3)
+        if (extensions.length === 3)
           if (extensions[extensions.length - 1].toUpperCase() === "JSON")
             if (extensions[extensions.length - 2].toUpperCase() === "ENVIRONMENT")
               environments[extensions[0]] = require(`${projectPWD}/app/environments/${file}`);
@@ -42,17 +46,22 @@ class AFEnvironment {
         if (environmentKey === arguments[0]) {
           this.loadEnvironment(selectedEnvironment);
           prefferedEnvironmentLoaded = true;
+          this._NAME = environmentKey;
+          break;
         }
       } else {
         if (environmentKey === packageConfig.avalancheConfig.preferredEnvironment) {
           this.loadEnvironment(selectedEnvironment);
           prefferedEnvironmentLoaded = true;
+          this._NAME = environmentKey;
+          break;
         }
       }
     }
     if (!prefferedEnvironmentLoaded) {
       console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
       this.loadEnvironment(selectedEnvironment);
+      this._NAME = selectedEnvironment;
     }
   }
 
@@ -61,28 +70,75 @@ class AFEnvironment {
     return fullURL;
   }
 
+  save() {
+    const environment = JSON.parse(JSON.stringify(this));
+    const environmentName = environment._NAME;
+    // Prune environment object
+    delete environment._NAME;
+    delete environment.title;
+    delete environment.version;
+    delete environment.description;
+    delete environment.domain;
+    delete environment.host;
+    delete environment.port;
+    var normalizedPath = `${projectPWD}/app/environments/${environmentName}.environment.json`;
+    const results = fs.writeFileSync(normalizedPath, JSON.stringify(environment, null, 2));
+    console.log(results);
+  }
+
+  getSettings() {
+    const environment = JSON.parse(JSON.stringify(this));
+    if (arguments[0] === true) { // Flat
+      const flatEnvironment = this.getSettings();
+      for (const domain of Object.keys(environment)) {
+        if (typeof environment[domain] === "object") {
+          for (const key of Object.keys(environment[domain])) {
+            flatEnvironment[`${domain}.${key}`] = environment[domain][key];
+          }
+          delete flatEnvironment[domain];
+        }
+      }
+      return Object.keys(flatEnvironment);
+    } else {
+      // Prune environment object
+      delete environment.title;
+      delete environment.version;
+      delete environment.description;
+      delete environment.domain;
+      delete environment.host;
+      delete environment.port;
+    }
+    return environment;
+  }
+
   loadEnvironment(env) {
     var isValid = true;
 
     this.network = {};
     if (typeof (env.network) === "object") {
       if (typeof (env.network.domain) === "string") {
-        this.domain = env.network.domain;
+        this.domain = env.network.domain; // DEPRECATED
+        this.network.domain = env.network.domain;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
-        this.domain = "localhost";
+        this.domain = "localhost"; // DEPRECATED
+        this.network.domain = "localhost";
       }
       if (typeof (env.network.host) === "string") {
-        this.host = env.network.host;
+        this.host = env.network.host; // DEPRECATED
+        this.network.host = env.network.host;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
-        this.host = "127.0.0.1";
+        this.host = "127.0.0.1"; // DEPRECATED
+        this.network.host = "127.0.0.1";
       }
       if (typeof (env.network.port) === "number") {
-        this.port = env.network.port;
+        this.port = env.network.port; // DEPRECATED
+        this.network.port = env.network.port;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
-        this.port = 80;
+        this.port = 80; // DEPRECATED
+        this.network.port = 80;
       }
     } else {
       isValid = false
@@ -104,28 +160,18 @@ class AFEnvironment {
       this.debug.reloadClientsAfterRestart = false;
     }
 
-    this.auth = {};
-    if (typeof (env.auth) === "object") {
-      if (typeof (env.auth.secret) === "string") {
-        this.secret = env.auth.secret;
-        this.auth.secret = env.auth.secret;
-      } else {
-        isValid = false;
-        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
-      }
-      this.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
-      this.auth.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
-      this.auth.sessionStore = typeof env.auth.sessionStore === "string" ? env.auth.sessionStore : null;
-    } else {
-      isValid = false
-      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
-    }
-
+    const randomSecret = new UUID().string.split("-").join("");
     this.security = {};
     if (typeof (env.security) === "object") {
-      this.security.csrf = typeof env.security.csrf === "boolean" ? env.security.csrf : true;;
+      this.security.csrf = typeof env.security.csrf === "boolean" ? env.security.csrf : true;
+      this.security.payloadLimit = typeof env.security.payloadLimit === "string" ? env.security.payloadLimit : "50mb";
+      this.security.secret = typeof env.security.secret === "string" && env.security.secret !== "" ? env.security.secret : randomSecret;
+      this.security.saltRounds = typeof env.security.saltRounds === "number" ? env.security.saltRounds : 10;
     } else {
       this.security.csrf = false;
+      this.security.payloadLimit = "50mb";
+      this.security.secret = randomSecret;
+      this.security.saltRounds = 10;
     }
 
     this.capabilities = {};
@@ -148,6 +194,13 @@ class AFEnvironment {
 
     this.database = {};
     if (typeof (env.database) === "object") {
+      if (typeof env.database.sessionStore === "string" && DB_STORE_OPTIONS.includes(env.database.sessionStore)) {
+        this.database.sessionStore = env.database.sessionStore;
+      } else if (typeof env.auth.sessionStore === "string" && DB_STORE_OPTIONS.includes(env.auth.sessionStore)) {
+        this.database.sessionStore = env.auth.sessionStore; // DEPRECATED
+      } else {
+        this.database.sessionStore = null;
+      }
       if (typeof (env.database.host) === "string") {
         this.database.host = env.database.host;
       } else {
@@ -200,6 +253,7 @@ class AFEnvironment {
     this.info.description = this.description;
 
     if (!isValid) {
+      this.save();
       process.exit(AFError.ENVINVALID);
     }
   }

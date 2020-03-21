@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.37] - 2020-03-21
+### Added
+- Added 'configure' command to configure environment files.
+
+### Changes
+- Many small structural optimisations.
+
 ## [0.5.31] - 2020-01-23
 ### Added
 - Added 'code', 'description' & 'deletedAt' as default properties to model template.

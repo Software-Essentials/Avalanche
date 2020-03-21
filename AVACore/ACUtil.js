@@ -212,7 +212,7 @@ export function getModels() {
 
 
 /**
- * @returns {Object}
+ * @returns {[String]}
  */
 export function getEnvironments() {
   const normalizedPath = `${projectPWD}/app/environments`;
