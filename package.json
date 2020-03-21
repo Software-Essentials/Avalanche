@@ -1,7 +1,7 @@
 {
   "name": "avacore",
-  "version": "0.5.45",
-  "description": "Node OOP framework for APIs, & other backend solutions.",
+  "version": "0.5.46",
+  "description": "The NodeJS framework for developing sophisticated web-based solutions.",
   "main": "index.js",
   "license": "MIT",
   "homepage": "https://github.com/Software-Essentials/Avalanche",

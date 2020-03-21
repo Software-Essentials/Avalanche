@@ -24,6 +24,22 @@ export function rmdirSyncRecursive(filePath) {
 
 
 /**
+ * @param {Object} request 
+ * @returns {Boolean}
+ */
+export function isFromBrowser(request) {
+  const headers = request.headers;
+  if (headers["x-requested-with"] === "XMLHttpRequest") {
+    return false;
+  }
+  if (headers["authorization"]) {
+    return false;
+  }
+  return true;
+}
+
+
+/**
  * @param {String} versionValue 
  * @returns {Boolean}
  */

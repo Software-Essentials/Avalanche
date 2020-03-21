@@ -88,6 +88,10 @@ class AFEnvironment {
     return this._NAME;
   }
 
+  getTitle() {
+    return this.info.title;
+  }
+
   getDBCredentials() {
     const credentials = JSON.parse(JSON.stringify(this.database));
     delete credentials.sessionStore;
