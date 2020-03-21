@@ -39,7 +39,7 @@ function update() {
     if (pconfigAfter.version === latestVersion) {
       process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[32m The Avalanche CLI has been updated to the latest stable version (v${pconfig.version} > v${pconfigAfter.version}).\n\x1b[0m`);
     } else {
-      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[31m Failed to update the Avalanche CLI! (This could be a permissions issue).\n\x1b[0m`);
+      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[31m CLI update probably failed! (This could be a permissions issue).\n\x1b[0m`);
     }
     ready();
   });

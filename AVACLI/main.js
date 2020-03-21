@@ -30,7 +30,9 @@ function main() {
       const command = require(`${path}/${key}`);
       if (cmdValue === command.command) {
         checkForUpdate();
-        notifyIfUpdate();
+        if (cmdValue !== "update" && cmdValue !== "upgrade") {
+          notifyIfUpdate();
+        }
         if (command.enabled) {
           if (command.scope === "PROJECT") {
             if (!isAVAProject()) {
@@ -88,6 +90,7 @@ function main() {
 
 
 function checkForUpdate() {
+  const onReady = typeof arguments[0] === "function" ? arguments[0] : () => { };
   https.get(npmRegistryAPIURI, (response) => {
     var body = "";
     response.on("data", (chunk) => {
@@ -103,6 +106,7 @@ function checkForUpdate() {
           json.avalancheCache = { latestUpdate: data.latest };
         }
         fs.writeFileSync(`${__dirname}/../package.json`, JSON.stringify(json, null, 2), "utf8");
+        onReady();
       }
     });
   }).on("error", (error) => {
