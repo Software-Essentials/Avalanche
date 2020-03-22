@@ -5,10 +5,12 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.44] - 2020-03-21
+## [0.5.47] - 2020-03-21
 ### Added
 - Added '--notty' & '--tty=false' command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.
 - Added 'configure' command to configure environment files.
+- Added guidelines for how to structure your code in an Avalanche application.
+- Added option in 'AFModel.select'. It is now possible to pass an array as condition value.
 
 ### Changes
 - Updated Dockerfile.

@@ -279,7 +279,7 @@ AFModel.register = (Model) => {
     }
     queryParts.push(columns.join(", "));
     queryParts.push(`FROM \`${Model.NAME}\``);
-    for (const condition of conditionsArray) {
+    for (const condition of conditionsArray) { // Handle all where's
       const keyParts = condition.key.split(".");
       if (modelProperties.hasOwnProperty(keyParts[0])) {
         const property = modelProperties[keyParts[0]];
@@ -290,8 +290,15 @@ AFModel.register = (Model) => {
             if (typeof value === "string" && (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL")) {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
-              parameters.push(value);
-              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              if (Array.isArray(value)) {
+                for(const item of value) {
+                  parameters.push(item);
+                }
+                wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
+              } else {
+                parameters.push(value);
+                wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              }
             }
           }
         } else if (keyParts.length > 1) {
@@ -357,7 +364,7 @@ AFModel.register = (Model) => {
     var wheres = [];
     var parameters = [];
     const modelProperties = Model.PROPERTIES;
-    for (const condition of conditionsArray) {
+    for (const condition of conditionsArray) { // Handle all where's
       const keyParts = condition.key.split(".");
       if (modelProperties.hasOwnProperty(keyParts[0])) {
         const property = modelProperties[keyParts[0]];
@@ -368,8 +375,15 @@ AFModel.register = (Model) => {
             if (typeof value === "string" && (value.toUpperCase() === "NULL" || value.toUpperCase() === "NOT NULL")) {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
-              parameters.push(value);
-              wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              if (Array.isArray(value)) {
+                for(const item of value) {
+                  parameters.push(item);
+                }
+                wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
+              } else {
+                parameters.push(value);
+                wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+              }
             }
           }
         } else if (keyParts.length > 1) {

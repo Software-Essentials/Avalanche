@@ -155,8 +155,8 @@ class <#name?> extends AFModel {
         name: "updated_at",
         type: "INT",
         length: 1
-      }
-      "deletedAt": {
+      },
+      "deletedAt": { // If a property called 'deletedAt' exists in the model. It can be used to mark the record as deleted.
         name: "deleted_at",
         type: "INT",
         length: 1
