@@ -7,6 +7,7 @@ import { AFController } from "avacore";
 class <#name?> extends AFController {
 
   /**
+   * @description The index handler will return a list of <#model?>s.
    * @param {Object} request
    * @param {Object} response
    */
@@ -14,27 +15,26 @@ class <#name?> extends AFController {
     const onSuccess = ({ results }) => {
       response.json({
         success: true,
-        message: results.length <= 0 ? "There are no <#model_lowercase?>s." : undefined,
         data: results
       });
     }
     const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: message || "Unable to display <#model_lowercase?>s.",
+        message: message || "Unable to display <#model?>s.",
         errors
       });
     }
     <#model?>.select({
       properties: ["ID", "name", "createdAt", "updatedAt"],
       conditions: [],
-      onFailure,
-      onSuccess
+      onFailure, onSuccess
     });
   }
 
 
   /**
+   * @description The show handler will return a specific <#model?>.
    * @param {Object} request
    * @param {Object} response
    */
@@ -53,20 +53,20 @@ class <#name?> extends AFController {
         message: message || "<#model?> doesn't exist."
       });
     }
-    request.query.validate("ID").type("number");
+    request.query.validate("ID").number();
     if (request.validate({ onFailure })) {
       const { ID } = request.query;
-      <#model?>.select({
-        properties: ["ID", "name", "createdAt", "updatedAt"],
-        conditions: [{ key: "ID", value: ID }],
-        onFailure,
-        onSuccess
+      <#model?>.get(ID, {
+        onFailure, onSuccess: <#model_lowercase?> => {
+          onSuccess({ results: <#model_lowercase?> });
+        }
       });
     }
   }
 
 
   /**
+   * @description The store handler is responsible for saving a newly given <#model?>.
    * @param {Object} request
    * @param {Object} response
    */
@@ -85,7 +85,7 @@ class <#name?> extends AFController {
         errors
       });
     }
-    request.body.validate("name").string().range(4, 64);
+    request.body.validate("name").alias("Name").string().range(4, 64);
     if (request.validate({ onFailure })) {
       const { name } = request.body;
       const <#model_lowercase?> = new <#model?>();
@@ -100,11 +100,12 @@ class <#name?> extends AFController {
 
 
   /**
+   * @description The update handler is responsible for applying changes to a specific <#model?>.
    * @param {Object} request
    * @param {Object} response
    */
   update(request, response) {
-    const onSuccess = () => {
+    const onSuccess = ({ results }) => {
       response.json({
         success: true,
         message: "<#model?> saved."
@@ -118,7 +119,7 @@ class <#name?> extends AFController {
       });
     }
     request.body.validate("ID").string().length(36);
-    request.body.validate("name").string().range(4, 64);
+    request.body.validate("name").alias("Name").string().range(4, 64);
     if (request.validate({ onFailure })) {
       const { ID, name } = request.body;
       <#model?>.get(ID, {
@@ -135,11 +136,12 @@ class <#name?> extends AFController {
 
 
   /**
+   * @description The destroy handler is responsible for deleting a specific <#model?>.
    * @param {Object} request
    * @param {Object} response
    */
   destroy(request, response) {
-    const onSuccess = () => {
+    const onSuccess = ({ results }) => {
       response.json({
         success: true,
         message: "<#model?> deleted."
@@ -157,13 +159,11 @@ class <#name?> extends AFController {
       const { ID } = request.body;
       <#model?>.delete({
         conditions: [{ key: "ID", value: ID }],
-        onFailure,
-        onSuccess: ({ results }) => {
-          if (results.affectedRows === 1) {
-            onSuccess();
-          } else {
-            onFailure({ errors: [{ error: "notExist", message: "<#model?> does not exist." }] });
+        onFailure, onSuccess: ({ results }) => {
+          if (results.affectedRows < 1) {
+            onFailure({ message: "<#model?> does not exist.", errors: [{ error: "notExist", message: "<#model?> does not exist." }] });
           }
+          onSuccess({});
         }
       });
     }

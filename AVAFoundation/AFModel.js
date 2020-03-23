@@ -1,5 +1,5 @@
 import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
-import { parseBoolean } from "../AVAFoundation/AFUtil";
+import { parseBoolean, UUID } from "../AVAFoundation/AFUtil";
 import * as ACUtil from "../AVACore/ACUtil";
 
 
@@ -100,6 +100,8 @@ class AFModel {
           values.push("?");
           if (property.type === "BOOLEAN") {
             parameters.push(parseBoolean(this[key]));
+          } else if (property.type === "UUID" && property.required && !this[key]) {
+            parameters.push(new UUID().string);
           } else {
             parameters.push(this[key]);
           }
@@ -291,7 +293,7 @@ AFModel.register = (Model) => {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
               if (Array.isArray(value)) {
-                for(const item of value) {
+                for (const item of value) {
                   parameters.push(item);
                 }
                 wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
@@ -376,7 +378,7 @@ AFModel.register = (Model) => {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
               if (Array.isArray(value)) {
-                for(const item of value) {
+                for (const item of value) {
                   parameters.push(item);
                 }
                 wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
