@@ -28,6 +28,7 @@ class AFPushNotification {
    * @param {[String]} tokens Client device tokens.
    */
   push() {
+    // console.log(`teamID: ${environment.appleDeveloperTeamID}; APNSKeyID: ${environment.APNSKeyID}; production: ${environment.APNSIsProduction}; appBundleID: ${environment.appBundleID};`);
     if (arguments.length > 1) { /** @deprecated */
       this.title = typeof arguments[0] === "string" ? arguments[0] : environment.getTitle();
       this.message = typeof arguments[1] === "string" ? arguments[1] : "";
@@ -46,7 +47,7 @@ class AFPushNotification {
     const notification = new Notification();
     notification.topic = environment.appBundleID;
     notification.expiry = this.expiry;
-    notification.badge = badge;
+    notification.badge = this.badge;
     notification.sound = this.sound;
     notification.alert = {
       title: this.title,

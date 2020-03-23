@@ -226,7 +226,7 @@ AFModel.register = (Model) => {
 
   /**
    */
-  Model.select = ({ properties, conditions, onSuccess, onFailure }) => {
+  Model.select = ({ properties, conditions, onFailure, onSuccess }) => {
     const propertiesArray = Array.isArray(properties) ? properties : [];
     const conditionsArray = Array.isArray(conditions) ? conditions : [];
     const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
@@ -356,7 +356,7 @@ AFModel.register = (Model) => {
 
   /**
    */
-  Model.delete = ({ conditions, onSuccess, onFailure }) => {
+  Model.delete = ({ conditions, onFailure, onSuccess }) => {
     const conditionsArray = Array.isArray(conditions) ? conditions : [];
     const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
     const didFail = typeof onFailure === "function" ? onFailure : () => { };
@@ -426,18 +426,20 @@ AFModel.register = (Model) => {
     });
   }
 
+
   /**
-   * @description Used to fetch a single Model.
-   * @param {Int|UUID} ID
-   * @param {{Function, Function}} 
+   * @description Returns AFModel.
+   * @param {Int|UUID}
+   * @param {Function}
    */
-  Model.get = (ID, { onSuccess, onFailure }) => {
+  Model.get = (ID, { onFailure, onSuccess }) => {
+    const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
+    const didFail = typeof onFailure === "function" ? onFailure : () => { };
     const model = new Model();
     Model.select({
       properties: Object.keys(Model.PROPERTIES),
       conditions: [{ key: Model.IDENTIFIER, value: ID }],
-      onFailure,
-      onSuccess: ({ results }) => {
+      onFailure: didFail, onSuccess: ({ results }) => {
         // NOTE: If results is empty it can't update because it doesnt exist. Therefor the request never completes. (goto /activity/update)
         if (results.length === 1) {
           const result = results[0];
@@ -445,9 +447,9 @@ AFModel.register = (Model) => {
             model[property.split(".")[0]] = result[property];
           }
           model.DRAFT = false;
-          onSuccess(model);
+          didSucceed(model);
         } else {
-          onFailure({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
+          didFail({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
         }
       }
     });
