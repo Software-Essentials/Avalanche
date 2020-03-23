@@ -15,6 +15,25 @@ But generally in the context of an entity like '*Item*', '*Post*' or '*Team*'.
 
 ---
 
+## Routes
+
+You can add an endpoint like this:
+
+`"<method> <path>": "<controller>.<handler>",`
+
+So a routing file could look like this for example:
+
+```
+{
+    "endpoints": {
+        "GET /post": "PostController.index",
+        "GET /post/show": "PostController.show"
+    }
+}
+```
+
+---
+
 ## Controller handlers
 
 At the top of each controller handler you should have an `onSuccess` function and an `onFailure` function.

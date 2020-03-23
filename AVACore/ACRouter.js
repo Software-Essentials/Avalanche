@@ -39,6 +39,25 @@ class ACRouter extends Router {
                                 }
                                 routes.push.apply(routes, route.endpoints);
                             }
+                            if (typeof route === "object" && typeof route.endpoints === "object" && !Array.isArray(route.endpoints)) {
+                                var additionalMiddleware = [];
+                                const endpoints = [];
+                                if (Array.isArray(route.middleware)) {
+                                    additionalMiddleware = route.middleware;
+                                }
+                                for (const navigation of Object.keys(route.endpoints)) {
+                                    const handler = route.endpoints[navigation].split(".");
+                                    const pair = navigation.trim().split(" ");
+                                    endpoints.push({
+                                        method: pair[0],
+                                        path: pair[1],
+                                        controller: handler[0],
+                                        handler: handler[1],
+                                        middleware: additionalMiddleware
+                                    });
+                                }
+                                routes.push.apply(routes, endpoints);
+                            }
                         }
                     }
                 }
@@ -63,7 +82,6 @@ class ACRouter extends Router {
             const routePath = route.path;
             const routeFile = route.file;
             const routeMiddleware = route.middleware;
-            const routePermission = route.permission;
             const controllerFile = route.controller;
             const controllerHandler = route.handler;
             var controller;

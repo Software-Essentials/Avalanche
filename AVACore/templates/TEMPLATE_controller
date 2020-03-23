@@ -85,8 +85,7 @@ class <#name?> extends AFController {
         errors
       });
     }
-    request.body.validate("name").range(4, 64);
-    request.body.validate("name").type("string");
+    request.body.validate("name").string().range(4, 64);
     if (request.validate({ onFailure })) {
       const { name } = request.body;
       const <#model_lowercase?> = new <#model?>();
@@ -118,10 +117,8 @@ class <#name?> extends AFController {
         errors
       });
     }
-    request.body.validate("ID").length(36);
-    request.body.validate("ID").type("string");
-    request.body.validate("name").range(4, 64);
-    request.body.validate("name").type("string");
+    request.body.validate("ID").string().length(36);
+    request.body.validate("name").string().range(4, 64);
     if (request.validate({ onFailure })) {
       const { ID, name } = request.body;
       <#model?>.get(ID, {
@@ -155,8 +152,7 @@ class <#name?> extends AFController {
         errors
       });
     }
-    request.body.validate("ID").length(36);
-    request.body.validate("ID").type("string");
+    request.body.validate("ID").string().length(36);
     if (request.validate({ onFailure })) {
       const { ID } = request.body;
       <#model?>.delete({

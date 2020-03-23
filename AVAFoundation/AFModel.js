@@ -426,11 +426,10 @@ AFModel.register = (Model) => {
     });
   }
 
-
   /**
-   * @description Returns AFModel.
-   * @param {Int|UUID}
-   * @param {Function}
+   * @description Used to fetch a single Model.
+   * @param {Int|UUID} ID
+   * @param {{Function, Function}} 
    */
   Model.get = (ID, { onSuccess, onFailure }) => {
     const model = new Model();
