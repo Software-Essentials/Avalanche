@@ -130,7 +130,10 @@ class AFModel {
         queryParts.push(`WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ?`);
         parameters.push(this[this.IDENTIFIER]);
       }
-      database.connection.query(queryParts.join(" "), parameters, (error, results, fields) => {
+      if (environment.debug.logQueriesToConsole) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+      }
+      database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
         if (error) {
           console.log(error);
           if (error.code === "ECONNREFUSED") {
@@ -189,7 +192,10 @@ class AFModel {
       const database = new AFDatabase(environment.getDBCredentials());
       const query = `DELETE FROM \`${this.NAME}\` WHERE \`${this.PROPERTIES[this.IDENTIFIER].name}\` = ?`;
       const parameters = [this[this.IDENTIFIER]];
-      database.connection.query(query, parameters, (error, results, fields) => {
+      if (environment.debug.logQueriesToConsole) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${query};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+      }
+      database.connection.query(query + ";", parameters, (error, results, fields) => {
         if (error) {
           if (error.code === "ECONNREFUSED") {
             console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
@@ -293,10 +299,14 @@ AFModel.register = (Model) => {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
               if (Array.isArray(value)) {
-                for (const item of value) {
-                  parameters.push(item);
+                if (value.length > 0) {
+                  for (const item of value) {
+                    parameters.push(item);
+                  }
+                  wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
+                } else {
+                  wheres.push("0 = 1");
                 }
-                wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
               } else {
                 parameters.push(value);
                 wheres.push(`${Model.PROPERTIES[key].name} = ?`);
@@ -332,11 +342,10 @@ AFModel.register = (Model) => {
     if (modelProperties.hasOwnProperty("createdAt")) {
       queryParts.push(`ORDER BY ${modelProperties["createdAt"].name} DESC`);
     }
-    queryParts.push(";");
     if (environment.debug.logQueriesToConsole) {
-      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")}\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
     }
-    database.query(queryParts.join(" "), parameters, (error, results, fields) => {
+    database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
       if (error) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
         didFail({ errors: [{ error: error.code, message: error.message }] });
@@ -378,10 +387,14 @@ AFModel.register = (Model) => {
               wheres.push(`${Model.PROPERTIES[key].name} IS ${value.toUpperCase()}`);
             } else {
               if (Array.isArray(value)) {
-                for (const item of value) {
-                  parameters.push(item);
+                if (value.length > 0) {
+                  for (const item of value) {
+                    parameters.push(item);
+                  }
+                  wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
+                } else {
+                  wheres.push("0 = 1");
                 }
-                wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
               } else {
                 parameters.push(value);
                 wheres.push(`${Model.PROPERTIES[key].name} = ?`);
@@ -414,11 +427,10 @@ AFModel.register = (Model) => {
       queryParts.push("WHERE");
       queryParts.push(wheres.join(" AND "));
     }
-    queryParts.push(";");
     if (environment.debug.logQueriesToConsole) {
-      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")}\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
+      console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
     }
-    database.query(queryParts.join(" "), parameters, (error, results, fields) => {
+    database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
       if (error) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
         didFail({ errors: [{ error: error.code, message: error.message }] });

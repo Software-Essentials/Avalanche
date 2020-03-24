@@ -84,8 +84,6 @@ class <#name?> extends AFModel {
       |*                                                                                             *|
       |*  'required'         When set to true it marks the column "NOT NULL" in a MySQL database.    *|
       |*                                                                                             *|
-      |*  'relatable'        Marks the column "unsigned" in a MySQL database.                        *|
-      |*                                                                                             *|
       |*  'model'            Creates a relation constraint between two entities.                     *|
       |*                                                                                             *|
       |*  'onDelete'         Determines the behaviour of the record when the parent gets deleted.    *|
