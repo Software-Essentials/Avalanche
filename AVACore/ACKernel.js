@@ -131,28 +131,41 @@ class ACKernel {
 
     next();
 
-    // Request logger
-    if (environment.debug.logHTTPRequestsToConsole) {
-      const now = new Date();
-      const method = request.method;
-      const status = response.statusCode;
-      const log = `[${now.toLocaleString()}]\t[${method}::${status}]\t>> ${request.url}`;
-      const color = status === 200 ? 32 : status === 304 ? 33 : 31
-      const methodColor =
-        method === "GET" ? 32 :
-          method === "POST" ? 33 :
-            method === "PUT" ? 34 :
-              method === "DELETE" ? 31 : 0
-      console.log(`[\x1b[1m${now.toLocaleTimeString()}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
-      if (!fs.existsSync(`${projectPWD}/logs`)) {
-        fs.mkdirSync(`${projectPWD}/logs`);
-      }
-      fs.appendFile(`${projectPWD}/logs/requests.log`, `${log}\n`, (error) => {
-        if (error) {
-          console.log(`${terminalPrefix()}\x1b[33m ${error.message}\x1b[0m`);
+    response.on("finish", () => {
+
+      // Request logger
+      if (environment.debug.logHTTPRequestsToConsole) {
+        const now = new Date();
+        const method = request.method;
+        const status = response.statusCode;
+        for (const ignore of environment.debug.logIgnores) {
+          if (request.url.startsWith(ignore)) {
+            return;
+          }
         }
-      });
-    }
+        const log = `[${now.toLocaleString()}]\t[${method} ${status}]\t>> ${request.url}`;
+        const color =
+          status < 200 ? 31 :
+            status < 300 ? 32 :
+              status < 400 ? 34 :
+                status < 500 ? 34 : 31
+        const methodColor =
+          method === "GET" ? 32 :
+            method === "POST" ? 33 :
+              method === "PUT" ? 34 :
+                method === "DELETE" ? 31 : 0
+        console.log(`[\x1b[1m${now.toLocaleTimeString()}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m \x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
+        if (!fs.existsSync(`${projectPWD}/logs`)) {
+          fs.mkdirSync(`${projectPWD}/logs`);
+        }
+        fs.appendFile(`${projectPWD}/logs/requests.log`, `${log}\n`, (error) => {
+          if (error) {
+            console.log(`${terminalPrefix()}\x1b[33m ${error.message}\x1b[0m`);
+          }
+        });
+      }
+
+    });
 
   }
 

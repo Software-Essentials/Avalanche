@@ -99,19 +99,19 @@ class <#name?> extends AFModel {
       \***********************************************************************************************/
 <#line_property_id?>
       "code": {
-        name: "<#name_lower?>_code",
+        name: "<#column_prefix?>_code",
         type: "VARCHAR",
         length: 8,
         required: true
       },
       "name": {
-        name: "<#name_lower?>_name",
+        name: "<#column_prefix?>_name",
         type: "VARCHAR",
         length: 64,
         required: true
       },
       "description": {
-        name: "<#name_lower?>_description",
+        name: "<#column_prefix?>_description",
         type: "VARCHAR",
         length: 255
       },

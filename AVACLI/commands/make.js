@@ -305,19 +305,22 @@ function make_model() {
     var lineIdenifier = `    // this.IDENTIFIER = "ID";`;
     var lineComputedDefault = "";
     var linePropertyID = "";
+    const prefix = name.match(/[A-Z][a-z]+/g);
+    const columnPrefix = prefix[prefix.length - 1].toLowerCase();
     if (identificationMethod === "UUID") {
       lineImportAvacore = `import { AFModel, AFUtil } from "avacore";`;
       lineConstUUID = `\nconst { UUID } = AFUtil;\n`;
       lineIdenifier = `    this.IDENTIFIER = "ID";`;
       lineComputedDefault = "\n    this.ID = new UUID().string;";
-      linePropertyID = `\n      "ID": {\n        name: "${name.toLowerCase()}_id",\n        type: "UUID",\n        required: true\n      },`;
+      linePropertyID = `\n      "ID": {\n        name: "${columnPrefix}_id",\n        type: "UUID",\n        required: true\n      },`;
     }
     if (identificationMethod === "ID") {
       lineIdenifier = `    this.IDENTIFIER = "ID";`;
-      linePropertyID = `\n      "ID": {\n        name: "${name.toLowerCase()}_id",\n        type: "INT",\n        length: 10,\n        relatable: true,\n        autoIncrement: true,\n        required: true\n      },`;
+      linePropertyID = `\n      "ID": {\n        name: "${columnPrefix}_id",\n        type: "INT",\n        length: 10,\n        relatable: true,\n        autoIncrement: true,\n        required: true\n      },`;
     }
     const variables = {
       name: name,
+      column_prefix: columnPrefix,
       name_lower: name.toLowerCase(),
       method: answers.method,
       method_key: answers.method === "AFStorage (deprecated)" ? "STORAGE" : "DATABASE",

@@ -178,12 +178,14 @@ class AFEnvironment {
 
     this.debug = {};
     if (typeof (env.debug) === "object") {
+      this.debug.logIgnores = Array.isArray(env.debug.logIgnores) ? env.debug.logIgnores : [];
       this.debug.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
       this.debug.logQueriesToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
       this.debug.logWebSocket = typeof env.debug.logWebSocket === "boolean" ? env.debug.logWebSocket : false;
       this.debug.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
       this.debug.reloadClientsAfterRestart = typeof env.debug.reloadClientsAfterRestart === "boolean" ? env.debug.reloadClientsAfterRestart : false;
     } else {
+      this.debug.logIgnores = [];
       this.debug.logHTTPRequestsToConsole = false;
       this.debug.logQueriesToConsole = false;
       this.debug.logWebSocket = false;

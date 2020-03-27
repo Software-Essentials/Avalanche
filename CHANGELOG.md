@@ -5,6 +5,18 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.52] - 2020-03-27
+### Added
+- Added request log ignore filter. Available in the environment file as 'logIgnores';
+- Added added domains property to routing files;
+
+### Fixed
+- Fixed user agent specifier functions in AFUtil.
+- Fixed request logging. (Status & coloring)
+
+### Changes
+- Many small structural optimisations.
+
 ## [0.5.48] - 2020-03-21
 ### Added
 - Added '--notty' & '--tty=false' command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.

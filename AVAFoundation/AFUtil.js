@@ -109,36 +109,62 @@ export function UUID() {
 
 
 /**
- * 
+ * @param {String} ua User agent
+ * @returns {String|null} OS name
  */
 export function getOSFromUserAgent(ua) {
-  if (ua.includes("Mac OS X")) {
-    return "Mac OS X";
+  const oses = {
+    "Mac OS X": "macOS",
+    "iPhone OS": "iOS",
+    "Windows NT": "Windows",
+    "Android": "Android",
+    "Linux": "Linux"
+  };
+  for (const os of Object.keys(oses)) {
+    if (ua.includes(os)) {
+      const name = oses[os];
+      const version = ua.split(os)[1].split(";")[0].split(")")[0].trim().split("_").join(".");
+      return {
+        name, version
+      }
+    }
   }
-  if (ua.includes("Windows")) {
-    return "Windows";
-  }
-  if (ua.includes("iPhone OS")) {
-    return "iOS";
-  }
-  return null;
+  return { name: null, version: null };
 }
 
 
 /**
- * 
+ * @param {String} ua User agent
+ * @returns {String|null} Browser name
  */
 export function getBrowserFromUserAgent(ua) {
-  if (ua.includes("Safari")) {
-    return "Safari";
+  var name = null;
+  var version = null;
+  var tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+  if (/trident/i.test(M[1])) {
+    tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+    return {
+      name: "IE",
+      version: (tem[1] || null)
+    };
   }
-  if (ua.includes("Firefox")) {
-    return "Firefox";
+  if (M[1] === "Chrome") {
+    tem = ua.match(/\bOPR|Edge\/(\d+)/)
+    if (tem != null) {
+      return {
+        name: "Opera",
+        version: tem[1]
+      };
+    }
   }
-  if (ua.includes("Chrome")) {
-    return "Chrome";
+  M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, "-?"];
+  if ((tem = ua.match(/version\/(.+?(?= ))/i)) != null) {
+    M.splice(1, 1, tem[1]);
   }
-  return null;
+  return {
+    name: M[0],
+    version: M[1]
+  };
 }
 
 

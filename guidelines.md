@@ -32,6 +32,43 @@ So a routing file could look like this for example:
 }
 ```
 
+## Routing file
+
+A routing file generally has 3 properties. `domains`, `middleware` and `endpoints`.
+
+
+
+```
+{
+    "domains": [ Array ]
+    "middleware": [ Array ]
+    "endpoints": { Object }
+}
+```
+
+So a routing file could look like this for example:
+
+```
+{
+    "domains": [
+        "localhost",
+        "www.example.com",
+        "api.example.com"
+    ]
+    "middleware": [
+        "Localised",
+        "Authentication"
+    ]
+    "endpoints": {
+        "GET /login": "AuthenticationController.login",
+        "GET /register": "AuthenticationController.register"
+    }
+}
+```
+
+The properties `domains` & `middleware` are not required. If you omit them `domains` will default to `["*"]` and `middleware` will default to `[]`.
+
+
 ---
 
 ## Controller handlers

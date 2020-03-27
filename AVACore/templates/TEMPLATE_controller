@@ -40,11 +40,9 @@ class <#name?> extends AFController {
    */
   show(request, response) {
     const onSuccess = ({ results }) => {
-      const isEmpty = results.length <= 0;
       response.json({
-        success: !isEmpty,
-        message: isEmpty ? "<#model?> doesn't exist." : undefined,
-        data: isEmpty ? undefined : results[0]
+        success: true,
+        data: results
       });
     }
     const onFailure = ({ message, errors }) => {
@@ -123,10 +121,7 @@ class <#name?> extends AFController {
     if (request.validate({ onFailure })) {
       const { ID, name } = request.body;
       <#model?>.get(ID, {
-        onFailure: ({ errors }) => {
-          onFailure({ errors });
-        },
-        onSuccess: (<#model_lowercase?>) => {
+        onFailure, onSuccess: (<#model_lowercase?>) => {
           <#model_lowercase?>.name = name;
           <#model_lowercase?>.save({ onFailure, onSuccess });
         }
