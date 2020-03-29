@@ -138,9 +138,7 @@ export function getOSFromUserAgent(ua) {
  * @returns {String|null} Browser name
  */
 export function getBrowserFromUserAgent(ua) {
-  var name = null;
-  var version = null;
-  var tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+  var tem, M = ua.match(/(postmanruntime|opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+(\.\d+)?(\.\d+)?)/i) || [];
   if (/trident/i.test(M[1])) {
     tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
     return {
@@ -157,7 +155,13 @@ export function getBrowserFromUserAgent(ua) {
       };
     }
   }
-  M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, "-?"];
+  M = M[2] ? [M[1], M[2]] : [null, null, "-?"];
+  if (M[0] === "PostmanRuntime") {
+    return {
+      name: "Postman",
+      version: M[1]
+    };
+  }
   if ((tem = ua.match(/version\/(.+?(?= ))/i)) != null) {
     M.splice(1, 1, tem[1]);
   }
