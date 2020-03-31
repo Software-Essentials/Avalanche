@@ -5,10 +5,11 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.52] - 2020-03-27
+## [0.5.54] - 2020-03-31
 ### Added
 - Added request log ignore filter. Available in the environment file as 'logIgnores';
-- Added added domains property to routing files;
+- Added domains property to routing files;
+- Added support for enums;
 
 ### Fixed
 - Fixed user agent specifier functions in AFUtil.

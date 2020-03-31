@@ -22,6 +22,7 @@ const DATATYPES = {
   "TINYTEXT": { type: "tinytext", string: true },
   "MEDIUMTEXT": { type: "mediumtext", string: true },
   "LONGTEXT": { type: "longtext", string: true },
+  "ENUM": { type: "enum", string: true, length: true },
   "UUID": { type: "char", string: true }
 };
 
@@ -197,12 +198,26 @@ class AFDatabase {
           foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
         }
       }
-      const length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
-      const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
       const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
       const typeProperty = DATATYPES[type];
-      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
       const defaultVal = column.default;
+      var length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
+      if (typeProperty.type === "enum") {
+        if (Array.isArray(column.options)) {
+          if (!column.options.includes(defaultVal)) {
+            console.log(`${terminalPrefix()}\x1b[31m (error) Default value '${defaultVal}' of enum '${tablename}.${propertyKeys[name]}' is not an option.`);
+          }
+          for (let i = 0; i < column.options.length; i++) {
+            column.options[i] = `'${column.options[i]}'`;
+          }
+          length = column.options.join(",");
+        } else {
+          console.log(`${terminalPrefix()}\x1b[31m (error) Enum '${tablename}.${propertyKeys[name]}' is missing 'options' argument.`);
+        }
+      }
+      const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
+      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
+      
       const required = !!column.required;
       const unique = column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
@@ -218,7 +233,7 @@ class AFDatabase {
         uniqueKeys[unique].push(`\`${name}\``);
       }
     }
-    for(const key in uniqueKeys) {
+    for (const key in uniqueKeys) {
       const columns = uniqueKeys[key];
       columnStrings.push(`UNIQUE KEY \`${key}\` (${columns.join(", ")})`);
     }
