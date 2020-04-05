@@ -85,20 +85,104 @@ export function startWatchingSession(filePath, callback) {
  * @returns {Object}
  */
 export function getRoutes() {
+  // Modulate routing files.
   const normalizedPath = `${projectPWD}/app/routes`;
   var routes = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return routes;
+  if (fs.existsSync(normalizedPath)) {
+    fs.readdirSync(normalizedPath).forEach((file) => {
+      const extensions = file.split(".");
+      if (extensions.length === 2) {
+        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+          const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
+          if (Array.isArray(route)) {
+            for (const endpoint of route) {
+              endpoint.domains = {};
+              endpoint.domains["*"] = {
+                controller: endpoint.controller,
+                handler: endpoint.handler,
+                middleware: endpoint.middleware
+              }
+            }
+            routes.push.apply(routes, route);
+          } else {
+            if (typeof route === "object" && Array.isArray(route.endpoints)) {
+              var domains = ["*"];
+              var additionalMiddleware = [];
+              if (Array.isArray(route.middleware)) {
+                additionalMiddleware = route.middleware;
+              }
+              if (Array.isArray(route.domains)) {
+                domains = route.domains;
+              }
+              for (let i = 0; i < route.endpoints.length; i++) {
+                const endpoint = route.endpoints[i];
+                route.endpoints[i].domains = {};
+                if (Array.isArray(endpoint.middleware)) {
+                  endpoint.middleware.push.apply(endpoint.middleware, additionalMiddleware);
+                } else {
+                  endpoint.middleware = additionalMiddleware;
+                }
+                for (const domain of domains) {
+                  route.endpoints[i].domains[domain] = {
+                    controller: endpoint.controller,
+                    handler: endpoint.handler,
+                    middleware: endpoint.middleware,
+                    file: endpoint.file
+                  }
+                }
+                delete route.endpoints[i].middleware;
+                delete route.endpoints[i].controller;
+              }
+              routes.push.apply(routes, route.endpoints);
+            }
+            if (typeof route === "object" && typeof route.endpoints === "object" && !Array.isArray(route.endpoints)) {
+              var domains = ["*"];
+              var additionalMiddleware = [];
+              const endpoints = [];
+              if (Array.isArray(route.middleware)) {
+                additionalMiddleware = route.middleware;
+              }
+              if (Array.isArray(route.domains)) {
+                domains = route.domains;
+              }
+              for (const navigation of Object.keys(route.endpoints)) {
+                const handler = route.endpoints[navigation].split(".");
+                const pair = navigation.trim().split(" ");
+                const endpoint = {
+                  method: pair[0],
+                  path: pair[1],
+                  domains: {}
+                };
+                for (const domain of domains) {
+                  endpoint.domains[domain] = {
+                    controller: handler[0],
+                    handler: handler[1],
+                    middleware: additionalMiddleware
+                  }
+                }
+                endpoints.push(endpoint);
+              }
+              routes.push.apply(routes, endpoints);
+            }
+          }
+        }
+      }
+    });
   }
-  fs.readdirSync(normalizedPath).forEach((file) => {
-    const extensions = file.split(".");
-    if (extensions.length === 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
-        routes.push.apply(routes, route);
+
+  // Merge method-path pairs
+  for (var i = 0; i < routes.length; i++) {
+    const route1 = routes[i];
+    for (var j = 0; j < routes.length; j++) {
+      const route2 = routes[j];
+      if (route1.path === route2.path && route1.method === route2.method) {
+        for (const domain of Object.keys(routes[j].domains)) {
+          routes[i].domains[domain] = routes[j].domains[domain];
+        }
       }
     }
-  });
+  }
+  
   return routes;
 }
 

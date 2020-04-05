@@ -17,6 +17,9 @@ function make(component) {
     case "controller":
       make_controller();
       return;
+    case "documentation":
+      make_documentation();
+      return;
     case "environment":
       make_environment();
       return;
@@ -34,12 +37,6 @@ function make(component) {
       return;
     case "routing":
       make_routes();
-      return;
-    case "seeds":
-      make_population();
-      return;
-    case "seed":
-      make_population();
       return;
     case "population":
       make_population();
@@ -68,7 +65,8 @@ function make_default() {
     "\x1b[32m\x1b[1mmiddleware",
     "\x1b[32m\x1b[1mpopulation",
     "\x1b[32m\x1b[1mlocalisation",
-    "\x1b[32m\x1b[1menvironment"
+    "\x1b[32m\x1b[1menvironment",
+    "\x1b[32m\x1b[1mdocumentation"
   ];
   const prompt = {
     type: "list",
@@ -426,6 +424,96 @@ function make_localisation() {
     const variables = {};
     makeTemplate(variables, template, path);
   });
+}
+
+
+/**
+ * 
+ */
+function make_documentation() {
+  const filename = "API Documentation.md";
+  if (fs.existsSync(filename)) {
+    const questions = [
+      {
+        type: "confirm",
+        name: "overwrite",
+        message: "Do you want to overwrite the existing Documentation file?",
+        prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
+        default: false,
+        suffix: "\x1b[0m"
+      }
+    ];
+    inquirer.prompt(questions).then(answers => {
+      if (answers.overwrite === true) {
+        generate();
+        return;
+      }
+      console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) Aborting.\x1b[0m`);
+    });
+    return;
+  }
+  generate();
+  function generateDescription(endpoint) {
+    const filePath = `${projectPWD}/app/controllers/${endpoint.controller}.js`;
+    const comments = [];
+    if (fs.existsSync(filePath)) {
+      const fileData = fs.readFileSync(filePath, { encoding: "utf8" });
+      for (const codeSections of fileData.split("/**")) {
+        const codeSection = codeSections.split("(")[0];
+        if (!codeSection.includes("*/")) {
+          continue;
+        }
+        const handlerMeta = codeSection.split("*/")
+        const comment = handlerMeta[0].trim().split("*").join(" ").split("\n").join(" ").split("\t").join(" ").replace(/  +/g, " ");
+        const handler = handlerMeta[1].trim();
+        if (!comment.includes("@description")) {
+          continue;
+        }
+        if (handler !== endpoint.handler) {
+          continue;
+        }
+        comments.push(comment);
+      }
+    }
+    const comment = comments.join(" ");
+    const description = comment ? comment.split("@description")[1].split("@")[0] : "";
+    return description;
+  }
+  function generate() {
+    const sections = [`# API Documentation\n*Generated on ${new Date().toDateString()}*`];
+    const routes = [];
+    for (const route of ACUtil.getRoutes()) {
+      if (Object.keys(route.domains).includes("*")) {
+        const endpoint = route.domains["*"];
+        endpoint.method = route.method;
+        endpoint.path = `*${route.path}`;
+        endpoint.description = generateDescription(endpoint);
+        routes.push(endpoint);
+      }
+      for (const domain of Object.keys(route.domains)) {
+        const endpoint = route.domains[domain];
+        endpoint.method = route.method;
+        endpoint.path = `${domain}${route.path}`;
+        endpoint.description = generateDescription(endpoint);
+        routes.push(endpoint);
+      }
+    }
+    routes.sort((a, b) => (a.path > b.path) ? 1 : ((b.path > a.path) ? -1 : 0));
+    for (const route of routes) {
+      const section = [];
+      section.push(`---\n## \`${route.method} ${route.path}\``);
+      if (route.description) {
+        section.push(`**Description:**&nbsp;&nbsp;${route.description}`);
+      }
+      section.push(`**Handler:**&nbsp;&nbsp;\`${route.handler ? `${route.controller}.${route.handler}` : route.controller}\``);
+      if (Array.isArray(route.middleware)) {
+        section.push(`**Middleware:**\n - ${route.middleware.join("\n - ")}`);
+      }
+      sections.push(section.join("\n\n"));
+    }
+    fs.writeFileSync(filename, sections.join("\n\n\n"));
+    console.log(`${ACUtil.terminalPrefix()}\x1b[32m Documentation file created!\x1b[0m`);
+  }
 }
 
 

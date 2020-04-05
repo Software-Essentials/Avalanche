@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.56] - 2020-05-03
+### Added
+- Added command &nbsp;&nbsp;`$ avalanche make documentation`&nbsp;&nbsp; for generating documentation
+
+### Fixed
+- Fixed routes calculator in &nbsp;&nbsp;`$ avalanche info`&nbsp;&nbsp; command.
+
 ## [0.5.55] - 2020-04-03
 ### Added
 - Added request log ignore filter. Available in the environment file as 'logIgnores';
@@ -21,8 +28,8 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.5.48] - 2020-03-21
 ### Added
-- Added '--notty' & '--tty=false' command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.
-- Added 'configure' command to configure environment files.
+- Added `--notty` & `--tty=false` command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.
+- Added &nbsp;&nbsp;`$ avalanche configure`&nbsp;&nbsp; command to configure environment files.
 - Added guidelines for how to structure your code in an Avalanche application.
 - Added option in 'AFModel.select'. It is now possible to pass an array as condition value.
 - Added new short endpoint notation for routerfile.
@@ -58,7 +65,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 ## [0.5.26] - 2020-01-20
 ### Added
 - Added easyer type rules to AFValidator; 'string()', 'boolean()' & 'number()' (instead of for example: 'type("string")'.
-- Added 'stopall' command; Stops all Avalanche applications that are currently running.
+- Added &nbsp;&nbsp;`$ avalanche stopall`&nbsp;&nbsp; command; Stops all Avalanche applications that are currently running.
 - When working with models the 'createdAt' & 'updatedAt' properties will now automatically be filled accordingly.
 - When working with models the 'unique' setting of a property can be set to a string value. All the properties with that string will be grouped as unique.
 
@@ -81,7 +88,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Client-side webpage reload debug option.
 
 ### Fixed
-- Fixed message when using 'upgrade' command.
+- Fixed message when using &nbsp;&nbsp;`$ avalanche upgrade`&nbsp;&nbsp; command.
 - Fixed process killer.
 - Fixed loading animation.
 
@@ -90,7 +97,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.5.19] - 2020-01-16
 ### Added
-- Added 'localise' command to the Avalanche CLI.
+- Added &nbsp;&nbsp;`$ avalanche localise`&nbsp;&nbsp; command to the Avalanche CLI.
 - Added 'alias', 'notEmpty', 'not' & 'equals' functions to AVAValidator.
 
 ### Fixed
@@ -108,8 +115,8 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.5.12] - 2019-12-21
 ### Added
-- Added troubleshooters to 'run' command.
-- Added ID method option to 'make model' command.
+- Added troubleshooters to `run` command.
+- Added ID method option to `make model` command.
 - Added BOOL & BOOLEAN datatypes to AFModel.
 
 ### Changes
@@ -312,9 +319,9 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Project structure.
 - Added installable boilerplates.
 - Added request logger.
-- Added 'version' command.
-- Added 'info' command.
-- Added 'init' command.
-- Added 'run' command.
-- Added 'routes' command.
-- Added 'fix' command.
+- Added &nbsp;&nbsp;`$ avalanche version`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche info`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche init`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche run`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche routes`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche fix`&nbsp;&nbsp; command.
