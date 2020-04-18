@@ -258,6 +258,7 @@ class AFEnvironment {
         isValid = false
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
       }
+      this.database.charset = typeof (env.database.charset) === "string" ? env.database.charset : "utf8mb4";
       if (typeof (env.database.connectionLimit) === "number")
         this.database.connectionLimit = env.database.connectionLimit;
       this.database.multipleStatements = true;

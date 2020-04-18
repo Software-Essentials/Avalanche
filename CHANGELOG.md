@@ -5,6 +5,13 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.57] - 2020-18-04
+### Added
+- Added ability to change `database.charset` in your environment files.
+
+### Changes
+- default `database.charset` has been changed from `utf8` to `utf8mb4`.
+
 ## [0.5.56] - 2020-05-03
 ### Added
 - Added command &nbsp;&nbsp;`$ avalanche make documentation`&nbsp;&nbsp; for generating documentation
