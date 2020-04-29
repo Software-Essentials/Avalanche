@@ -5,6 +5,12 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.58] - 2020-29-04
+### Added
+- Added `await` to model functions.
+- Added `ordering`, `offset`, `page` and `limit` setting to `AFModel.select`.
+- Added operator functions to items in the `conditions` setting in `AFModel.select`. This method can be used by making `conditions` an Object.
+
 ## [0.5.57] - 2020-18-04
 ### Added
 - Added ability to change `database.charset` in your environment files.
