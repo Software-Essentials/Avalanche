@@ -5,7 +5,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.59] - 2020-06-03
+## [0.5.60] - 2020-06-03
 ### Added
 - Added common options to `AFPushNotification`.
 

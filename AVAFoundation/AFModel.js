@@ -476,8 +476,7 @@ AFModel.register = (Model) => {
             const type = datasetProperties[key].structure.type;
             if (type === "BOOL" || type === "BOOLEAN") {
               results[i][key] = results[i][key] ? true : false
-            }
-            if (type === "UUID") {
+            } else if (type === "UUID" || typeof type === "undefined") {
               results[i][key] = isUUID(results[i][key]) ? results[i][key] : shortToUUID(results[i][key]);
             }
           }
