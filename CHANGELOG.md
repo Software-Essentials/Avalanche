@@ -5,13 +5,21 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.58] - 2020-29-04
+## [0.5.59] - 2020-06-03
+### Added
+- Added common options to `AFPushNotification`.
+
+### Changes
+- Optimised UUID compression.
+- Optimised `AFPushNotification` delivery reporting.
+
+## [0.5.58] - 2020-04-29
 ### Added
 - Added `await` to model functions.
 - Added `ordering`, `offset`, `page` and `limit` setting to `AFModel.select`.
 - Added operator functions to items in the `conditions` setting in `AFModel.select`. This method can be used by making `conditions` an Object.
 
-## [0.5.57] - 2020-18-04
+## [0.5.57] - 2020-04-18
 ### Added
 - Added ability to change `database.charset` in your environment files.
 

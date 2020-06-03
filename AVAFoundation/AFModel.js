@@ -97,15 +97,14 @@ class AFModel {
             if (property.autoIncrement) {
               continue;
             }
-            console.log(this[key]);
             columns.push(property.name);
             values.push("?");
             if (property.type === "BOOLEAN") {
               parameters.push(parseBoolean(this[key]));
             } else if (property.type === "UUID" && property.required && !this[key]) {
-              parameters.push(new UUID().string);
+              parameters.push(uuidToShort(new UUID().string));
             } else {
-              parameters.push(this[key]);
+              parameters.push(property.type === "UUID" && isUUID(pushableValue) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
@@ -123,7 +122,7 @@ class AFModel {
             if (property.type === "BOOLEAN") {
               parameters.push(parseBoolean(this[key]));
             } else {
-              parameters.push(this[key]);
+              parameters.push(property.type === "UUID" && isUUID(pushableValue) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(keyValues.join(", "));
@@ -332,8 +331,13 @@ AFModel.register = (Model) => {
                     wheres.push("0 = 1");
                   }
                 } else {
-                  parameters.push(value);
-                  wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+                  if (property.type === "UUID") {
+                    parameters.push(property.type === "UUID" && isUUID(value) ? uuidToShort(value) : value);
+                    wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+                  } else {
+                    parameters.push(value);
+                    wheres.push(`${Model.PROPERTIES[key].name} = ?`);
+                  }
                 }
               }
             }
@@ -473,6 +477,9 @@ AFModel.register = (Model) => {
             if (type === "BOOL" || type === "BOOLEAN") {
               results[i][key] = results[i][key] ? true : false
             }
+            if (type === "UUID") {
+              results[i][key] = isUUID(results[i][key]) ? results[i][key] : shortToUUID(results[i][key]);
+            }
           }
         }
         didSucceed({ results });
@@ -603,6 +610,42 @@ AFModel.register = (Model) => {
 
 
   return Model;
+}
+
+
+/**
+ * Checks if the value is a UUID.
+ * 
+ * @param {String} uuid 
+ */
+function isUUID(uuid) {
+  if (typeof uuid != "string" || uuid.match("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") === null) {
+    return false;
+  }
+  return true;
+}
+
+
+/**
+ * Converts UUID to short UUID.
+ * 
+ * @param {String} uuid
+ */
+function uuidToShort(uuid) {
+  return uuid.split("-").join("").toUpperCase();
+}
+
+
+/**
+ * Converts short UUID to normal UUID.
+ * 
+ * @param {String} shortUUID 
+ */
+function shortToUUID(shortUUID) {
+  if (typeof shortUUID !== "string" || shortUUID.length !== 32) {
+    return null;
+  }
+  return (shortUUID.slice(0, 8) + "-" + shortUUID.slice(8, 12) + "-" + shortUUID.slice(12, 16) + "-" + shortUUID.slice(16, 20) + "-" + shortUUID.slice(20, 36)).toUpperCase();
 }
 
 
