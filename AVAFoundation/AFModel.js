@@ -104,7 +104,7 @@ class AFModel {
             } else if (property.type === "UUID" && property.required && !this[key]) {
               parameters.push(uuidToShort(new UUID().string));
             } else {
-              parameters.push(property.type === "UUID" && isUUID(pushableValue) ? uuidToShort(this[key]) : this[key]);
+              parameters.push(property.type === "UUID" && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
@@ -122,7 +122,7 @@ class AFModel {
             if (property.type === "BOOLEAN") {
               parameters.push(parseBoolean(this[key]));
             } else {
-              parameters.push(property.type === "UUID" && isUUID(pushableValue) ? uuidToShort(this[key]) : this[key]);
+              parameters.push(property.type === "UUID" && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(keyValues.join(", "));
