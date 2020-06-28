@@ -17,12 +17,15 @@ function make(component) {
     case "controller":
       make_controller();
       return;
+    case "docs":
     case "documentation":
       make_documentation();
       return;
+    case "env":
     case "environment":
       make_environment();
       return;
+    case "mw":
     case "middleware":
       make_middleware();
       return;
@@ -30,14 +33,9 @@ function make(component) {
       make_model();
       return;
     case "routes":
-      make_routes();
-      return;
     case "route":
-      make_routes();
-      return;
     case "routing":
       make_routes();
-      return;
     case "population":
       make_population();
       return;
@@ -372,7 +370,7 @@ function make_population() {
       prefix: `${ACUtil.terminalPrefix()}\x1b[34m`,
       suffix: "\x1b[0m",
       validate: (answer) => {
-        if (fs.existsSync(`${projectPWD}/app/migration/seeds/${answer}.json`))
+        if (fs.existsSync(`${projectPWD}/app/migration/population/${answer}.json`))
           return "\x1b[31mA population file with this name already exists.\x1b[0m"
         return true;
       }
@@ -387,7 +385,7 @@ function make_population() {
     }
   ];
   inquirer.prompt(questions).then(answers => {
-    const path = `app/migration/seeds/${answers.filename}.json`;
+    const path = `app/migration/population/${answers.filename}.json`;
     const template = "TEMPLATE_seeds";
     const DummyClass = require(`${projectPWD}/app/models/${answers.model}.js`).default;
     const variables = {

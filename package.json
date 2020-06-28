@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.5.62",
+  "version": "0.5.63",
   "description": "The NodeJS framework for developing sophisticated web-based solutions.",
   "main": "index.js",
   "license": "MIT",
