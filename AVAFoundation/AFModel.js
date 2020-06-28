@@ -1,5 +1,5 @@
 import { AFStorage, AFRecordZone, AFDatabase, AFError } from "../index";
-import { parseBoolean, UUID } from "../AVAFoundation/AFUtil";
+import { parseBoolean, UUID, isUUID, shortToUUID, uuidToShort } from "../AVAFoundation/AFUtil";
 import * as ACUtil from "../AVACore/ACUtil";
 
 
@@ -335,7 +335,7 @@ AFModel.register = (Model) => {
                     parameters.push(property.type === "UUID" && isUUID(value) ? uuidToShort(value) : value);
                     wheres.push(`${Model.PROPERTIES[key].name} = ?`);
                   } else {
-                    parameters.push(value);
+                    parameters.push(isUUID(value) ? uuidToShort(value) : value);
                     wheres.push(`${Model.PROPERTIES[key].name} = ?`);
                   }
                 }
@@ -407,14 +407,14 @@ AFModel.register = (Model) => {
                 if (Array.isArray(value)) {
                   if (value.length > 0) {
                     for (const item of value) {
-                      parameters.push(item);
+                      parameters.push(isUUID(item) ? uuidToShort(item) : item);
                     }
                     wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
                   } else {
                     wheres.push("0 = 1");
                   }
                 } else {
-                  parameters.push(value);
+                  parameters.push(isUUID(value) ? uuidToShort(value) : value);
                   wheres.push(`${Model.PROPERTIES[key].name} = ?`);
                 }
               }
@@ -609,42 +609,6 @@ AFModel.register = (Model) => {
 
 
   return Model;
-}
-
-
-/**
- * Checks if the value is a UUID.
- * 
- * @param {String} uuid 
- */
-function isUUID(uuid) {
-  if (typeof uuid != "string" || uuid.match("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") === null) {
-    return false;
-  }
-  return true;
-}
-
-
-/**
- * Converts UUID to short UUID.
- * 
- * @param {String} uuid
- */
-function uuidToShort(uuid) {
-  return uuid.split("-").join("").toUpperCase();
-}
-
-
-/**
- * Converts short UUID to normal UUID.
- * 
- * @param {String} shortUUID 
- */
-function shortToUUID(shortUUID) {
-  if (typeof shortUUID !== "string" || shortUUID.length !== 32) {
-    return null;
-  }
-  return (shortUUID.slice(0, 8) + "-" + shortUUID.slice(8, 12) + "-" + shortUUID.slice(12, 16) + "-" + shortUUID.slice(16, 20) + "-" + shortUUID.slice(20, 36)).toUpperCase();
 }
 
 

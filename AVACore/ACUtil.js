@@ -367,7 +367,7 @@ export function getMigrations() {
  * @returns {Object}
  */
 export function getSeedFilesNames() {
-  const normalizedPath = `${projectPWD}/app/migration/seeds`;
+  const normalizedPath = `${projectPWD}/app/migration/population`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
     return controllers;

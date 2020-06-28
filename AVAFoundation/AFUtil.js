@@ -3,6 +3,42 @@ import path from "path";
 
 
 /**
+ * Checks if the value is a UUID.
+ * 
+ * @param {String} uuid 
+ */
+export function isUUID(uuid) {
+  if (typeof uuid != "string" || uuid.match("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") === null) {
+    return false;
+  }
+  return true;
+}
+
+
+/**
+ * Converts UUID to short UUID.
+ * 
+ * @param {String} uuid
+ */
+export function uuidToShort(uuid) {
+  return uuid.split("-").join("").toUpperCase();
+}
+
+
+/**
+ * Converts short UUID to normal UUID.
+ * 
+ * @param {String} shortUUID 
+ */
+export function shortToUUID(shortUUID) {
+  if (typeof shortUUID !== "string" || shortUUID.length !== 32) {
+    return null;
+  }
+  return (shortUUID.slice(0, 8) + "-" + shortUUID.slice(8, 12) + "-" + shortUUID.slice(12, 16) + "-" + shortUUID.slice(16, 20) + "-" + shortUUID.slice(20, 36)).toUpperCase();
+}
+
+
+/**
  * @description Removes a directory recursively.
  * @param {String} filePath
  */

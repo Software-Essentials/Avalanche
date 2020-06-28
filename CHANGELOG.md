@@ -5,7 +5,14 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.5.60] - 2020-06-03
+## [0.5.62] - 2020-06-28
+### Added
+- Added argument aliasses to `$ make ` command.
+
+### Changes
+- Deprecated `/migration/seeds/` as a population folder.
+
+## [0.5.61] - 2020-06-03
 ### Added
 - Added common options to `AFPushNotification`.
 

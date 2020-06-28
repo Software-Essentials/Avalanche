@@ -1,5 +1,6 @@
 import mysql from "mysql";
 import { terminalPrefix } from "../AVACore/ACUtil";
+import { isUUID, uuidToShort } from "./AFUtil";
 
 const DATATYPES = {
   "INT": { type: "int", length: true, unsignable: true, incrementable: true },
@@ -283,7 +284,7 @@ class AFDatabase {
         const record = row[key];
         switch (typeof record) {
           case "string":
-            records.push(`"${record}"`);
+            records.push(`"${isUUID(record) ? uuidToShort(record) : record}"`);
             break;
           case "number":
             records.push(`${record}`);

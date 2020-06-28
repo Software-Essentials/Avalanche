@@ -11,11 +11,22 @@ import { UUID } from "../AVAFoundation/AFUtil";
 class ACPopulator {
 
   constructor() {
+    const basePath = `${projectPWD}/app/migration`;
+    const oldPath = `${basePath}/seeds`;
+    const newPath = `${basePath}/population`;
+    if (fs.existsSync(oldPath)) {
+      console.log(`${terminalPrefix()}\x1b[33m WARNING: '/migration/seeds/' is deprecated! Upgrading project structure...\x1b[0m`);
+      try {
+        fs.renameSync(oldPath, newPath);
+      } catch (error) {
+        console.log(`${terminalPrefix()}\x1b[34m Unable to move '/migration/seeds/' to '/migration/population/'.\x1b[0m`);
+      }
+    }
     this.seeds = [];
     const seedFiles = getSeedFilesNames();
     for (const i in seedFiles) {
       const fileName = seedFiles[i];
-      const path = `${projectPWD}/app/migration/seeds/${fileName}.json`;
+      const path = `${newPath}/${fileName}.json`;
       if (fs.existsSync(path)) {
         const fileSeeds = require(path);
         for (const i in fileSeeds) {

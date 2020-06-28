@@ -76,7 +76,7 @@
     },
     {
       "template": "example1_seeds",
-      "path": "/app/migration/seeds/DummyData.json"
+      "path": "/app/migration/population/DummyData.json"
     },
     {
       "template": "example1_environment",
