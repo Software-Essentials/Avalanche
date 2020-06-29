@@ -104,7 +104,7 @@ class AFModel {
             } else if (property.type === "UUID" && property.required && !this[key]) {
               parameters.push(uuidToShort(new UUID().string));
             } else {
-              parameters.push(property.type === "UUID" && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
+              parameters.push((property.model || property.type === "UUID") && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
@@ -122,14 +122,14 @@ class AFModel {
             if (property.type === "BOOLEAN") {
               parameters.push(parseBoolean(this[key]));
             } else {
-              parameters.push(property.type === "UUID" && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
+              parameters.push((property.model || property.type === "UUID") && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
             }
           }
           queryParts.push(keyValues.join(", "));
         }
         if (!this.DRAFT) {
           queryParts.push(`WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ?`);
-          parameters.push(this[this.IDENTIFIER]);
+          parameters.push(this.PROPERTIES[this.IDENTIFIER].type === "UUID" && isUUID(this[this.IDENTIFIER]) ? uuidToShort(this[this.IDENTIFIER]) : this[this.IDENTIFIER]);
         }
         if (environment.debug.logQueriesToConsole) {
           console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
@@ -331,13 +331,8 @@ AFModel.register = (Model) => {
                     wheres.push("0 = 1");
                   }
                 } else {
-                  if (property.type === "UUID") {
-                    parameters.push(property.type === "UUID" && isUUID(value) ? uuidToShort(value) : value);
-                    wheres.push(`${Model.PROPERTIES[key].name} = ?`);
-                  } else {
-                    parameters.push(isUUID(value) ? uuidToShort(value) : value);
-                    wheres.push(`${Model.PROPERTIES[key].name} = ?`);
-                  }
+                  parameters.push((property.model || property.type === "UUID") && isUUID(value) ? uuidToShort(value) : value);
+                  wheres.push(`${Model.PROPERTIES[key].name} = ?`);
                 }
               }
             }
@@ -355,7 +350,7 @@ AFModel.register = (Model) => {
                 } else {
                   wheres.push(`${linkName} IN(SELECT ${foreignIdentifierName} FROM \`${foreignModel.NAME}\` WHERE ${foreignPropertyName} = ?)`);
                 }
-                parameters.push(condition.value);
+                parameters.push((property.model || property.type === "UUID") && isUUID(condition.value) ? uuidToShort(condition.value) : condition.value);
               }
             }
           }
