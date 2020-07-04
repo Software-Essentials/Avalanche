@@ -10,40 +10,52 @@ import { isEmail } from "./AFUtil";
 class AFMailer {
 
   constructor() {
-    this.transporter = nodemailer.createTransport(environment.email["noreply"]);
-    this.from = `"${environment.email["noreply"].name}" <${environment.email["noreply"].auth.user}>`;
+    const name = arguments[0] || "noreply";
+    const account = environment.email[name];
+    const configuration = {
+      host: account.host,
+      port: account.port,
+      secure: false,
+      auth: {
+        user: account.auth.user,
+        pass: account.auth.pass
+      },
+      tls: account.tls
+    }
+    this.transporter = nodemailer.createTransport(configuration);
+    this.from = `"${account.name}" <${account.auth.user}>`;
   }
 
   /**
    * @description Sends email to all recipients.
    * @param {AFEMail} email 
    */
-  send(email) {
-    const callback = typeof arguments[1] === "function" ? arguments[1] : () => { };
-    var to = [];
-    for (const recipient of email.recipients) {
-      if (isEmail(recipient.trim())) {
-        to.push(recipient.toLowerCase().trim());
+  async send(email) {
+    return new Promise((resolve, reject) => {
+      var to = [];
+      for (const recipient of email.recipients) {
+        if (isEmail(recipient.trim())) {
+          to.push(recipient.toLowerCase().trim());
+        }
       }
-    }
-    const mailOptions = {
-      from: this.from,
-      to: to,
-      subject: email.subject,
-      template: email.template,
-      context: email.context,
-      attachments: email.attachments
-    };
+      const mailOptions = {
+        from: this.from,
+        to: to,
+        subject: email.subject,
+        template: email.template,
+        context: email.context,
+        attachments: email.attachments
+      };
 
-    this.transporter.use("compile", hbs(email.templateOptions));
+      this.transporter.use("compile", hbs(email.templateOptions));
 
-    this.transporter.sendMail(mailOptions, function (error, results) {
-      if (error) {
-        console.log("Error: ", error);
-        callback(false);
-      } else {
-        callback(true);
-      }
+      this.transporter.sendMail(mailOptions, (error, results) => {
+        if (error) {
+          reject({ error });
+        } else {
+          resolve({ results });
+        }
+      });
     });
   }
 

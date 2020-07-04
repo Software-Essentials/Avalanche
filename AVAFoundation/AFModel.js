@@ -324,7 +324,7 @@ AFModel.register = (Model) => {
                 if (Array.isArray(value)) {
                   if (value.length > 0) {
                     for (const item of value) {
-                      parameters.push(item);
+                      parameters.push((property.model || property.type === "UUID") && isUUID(item) ? uuidToShort(item) : item);
                     }
                     wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
                   } else {
@@ -509,7 +509,7 @@ AFModel.register = (Model) => {
                 if (Array.isArray(value)) {
                   if (value.length > 0) {
                     for (const item of value) {
-                      parameters.push(item);
+                      parameters.push((property.model || property.type === "UUID") && isUUID(item) ? uuidToShort(item) : item);
                     }
                     wheres.push(`${Model.PROPERTIES[key].name} IN(${Array(value.length).fill("?").join(", ")})`);
                   } else {

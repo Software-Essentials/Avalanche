@@ -5,6 +5,11 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.65] - 2020-07-04
+### Fixed
+- Fixed email configuration validation.
+- Fixed `AFModel` conditions arguments parser when working with array values.
+
 ## [0.5.63] - 2020-06-28
 ### Added
 - Added argument aliasses to `$ make ` command.
