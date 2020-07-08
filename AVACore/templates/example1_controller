@@ -125,7 +125,7 @@ class PostController extends AFController {
       }
       self.name = request.body.postName;
       self.body = request.body.postBody;
-      self.updatedAt = new Date().valueOf();
+      self.modifiedAt = new Date().valueOf();
       self.save({onSuccess, onFailure});
     });
   }

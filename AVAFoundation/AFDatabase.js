@@ -69,7 +69,7 @@ class AFDatabase {
         failure({ error });
         return;
       }
-      const results = _results.slice(1)[0];
+      const results = _results ? _results.slice(1)[0] : null;
       if (results.length > 0) {
         for (const result of results) {
           const table = result.name;
@@ -116,14 +116,14 @@ class AFDatabase {
         failure({ error });
         return;
       }
-      const results = _results.slice(1)[0];
+      const results = _results ? _results.slice(1)[0] : null;
       if (results.length > 0) {
         for (const result of results) {
           const table = result.name;
           wipes[table] = null;
           const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
           this.query(this.preQuery() + query, [], (error, _results, fields) => {
-            const results = _results.slice(1);
+            const results = _results ? _results.slice(1) : null; // Parsed results. Use this instead of _results if you are going to utilise.
             if (error) {
               wipes[table] = false;
               failure({ error });
@@ -173,7 +173,8 @@ class AFDatabase {
     for (const column of columns) {
       const name = column.name;
       // Relation
-      if (typeof column.model === "string" || typeof column.relation === "string" || typeof column.relation === "object") {
+      // if (typeof column.model === "string" || typeof column.relation === "string" || typeof column.relation === "object") { // REMOVED DEPRECATION
+      if (typeof column.model === "string" || (typeof column.database === "string" && typeof column.table === "string") || typeof column.relation === "string" || typeof column.relation === "object") {
         var foreignClass, onDelete, onUpdate;
         // Model link
         if (typeof column.model === "string") {
@@ -181,25 +182,39 @@ class AFDatabase {
           onUpdate = typeof column.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[column.onUpdate.toUpperCase().split(" ").join("_")] : null;
           foreignClass = column.model;
         }
-        // Relation (old linking method)
-        const relation = column.relation;
-        if (typeof relation === "string" || typeof relation === "object") {
-          const options = typeof relation === "object" ? relation : {};
-          onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
-          onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
-          foreignClass = typeof relation === "object" ? options.hasOwnProperty("model") ? options.model : options.hasOwnProperty("table") ? options.table : relation : relation;
-        }
-        const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
-        const foreignTable = foreignModel.NAME;
-        const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
-        const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
-        columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
-        columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
-        if (typeof column.model === "string") {
-          foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+        // // Relation (old linking method) // REMOVED DEPRECATED
+        // const relation = column.relation;
+        // if (typeof relation === "string" || typeof relation === "object") {
+        //   const options = typeof relation === "object" ? relation : {};
+        //   onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
+        //   onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
+        //   foreignClass = typeof relation === "object" ? options.hasOwnProperty("model") ? options.model : options.hasOwnProperty("table") ? options.table : relation : relation;
+        // }
+
+        if (column.database && column.table) {
+          const foreignDatabase = column.database;
+          const foreignKey = column.bind;
+          const foreignTable = column.table;
+          const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
+          columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+          columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignDatabase}\`.\`${foreignTable}\` (\`${foreignKey || name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+        } else {
+          const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
+          const foreignTable = foreignModel.NAME;
+          const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+          const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
+          columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+          columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+          if (typeof column.model === "string") {
+            foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+          }
         }
       }
       const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
+      if (typeof type !== "string") {
+        console.log(`${terminalPrefix()}\x1b[31m (error) Unable to infer type of property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[35m [SOLUTION]: Add 'type' argument to property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[0m`);
+        continue;
+      }
       const typeProperty = DATATYPES[type];
       const defaultVal = column.default;
       var length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
@@ -244,7 +259,7 @@ class AFDatabase {
     if (force) {
       const query = `DROP TABLE IF EXISTS \`${tablename}\`;`;
       this.query(that.preQuery() + query, [], (error, _results, fields) => {
-        const results = _results.slice(1);
+        const results = _results ? _results.slice(1) : null;
         if (error) {
           failure({ table: tablename, error: error });
           return;
@@ -257,7 +272,7 @@ class AFDatabase {
     function create() {
       const query = `CREATE TABLE \`${tablename}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
       that.query(that.preQuery() + query, [], (error, _results, fields) => {
-        const results = _results.slice(1);
+        const results = _results ? _results.slice(1) : null;
         if (error) {
           failure({ table: tablename, error: error });
           return;
@@ -308,7 +323,7 @@ class AFDatabase {
     function insert() {
       const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
       that.query(that.preQuery() + query, [], (error, _results, fields) => {
-        const results = _results.slice(1);
+        const results = _results ? _results.slice(1) : null;
         if (error) {
           failure({ table: name, error: error });
           return;
@@ -333,7 +348,7 @@ class AFDatabase {
     function select() {
       const query = `SELECT ${columns.length <= 0 ? "*" : columns.join(", ")} FROM \`${name}\`${Object.keys(conditions).length > 0 ? ` WHERE ${compiledConditions}` : ""};`;
       that.query(that.preQuery() + query, [], (error, _results, fields) => {
-        const results = _results.slice(1);
+        const results = _results ? _results.slice(1) : null;
         if (error) {
           console.log(`${terminalPrefix()}\x1b[31m (error) Database error:\x1b[0 ${error.message}`);
           failure({ table: name, error: error });

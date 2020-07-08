@@ -5,6 +5,16 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.67] - 2020-07-08
+### Added
+- Added inter-database model relations. You can set them up in an `AFModel`s property using the keys `database` & `table`. If a key is not inferrable you can use `bind` to explicitly specify it.
+
+### Fixed
+- Fixed the `delete` method in `AFModel`.
+
+### Changes
+- `updatedAt` and `updatedBy` have been deprecated and been replaced by `modifiedAt` and `modifiedBy`.
+
 ## [0.5.65] - 2020-07-04
 ### Fixed
 - Fixed email configuration validation.

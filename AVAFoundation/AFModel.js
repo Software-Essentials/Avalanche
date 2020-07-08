@@ -9,26 +9,7 @@ import * as ACUtil from "../AVACore/ACUtil";
  */
 class AFModel {
 
-  /**
-   * @param {String} name Name of the resource.
-   */
   constructor() {
-    // if (typeof arguments[0] === "string" && typeof arguments[1] === "string" && typeof arguments[2] === "object") {
-    //   this.NAME = arguments[0];
-    //   this.IDENTIFIER = arguments[1];
-    //   this.PROPERTIES = arguments[2];
-    //   this.METHOD = "STORAGE";
-    //   this.DRAFT = false;
-    // }
-    // if (typeof arguments[0] === "object" && arguments[0] instanceof AFModel, typeof arguments[1] === "function") {
-    //   const self = arguments[0];
-    //   this.NAME = self.NAME;
-    //   this.IDENTIFIER = self.IDENTIFIER;
-    //   this.PROPERTIES = self.PROPERTIES;
-    //   this.METHOD = self.METHOD;
-    //   this.DRAFT = self.DRAFT
-    //   this.PROMISE = arguments[1];
-    // }
   }
 
 
@@ -81,7 +62,7 @@ class AFModel {
   async save(options) {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
         var queryParts = [this.DRAFT ? `INSERT INTO \`${this.NAME}\`` : `UPDATE \`${this.NAME}\` SET`];
@@ -110,8 +91,11 @@ class AFModel {
           queryParts.push(`(${columns.join(", ")}) VALUES (${values.join(", ")})`);
         } else {
           var keyValues = [];
-          if (this.PROPERTIES.hasOwnProperty("updatedAt")) {
-            this["updatedAt"] = Math.floor(new Date() / 1000);
+          if (this.PROPERTIES.hasOwnProperty("modifiedAt")) {
+            this["modifiedAt"] = Math.floor(new Date() / 1000);
+          }
+          if (this.PROPERTIES.hasOwnProperty("modifiedAt")) { // DEPRECATED
+            this["modifiedAt"] = Math.floor(new Date() / 1000);
           }
           for (const key in this.PROPERTIES) {
             if (key === this.IDENTIFIER) {
@@ -155,8 +139,8 @@ class AFModel {
               resolve({ result: this });
               return;
             }
-            failure({ errors: [{ error: "nothingUpdated", message: "Nothing updated." }] });
-            reject({ errors: [{ error: "nothingUpdated", message: "Nothing updated." }] });
+            failure({ errors: [{ error: "nothingmodified", message: "Nothing modified." }] });
+            reject({ errors: [{ error: "nothingmodified", message: "Nothing modified." }] });
           }
         });
       }
@@ -186,21 +170,22 @@ class AFModel {
         resolve({ result: this });
       }
     });
-    return promise;
   }
 
 
   /**
-   * 
+   * @description Removes the current instance from the database.
    */
-  async delete(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    const promise = new Promise((resolve, reject) => {
+  async delete() {
+    const success = arguments[0] ? typeof arguments[0].onSuccess === "function" ? arguments[0].onSuccess : () => { } : () => { };
+    const failure = arguments[0] ? typeof arguments[0].onFailure === "function" ? arguments[0].onFailure : () => { } : () => { };
+    return new Promise((resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
-        const query = `DELETE FROM \`${this.NAME}\` WHERE \`${this.PROPERTIES[this.IDENTIFIER].name}\` = ?`;
-        const parameters = [this[this.IDENTIFIER]];
+        const property = this.PROPERTIES[this.IDENTIFIER];
+        const value = this[this.IDENTIFIER];
+        const parameters = [(property.model || property.type === "UUID") && isUUID(value) ? uuidToShort(value) : value];
+        const query = `DELETE FROM \`${this.NAME}\` WHERE \`${property.name}\` = ?`;
         if (environment.debug.logQueriesToConsole) {
           console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${query};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
         }
@@ -233,7 +218,6 @@ class AFModel {
       }
       reject({ errors: [{ error: "NO METHOD" }] });
     });
-    return promise;
   }
 
 }
@@ -249,6 +233,7 @@ AFModel.register = (Model) => {
 
 
   /**
+   * 
    */
   Model.select = async ({ properties, conditions, ordering, limit, offset, page, onFailure, onSuccess }) => {
     var limit = isNaN(parseInt(limit)) ? null : parseInt(limit);
@@ -460,6 +445,7 @@ AFModel.register = (Model) => {
       }
       database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
         if (error) {
+          console.log("TEST1");
           console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
           didFail({ errors: [{ error: error.code, message: error.message }] });
           reject({ errors: [{ error: error.code, message: error.message }] });
@@ -494,7 +480,7 @@ AFModel.register = (Model) => {
     var wheres = [];
     var parameters = [];
     const modelProperties = Model.PROPERTIES;
-    const promise = new Promise((resolve, reject) => {
+    return promise = new Promise((resolve, reject) => {
       for (const condition of conditionsArray) { // Handle all where's
         const keyParts = condition.key.split(".");
         if (modelProperties.hasOwnProperty(keyParts[0])) {
@@ -552,6 +538,7 @@ AFModel.register = (Model) => {
       }
       database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
         if (error) {
+          console.log("TEST2");
           console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
           didFail({ errors: [{ error: error.code, message: error.message }] });
           reject({ errors: [{ error: error.code, message: error.message }] });
@@ -561,7 +548,6 @@ AFModel.register = (Model) => {
         resolve({ results });
       });
     });
-    return promise;
   }
 
 
@@ -570,36 +556,35 @@ AFModel.register = (Model) => {
    * @param {Int|UUID}
    * @param {Function}
    */
-  Model.get = (ID, { onFailure, onSuccess }) => {
-    const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
-    const didFail = typeof onFailure === "function" ? onFailure : () => { };
+  Model.get = (ID) => {
+    const options = typeof arguments[1] === "object" ? arguments[1] : {};
+    const didSucceed = typeof options.onSuccess === "function" ? options.onSuccess : () => { };
+    const didFail = typeof options.onFailure === "function" ? options.onFailure : () => { };
     const model = new Model();
-    const promise = new Promise((resolve, reject) => {
-      Model.select({
-        properties: Object.keys(Model.PROPERTIES),
-        conditions: [{ key: Model.IDENTIFIER, value: ID }],
-        onFailure: errors => {
-          didFail(errors)
-          reject(errors);
-        },
-        onSuccess: ({ results }) => {
-          // NOTE: If results is empty it can't update because it doesnt exist. Therefor the request never completes. (goto /activity/update)
-          if (results.length === 1) {
-            const result = results[0];
-            for (const property in result) {
-              model[property.split(".")[0]] = result[property];
-            }
-            model.DRAFT = false;
-            didSucceed(model);
-            resolve(model);
-            return;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { results } = await Model.select({
+          properties: Object.keys(Model.PROPERTIES),
+          conditions: [{ key: Model.IDENTIFIER, value: ID }]
+        });
+        // NOTE: If results is empty it can't update because it doesnt exist. Therefor the request never completes. (goto /activity/update)
+        if (results.length === 1) {
+          const result = results[0];
+          for (const property in result) {
+            model[property.split(".")[0]] = result[property];
           }
-          didFail({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
-          reject({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
+          model.DRAFT = false;
+          didSucceed(model);
+          resolve(model);
+          return;
         }
-      });
+        didFail({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
+        reject({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
+      } catch (errors) {
+        didFail(errors)
+        reject(errors);
+      }
     });
-    return promise;
   }
 
 

@@ -26,7 +26,7 @@ class <#name?> extends AFController {
       });
     }
     <#model?>.select({
-      properties: ["ID", "name", "createdAt", "updatedAt"],
+      properties: ["ID", "name", "createdAt", "modifiedAt"],
       conditions: [],
       onFailure, onSuccess
     });

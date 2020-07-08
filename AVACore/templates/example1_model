@@ -52,7 +52,7 @@ class Post extends AFModel {
     |*                                                                         *|
     |*  'PROPERTIES' defines the structure of the model properties.            *|
     |*  There are a couple of standard keys in this list:                      *|
-    |*  'ID', 'createdBy, updatedBy, createdAt, updatedAt                      *|
+    |*  'ID', 'createdBy, modifiedBy, createdAt, modifiedAt                    *|
     |*  Ofcourse you don't have to add these properties if they don't fit      *|
     |*  your use case, it is just a best practice in the Avalanche framework.  *|
     |*                                                                         *|
@@ -119,7 +119,7 @@ class Post extends AFModel {
       /*************************************************************\
       |*                                                           *|
       |*  Since there is no User table in this boilerplate, there  *|
-      |*  is no use for the createdBy and updatedBy properties.    *|
+      |*  is no use for the createdBy and modifiedBy properties.    *|
       |*                                                           *|
       \*************************************************************/
 
@@ -129,8 +129,8 @@ class Post extends AFModel {
       //   onDelete: "set null",
       //   onUpdate: "cascade"
       // },
-      // "updatedBy": {
-      //   name: "updated_by",
+      // "modifiedBy": {
+      //   name: "modified_by",
       //   model: "User",
       //   onDelete: "set null",
       //   onUpdate: "cascade"
@@ -143,8 +143,8 @@ class Post extends AFModel {
         length: 1,
         required: true
       },
-      "updatedAt": {
-        name: "updated_at",
+      "modifiedAt": {
+        name: "modified_at",
         type: "INT",
         length: 1
       }

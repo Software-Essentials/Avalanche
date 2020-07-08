@@ -19,7 +19,7 @@
     "length":  16,
     "null": false
   },
-  "updated_at": {
+  "modified_at": {
     "datatype": "TINYINT",
     "length":  16
   }

@@ -123,14 +123,14 @@ Successful response:
                 code: "ABC",
                 description: "Multiple records must be encapsulated in an array",
                 createdAt: 1570744800,
-                updatedAt: null
+                modifiedAt: null
             },
             {
                 ID: 124,
                 code: "ABD",
                 description: "Example record 2.",
                 createdAt: 1570744801,
-                updatedAt: null
+                modifiedAt: null
             }
         ]
     }
@@ -147,7 +147,7 @@ Successful response:
             code: "ABE",
             description: "Single record that is not encapsulated in an array",
             createdAt: 1570744802,
-            updatedAt: null
+            modifiedAt: null
         }
     }
 ```

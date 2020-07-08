@@ -60,7 +60,7 @@ class <#name?> extends AFModel {
     |*                                                                         *|
     |*  'PROPERTIES' defines the structure of the model properties.            *|
     |*  There are a couple of standard keys in this list:                      *|
-    |*  'ID', 'createdBy, updatedBy, createdAt, updatedAt                      *|
+    |*  'ID', 'createdBy, modifiedBy, createdAt, modifiedAt                    *|
     |*  Ofcourse you don't have to add these properties if they don't fit      *|
     |*  your use case, it is just a best practice in the Avalanche framework.  *|
     |*                                                                         *|
@@ -130,8 +130,8 @@ class <#name?> extends AFModel {
       //   onDelete: "set null",
       //   onUpdate: "cascade"
       // },
-      // "updatedBy": {
-      //   name: "updated_by",
+      // "modifiedBy": {
+      //   name: "modified_by",
       //   model: "User",
       //   onDelete: "set null",
       //   onUpdate: "cascade"
@@ -149,8 +149,8 @@ class <#name?> extends AFModel {
         length: 1,
         required: true
       },
-      "updatedAt": { // If a property called 'updatedAt' exists in the model. It will automatically be filled once a record changes.
-        name: "updated_at",
+      "modifiedAt": { // If a property called 'modifiedAt' exists in the model. It will automatically be filled once a record changes.
+        name: "modified_at",
         type: "INT",
         length: 1
       },

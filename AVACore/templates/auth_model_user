@@ -42,8 +42,8 @@ class User extends AFModel {
         length: 1,
         required: true
       },
-      "updatedAt": {
-        name: "updated_at",
+      "modifiedAt": {
+        name: "modified_at",
         type: "INT",
         length: 1
       }

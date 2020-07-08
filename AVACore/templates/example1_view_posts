@@ -28,14 +28,14 @@ class PostViewController extends AFViewController {
         }
         super.willLoad(request, response, self);
       };
-      Post.select({ properties: ["ID", "name", "body", "createdAt", "updatedAt"], conditions: [{ key: "ID", value: ID }], onSuccess, onFailure });
+      Post.select({ properties: ["ID", "name", "body", "createdAt", "modifiedAt"], conditions: [{ key: "ID", value: ID }], onSuccess, onFailure });
     } else {
       self.template = "posts";
       const onSuccess = ({ results }) => {
         self.variables.posts = results;
         super.willLoad(request, response, self);
       };
-      Post.select({ properties: ["ID", "name", "body", "createdAt", "updatedAt"], conditions: [], onSuccess, onFailure });
+      Post.select({ properties: ["ID", "name", "body", "createdAt", "modifiedAt"], conditions: [], onSuccess, onFailure });
     }
   }
 
