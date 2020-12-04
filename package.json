@@ -1,6 +1,6 @@
 {
   "name": "avacore",
-  "version": "0.5.74",
+  "version": "0.6.0",
   "description": "The NodeJS framework for developing sophisticated web-based solutions.",
   "main": "index.js",
   "license": "MIT",
@@ -57,6 +57,6 @@
     "socket.io": "^2.2.0"
   },
   "avalancheCache": {
-    "latestUpdate": "0.5.67"
+    "latestUpdate": "0.5.74"
   }
 }

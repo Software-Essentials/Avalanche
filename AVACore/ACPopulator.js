@@ -89,7 +89,8 @@ class ACPopulator {
             seedStats[seed.zone] = true;
             update();
           }
-          if (seed.hasOwnProperty("table")) {
+          if (seed.hasOwnProperty("model")) {
+            const Model = require(`${process.env.PWD}/app/models/${seed.model}.js`).default;
             for(const row of seed.data) {
               for(const property in row) {
                 const value = row[property]
@@ -98,7 +99,7 @@ class ACPopulator {
                 }
               }
             }
-            seedStats[seed.table] = null;
+            seedStats[Model.NAME] = null;
             const options = {
               force: true,
               onSuccess: ({ table }) => {
@@ -115,7 +116,7 @@ class ACPopulator {
                     console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
                     break;
                   case "ER_NO_SUCH_TABLE":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Table '${table}' not found. Migrate before populating.\x1b[0m`);
+                    console.log(`${terminalPrefix()}\x1b[31m (error) Table '${table}' (of model '${seed.model}') not found. Migrate before populating.\x1b[0m`);
                     break;
                   default:
                     console.log(`${terminalPrefix()}\x1b[31m (error) Error while populating '${table}':\x1b[0m ${error.message}`);
@@ -123,7 +124,18 @@ class ACPopulator {
                 update();
               }
             };
-            database.insertInto(seed.table, seed.data, options);
+            for(const record of seed.data) {
+              for(const key in Model.PROPERTIES) {
+                for(const attribute in record) {
+                  if (attribute == key) {
+                    record[Model.PROPERTIES[key].name] = record[attribute];
+                    delete record[attribute];
+                    break;
+                  }
+                }
+              }
+            }
+            database.insertInto(Model.NAME, seed.data, options);
           }
         }
       } else {

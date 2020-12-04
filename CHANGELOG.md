@@ -5,12 +5,23 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.6.0] - 2020-12-04
+### Fixed
+- Fixed a problem where the `ACMigrator` and `ACPopulator` would not properly handle model/table names.
+
+### Changes
+- Changed the way handlers are written. Now much fewer code is needed to write logic (about 25% less).
+- Changed the notation of population files. They now use the model property key instead of the database table column name.
+
+### Removed
+- Removed support for `onSuccess` and `onFailure` callbacks. Now only promises are supported.
+
 ## [0.5.74] - 2020-12-04
 ### Added
 - Added better file information to top of controller template.
 - Added implementation for asynchronous methods internally within the framework.
 - Added support for asynchronous use of ORM methods.
-- Added command that allows the developer to generate API reference documentation. `$ generate`
+- Added command that allows the developer to generate API reference documentation. `$ avalanche make docs`
 
 ### Fixed
 - Minor fixes.
@@ -36,7 +47,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [0.5.63] - 2020-06-28
 ### Added
-- Added argument aliasses to `$ make ` command.
+- Added argument aliasses to `$ avalanche make ` command.
 
 ### Changes
 - Deprecated `/migration/seeds/` as a population folder.

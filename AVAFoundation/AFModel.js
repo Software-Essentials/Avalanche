@@ -59,9 +59,7 @@ class AFModel {
   /**
    * 
    */
-  save(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+  save() {
     return new Promise(async (resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
@@ -80,10 +78,13 @@ class AFModel {
             }
             columns.push(property.name);
             values.push("?");
+            console.log(property.name);
             if (property.type === "BOOLEAN") {
               parameters.push(parseBoolean(this[key]));
-            } else if (property.type === "UUID" && property.required && !this[key]) {
-              parameters.push(uuidToShort(new UUID().string));
+            } else if (property.type === "UUID" && property.required && property.name === this.IDENTIFIER && !this[key]) { // If identifier is empty fill it in.
+              const newUUID = new UUID().string;
+              this[key] = newUUID;
+              parameters.push(uuidToShort(newUUID));
             } else {
               parameters.push((property.model || property.type === "UUID") && isUUID(this[key]) ? uuidToShort(this[key]) : this[key]);
             }
@@ -92,9 +93,6 @@ class AFModel {
         } else {
           var keyValues = [];
           if (this.PROPERTIES.hasOwnProperty("modifiedAt")) {
-            this["modifiedAt"] = Math.floor(new Date() / 1000);
-          }
-          if (this.PROPERTIES.hasOwnProperty("modifiedAt")) { // DEPRECATED
             this["modifiedAt"] = Math.floor(new Date() / 1000);
           }
           for (const key in this.PROPERTIES) {
@@ -111,9 +109,15 @@ class AFModel {
           }
           queryParts.push(keyValues.join(", "));
         }
+        const isAutoIncrement = this.DRAFT && !!this.PROPERTIES[this.IDENTIFIER].autoIncrement;
         if (!this.DRAFT) {
           queryParts.push(`WHERE ${this.PROPERTIES[this.IDENTIFIER].name} = ?`);
           parameters.push(this.PROPERTIES[this.IDENTIFIER].type === "UUID" && isUUID(this[this.IDENTIFIER]) ? uuidToShort(this[this.IDENTIFIER]) : this[this.IDENTIFIER]);
+        } else {
+          if (isAutoIncrement) {
+            const databaseName = environment.getDBCredentials().database;
+            queryParts.push(`; SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '${databaseName}' AND TABLE_NAME = '${this.NAME}'`);
+          }
         }
         if (environment.debug.logQueriesToConsole) {
           console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
@@ -125,23 +129,24 @@ class AFModel {
               console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) No database connection.\x1b[0m`);
             }
             if (error.code === "ER_DUP_ENTRY") {
-              failure({ errors: [{ error: "duplicateEntry", message: "Record already exists." }] });
               reject({ errors: [{ error: "duplicateEntry", message: "Record already exists." }] });
               return;
             }
             console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
-            failure({ errors: [{ error: "databaseError", message: error.code }] });
             reject({ errors: [{ error: "databaseError", message: error.code }] });
-          } else {
-            this.DRAFT = false;
-            if (results.affectedRows === 1) {
-              success({ result: this });
-              resolve({ result: this });
-              return;
-            }
-            failure({ errors: [{ error: "nothingmodified", message: "Nothing modified." }] });
-            reject({ errors: [{ error: "nothingmodified", message: "Nothing modified." }] });
+            return;
           }
+          this.DRAFT = false;
+          if (isAutoIncrement && !this[this.IDENTIFIER]) {
+            const ai = parseInt(results[1][0].AUTO_INCREMENT);
+            if (ai) this[this.IDENTIFIER] = ai - 1;
+          }
+          const upsertResults = Array.isArray(results) ? results[0] : results;
+          if (upsertResults.affectedRows === 1) {
+            resolve({ result: this });
+            return;
+          }
+          reject({ errors: [{ error: "nothingmodified", message: "Nothing modified." }] });
         });
       }
       if (this.METHOD === "STORAGE") {
@@ -166,7 +171,6 @@ class AFModel {
           zone.setRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID, data);
         }
         storage.save(zone);
-        success({ result: this });
         resolve({ result: this });
       }
     });
@@ -179,8 +183,6 @@ class AFModel {
    * @returns {Promise}
    */
   delete() {
-    const success = arguments[0] ? typeof arguments[0].onSuccess === "function" ? arguments[0].onSuccess : () => { } : () => { };
-    const failure = arguments[0] ? typeof arguments[0].onFailure === "function" ? arguments[0].onFailure : () => { } : () => { };
     return new Promise(async (resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
@@ -198,10 +200,8 @@ class AFModel {
             } else {
               console.log(`${ACUtil.terminalPrefix()}\x1b[33m (warning) ${error.message}\x1b[0m`);
             }
-            failure({ errors: [{ error: "databaseError", message: error.code }] });
             reject({ errors: [{ error: "databaseError", message: error.code }] });
           }
-          success({});
           resolve({});
         });
         return;
@@ -212,7 +212,6 @@ class AFModel {
         if (!this.DRAFT) {
           if (zone.deleteRecordWhere(this.PROPERTIES[this.IDENTIFIER].name, this.ID)) {
             storage.save(zone);
-            success({});
             resolve({});
           }
         }
@@ -489,11 +488,9 @@ AFModel.register = (Model) => {
    * 
    * @returns {Promise<Object>}
    */
-  Model.delete = ({ conditions, onFailure, onSuccess }) => {
+  Model.delete = ({ conditions }) => {
     const database = new AFDatabase(environment.getDBCredentials());
     const conditionsArray = Array.isArray(conditions) ? conditions : [];
-    const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
-    const didFail = typeof onFailure === "function" ? onFailure : () => { };
     var queryParts = [`DELETE FROM \`${Model.NAME}\``];
     var wheres = [];
     var parameters = [];
@@ -556,11 +553,9 @@ AFModel.register = (Model) => {
       }
       try {
         const results = await database.query(queryParts.join(" ") + ";", parameters);
-        didSucceed(results);
         resolve({ results });
       } catch (error) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
-        didFail({ errors: [{ error: error.code, message: error.message }] });
         reject(error);
       }
     });
@@ -574,9 +569,6 @@ AFModel.register = (Model) => {
    * @returns {Promise<Model>}
    */
   Model.get = (ID) => {
-    const options = typeof arguments[1] === "object" ? arguments[1] : {};
-    const didSucceed = typeof options.onSuccess === "function" ? options.onSuccess : () => { };
-    const didFail = typeof options.onFailure === "function" ? options.onFailure : () => { };
     const model = new Model();
     return new Promise(async (resolve, reject) => {
       try {
@@ -591,14 +583,11 @@ AFModel.register = (Model) => {
             model[property.split(".")[0]] = result[property];
           }
           model.DRAFT = false;
-          didSucceed(model);
           resolve(model);
           return;
         }
-        didFail({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
         reject({ errors: [{ error: "doesNotExist", message: "Does not exist." }] });
       } catch (errors) {
-        didFail(errors)
         reject(errors);
       }
     });

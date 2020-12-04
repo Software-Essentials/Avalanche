@@ -12,155 +12,103 @@ import { AFController } from "avacore";
 class <#class_name#> extends AFController {
 
   /**
-   * @description Shows all <#model_lowercase#>s or a specific <#model_lowercase#> if an 'ID' is specified in the body.
-   * 
-   * @param {Object} request
-   * @param {Object} response
+   * @description Shows a specific <#model_lowercase#>.
    */
-  async show(request, response) {
-    const onSuccess = ({ message, results }) => {
-      response.json({
-        success: true,
-        message: message,
-        data: results
+  async show({ body, request }, resolve, reject) {
+    body.validate("ID").alias("ID").number();
+    if (!request.validate({ reject })) return;
+    try {
+      const { ID } = body;
+      const results = await <#model#>.select({
+        properties: ["ID", "name", "details", "createdAt", "modifiedAt"],
+        conditions: ID ? [{ key: "ID", value: ID }] : []
       });
-    }
-    const onFailure = ({ message, errors }) => {
-      response.json({
-        success: false,
-        message: message || "<#model#> doesn't exist.",
-        errors
+      resolve({
+        data: ID && results.length === 1 ? results[0] : results
       });
-    }
-    // request.body.validate("ID").alias("ID").number(); /* Uncomment this if your model identifier is a number */
-    if (request.validate({ onFailure })) {
-      try {
-        const { ID } = request.body;
-        const results = await <#model#>.select({
-          properties: ["ID", "name", "body", "createdAt", "modifiedAt"],
-          conditions: ID ? [{ key: "ID", value: ID }] : []
-        });
-        onSuccess({ results: ID && results.length === 1 ? results[0] : results });
-      } catch (error) {
-        console.log(error);
-        onFailure({ errors: [{ error: error.code, message: error.message }] });
-      }
+    } catch (error) {
+      console.log(error);
+      reject({
+        message: "Unable to show <#model_lowercase#>",
+        errors: [{ error: error.code, message: error.message }]
+      });
     }
   }
 
 
   /**
    * @description Creates a new <#model_lowercase#>.
-   * 
-   * @param {Object} request
-   * @param {Object} response
    */
-  async store(request, response) {
-    const onSuccess = ({ message }) => {
-      if (typeof request.headers.referer === "string") {
-        response.redirect("/<#model_lowercase#>s");
-        return;
-      }
-      response.json({
-        success: true,
-        message: message || "<#model_lowercase#> created."
+  async store({ body, request }, resolve, reject) {
+    body.validate("name").alias("Name").string().notEmpty();
+    body.validate("details").alias("Details").string().notEmpty();
+    if (!request.validate({ reject })) return;
+    try {
+      const { name, details } = body;
+      const <#model_lowercase#> = new <#model#>();
+      <#model_lowercase#>.name = name;
+      <#model_lowercase#>.details = details;
+      await <#model_lowercase#>.save();
+      resolve({
+        message: "<#model_lowercase#> created.",
+        data: <#model_lowercase#>.data()
       });
-    }
-    const onFailure = ({ message, errors }) => {
-      if (typeof request.headers.referer === "string") {
-        response.redirect("/<#model_lowercase#>s");
-        return;
-      }
-      response.json({
-        success: false,
-        message: message || "Unable to add <#model_lowercase#>.",
-        errors
+    } catch (error) {
+      console.log(error);
+      reject({
+        message: "Unable to create <#model_lowercase#>",
+        errors: [{ error: error.code, message: error.message }]
       });
-    }
-    request.body.validate("name").alias("Name").string().notEmpty();
-    if (request.validate({ onFailure })) {
-      try {
-        const { name } = request.body;
-        const <#model_lowercase#> = new <#model#>();
-        <#model_lowercase#>.name = name;
-        await <#model_lowercase#>.save();
-        onSuccess({});
-      } catch (error) {
-        console.log(error);
-        onFailure({ errors: [{ error: error.code, message: error.message }] });
-      }
     }
   }
 
 
   /**
    * @description Updates all existing <#model_lowercase#>s with a specific ID.
-   * 
-   * @param {Object} request
-   * @param {Object} response
    */
-  async update(request, response) {
-    const onSuccess = ({ message }) => {
-      response.json({
-        success: true,
-        message: message || "<#model_lowercase#> updated."
+  async update({ body, request }, resolve, reject) {
+    body.validate("ID").alias("ID").number().notEmpty();
+    body.validate("name").alias("Name").string().notEmpty();
+    body.validate("details").alias("Details").string().notEmpty();
+    if (!request.validate({ reject })) return;
+    try {
+      const { ID, name, details } = body;
+      const <#model_lowercase#> = await <#model#>.get(ID);
+      <#model_lowercase#>.name = name;
+      <#model_lowercase#>.details = details;
+      await <#model_lowercase#>.save();
+      resolve({
+        message: "<#model#> updated."
       });
-    }
-    const onFailure = ({ message, errors }) => {
-      response.json({
-        success: false,
-        message: message || "Unable to update <#model_lowercase#>.",
-        errors
+    } catch (error) {
+      console.log(error);
+      reject({
+        message: "Unable to update <#model_lowercase#>",
+        errors: [{ error: error.code, message: error.message }]
       });
-    }
-    request.body.validate("ID").alias("ID").notEmpty();
-    request.body.validate("name").alias("Name").string().notEmpty();
-    if (request.validate({ onFailure })) {
-      try {
-        const { ID, name } = request.body;
-        const <#model_lowercase#> = await <#model#>.get(ID);
-        <#model_lowercase#>.name = name;
-        await <#model_lowercase#>.save();
-        onSuccess({});
-      } catch (error) {
-        console.log(error);
-        onFailure({ errors: [{ error: error.code, message: error.message }] });
-      }
     }
   }
 
 
   /**
    * @description Deletes all <#model_lowercase#>s with a specific ID.
-   * 
-   * @param {Object} request
-   * @param {Object} response
    */
-  async destroy(request, response) {
-    const onSuccess = ({ message }) => {
-      response.json({
-        success: true,
-        message: message || "<#model#> deleted."
+  async destroy({ body, request }, resolve, reject) {
+    body.validate("ID").alias("ID").number().notEmpty();
+    if (!request.validate({ reject })) return;
+    try {
+      const { ID } = body;
+      const <#model_lowercase#> = await <#model#>.get(ID);
+      await <#model_lowercase#>.delete();
+      resolve({
+        message: "<#model#> deleted."
       });
-    }
-    const onFailure = ({ message, errors }) => {
-      response.json({
-        success: false,
-        message: message || "Unable to delete <#model_lowercase#>.",
-        errors
+    } catch (error) {
+      console.log(error);
+      reject({
+        message: "Unable to delete <#model_lowercase#>",
+        errors: [{ error: error.code, message: error.message }]
       });
-    }
-    request.body.validate("ID").alias("ID").notEmpty();
-    if (request.validate({ onFailure })) {
-      try {
-        const { ID } = request.body;
-        const <#model_lowercase#> = await <#model#>.get(ID);
-        await <#model_lowercase#>.delete();
-        onSuccess({});
-      } catch (error) {
-        console.log(error);
-        onFailure({ errors: [{ error: error.code, message: error.message }] });
-      }
     }
   }
 

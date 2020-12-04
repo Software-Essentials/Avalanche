@@ -62,10 +62,10 @@ class ACMigrator {
       animation = progressAnimation(`\x1b[34mMigrating (0/${models.length})`);
       for (const i in models) {
         const model = models[i];
-        migrations[model] = null;
         const path = `${projectPWD}/app/models/${model}.js`;
         if (fs.existsSync(path)) {
           const Model = require(path).default;
+          migrations[Model.NAME] = null;
           if (Model.METHOD === "DATABASE") {
             var properties = [];
             var options = {
