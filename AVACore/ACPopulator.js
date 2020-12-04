@@ -37,11 +37,11 @@ class ACPopulator {
   }
 
 
-  seed(mode, callback) {
+  async seed(mode, callback) {
     switch (mode) {
-      case "SAFE": this.execute({ wipe: false, onReady: callback }); break;
-      case "OVERWRITE": this.execute({ wipe: false, onReady: callback }); break;
-      case "WIPE": this.execute({ wipe: true, onReady: callback }); break;
+      case "SAFE": await this.execute({ wipe: false, onReady: callback }); break;
+      case "OVERWRITE": await this.execute({ wipe: false, onReady: callback }); break;
+      case "WIPE": await this.execute({ wipe: true, onReady: callback }); break;
     }
   }
 
@@ -49,7 +49,7 @@ class ACPopulator {
   /**
    * @description Wipes the data in the storage and database. Then seeds.
    */
-  execute(options) {
+  async execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
     readline.cursorTo(process.stdout, 0);
@@ -59,7 +59,7 @@ class ACPopulator {
     var seedStats = {};
     const that = this;
     if (wipe) {
-      database.wipeAllData({
+      await database.wipeAllData({
         onSuccess: proceed
       });
       try {
@@ -93,7 +93,7 @@ class ACPopulator {
             for(const row of seed.data) {
               for(const property in row) {
                 const value = row[property]
-                if (value === "<#UUID?>") {
+                if (value === "<#UUID#>") {
                   row[property] = new UUID().string;
                 }
               }

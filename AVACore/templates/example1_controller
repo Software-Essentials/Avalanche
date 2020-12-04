@@ -8,155 +8,161 @@ import Post from "../models/Post.js";
  */
 class PostController extends AFController {
 
-  constructor() {
-    super()
-  }
-
-
-  /**
-   * @description Shows all posts.
-   * @param {Object} request
-   * @param {Object} response
-   */
-  index(request, response) {
-    const onSuccess = ({results}) => {
-      const isEmpty = results.length <= 0;
-      var data = [];
-      for(const i in results) {
-        data.push(results[i].get());
-      }
-      response.json({
-        success: !isEmpty,
-        message: isEmpty ? "No posts to display." : "Showing posts.",
-        data: isEmpty ? undefined : data
-      });
-    }
-    const onFailure = () => {
-      response.json({
-        success: false,
-        message: "Failure."
-      });
-    }
-    Post.all({onSuccess, onFailure});
-  }
-
-
   /**
    * @description Shows a specific post.
+   * 
    * @param {Object} request
    * @param {Object} response
    */
-  show(request, response) {
-    const ID = parseInt(request.params.ID);
-    const onSuccess = ({results}) => {
-      const isEmpty = results.length <= 0;
+  async show(request, response) {
+    const onSuccess = ({ message, results }) => {
       response.json({
-        success: !isEmpty,
-        message: isEmpty ? "Post doesn't exist." : "Showing post.",
-        data: isEmpty ? undefined : results[0].get()
+        success: true,
+        data: results
       });
     }
-    const onFailure = () => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Post doesn't exist."
+        message: message || "Post doesn't exist.",
+        errors
       });
     }
-    Post.where("post_id", ID, {onSuccess, onFailure});
+    request.body.validate("ID").alias("ID").number();
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID } = request.body;
+        const results = await Post.select({
+          properties: ["ID", "name", "body", "createdAt", "modifiedAt"],
+          conditions: ID ? [{ key: "ID", value: ID }] : []
+        });
+        onSuccess({ results: ID && results.length === 1 ? results[0] : results });
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
+      }
+    }
   }
 
 
   /**
    * @description Creates a new post.
+   * 
    * @param {Object} request
    * @param {Object} response
    */
-  store(request, response) {
-    const post = new Post();
-    post.name = request.body.postName;
-    post.body = request.body.postBody
-    const onSuccess = () => {
-      if(typeof request.headers.referer === "string") {
+  async store(request, response) {
+    const onSuccess = ({ message }) => {
+      if (typeof request.headers.referer === "string") {
         response.redirect("/posts");
-      } else {
-        response.json({
-          success: true,
-          message: "post created."
-        });
+        return;
+      }
+      response.json({
+        success: true,
+        message: message || "post created."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      if (typeof request.headers.referer === "string") {
+        response.redirect("/posts");
+        return;
+      }
+      response.json({
+        success: false,
+        message: message || "Unable to add post.",
+        errors
+      });
+    }
+    request.body.validate("postName").alias("Name").string().notEmpty();
+    request.body.validate("postBody").alias("Body").string().notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { postName, postBody } = request.body;
+        const post = new Post();
+        post.name = postName;
+        post.body = postBody
+        await post.save();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
       }
     }
-    const onFailure = ({error}) => {
-      if(typeof request.headers.referer === "string") {
-        response.redirect("/posts");
-      } else {
-        response.json({
-          success: false,
-          message: "Unable to add post."
-        });
-      }
-    }
-    post.save({onSuccess, onFailure});
   }
 
 
   /**
    * @description Updates all existing posts with a specific ID.
+   * 
    * @param {Object} request
    * @param {Object} response
    */
-  update(request, response) {
-    const ID = request.body.ID;
-    const onSuccess = () => {
+  async update(request, response) {
+    const onSuccess = ({ message }) => {
       response.json({
         success: true,
-        message: "post updated."
+        message: message || "post updated."
       });
     }
-    const onFailure = ({error}) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to update post."
+        message: message || "Unable to update post.",
+        errors
       });
     }
-    new Post().where("post_id", parseInt(ID)).fetch(({error, self}) => {
-      if (error) {
-        onFailure({error});
-        return;
+    request.body.validate("ID").alias("ID").number().notEmpty();
+    request.body.validate("postName").alias("Name").string().notEmpty();
+    request.body.validate("postBody").alias("Body").string().notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID, postName, postBody } = request.body;
+        const post = await Post.get(ID);
+        post.name = postName;
+        post.body = postBody;
+        post.modifiedAt = new Date().valueOf();
+        await post.save();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
       }
-      self.name = request.body.postName;
-      self.body = request.body.postBody;
-      self.modifiedAt = new Date().valueOf();
-      self.save({onSuccess, onFailure});
-    });
+    }
   }
 
 
   /**
    * @description Deletes all posts with a specific ID.
+   * 
    * @param {Object} request
    * @param {Object} response
    */
-  destroy(request, response) {
-    const ID = request.body.ID;
-    const onSuccess = () => {
+  async destroy(request, response) {
+    const onSuccess = ({ message }) => {
       response.json({
         success: true,
-        message: "Post deleted."
+        message: message || "Post deleted."
       });
     }
-    const onFailure = ({error}) => {
+    const onFailure = ({ message, errors }) => {
       response.json({
         success: false,
-        message: "Unable to delete post."
+        message: message || "Unable to delete post.",
+        errors
       });
     }
-    new Post().where("post_id", parseInt(ID)).fetch(({error, self}) => {
-      if (error) {
-        onFailure({error});
-        return;
+    request.body.validate("ID").alias("ID").number().notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID } = request.body;
+        const post = await Post.get(ID);
+        await post.delete();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
       }
-      self.delete({onSuccess, onFailure});
-    });
+    }
   }
 
 }

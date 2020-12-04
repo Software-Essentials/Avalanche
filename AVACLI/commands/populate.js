@@ -6,7 +6,7 @@ import { terminalPrefix } from "../../AVACore/ACUtil";
 /**
  * @description Migrate.
  */
-function populate() {
+async function populate() {
   const seeder = new ACPopulator();
   const choices = [
     "\x1b[32m\x1b[1mSAFE\x1b[0m       \x1b[3m(Only creates records that don't exist yet)\x1b[0m",
@@ -24,7 +24,8 @@ function populate() {
       choices: choices
     }
   ];
-  inquirer.prompt(questions).then(answers => {
+  try {
+    const answers = await inquirer.prompt(questions);
     const mode = ["SAFE", "OVERWRITE", "WIPE"];
     var options = {};
     choices.forEach((value, index, array) => {
@@ -33,13 +34,15 @@ function populate() {
     const choice = options[answers.mode];
     if(typeof mode[choice] === "string") {
       const option = options[answers.mode];
-      seeder.seed(mode[option], () => {
+      await seeder.seed(mode[option], () => {
         process.exit(0);
       });
       return;
     }
     console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m`);
-  });
+  } catch (error) {
+    console.log("INQUIRERY ERROR", error);
+  }
 }
 
 

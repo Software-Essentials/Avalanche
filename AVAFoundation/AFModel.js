@@ -59,10 +59,10 @@ class AFModel {
   /**
    * 
    */
-  async save(options) {
+  save(options) {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
         var queryParts = [this.DRAFT ? `INSERT INTO \`${this.NAME}\`` : `UPDATE \`${this.NAME}\` SET`];
@@ -175,11 +175,13 @@ class AFModel {
 
   /**
    * @description Removes the current instance from the database.
+   * 
+   * @returns {Promise}
    */
-  async delete() {
+  delete() {
     const success = arguments[0] ? typeof arguments[0].onSuccess === "function" ? arguments[0].onSuccess : () => { } : () => { };
     const failure = arguments[0] ? typeof arguments[0].onFailure === "function" ? arguments[0].onFailure : () => { } : () => { };
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.METHOD === "DATABASE") {
         const database = new AFDatabase(environment.getDBCredentials());
         const property = this.PROPERTIES[this.IDENTIFIER];
@@ -220,6 +222,20 @@ class AFModel {
     });
   }
 
+
+  /**
+   * @description Returns only the data of the model.
+   * 
+   * @returns {Promise<Object>}
+   */
+  data() {
+    const data = {};
+    for (const key in this.PROPERTIES) {
+      data[key] = this[key];
+    }
+    return data;
+  }
+
 }
 
 
@@ -235,10 +251,11 @@ AFModel.register = (Model) => {
   /**
    * 
    */
-  Model.select = async ({ properties, conditions, ordering, limit, offset, page, onFailure, onSuccess }) => {
+  Model.select = ({ properties, conditions, ordering, limit, offset, page, onFailure, onSuccess }) => {
     var limit = isNaN(parseInt(limit)) ? null : parseInt(limit);
     var offset = isNaN(parseInt(offset)) ? null : parseInt(offset);
     var page = isNaN(parseInt(page)) ? null : parseInt(page);
+    const database = new AFDatabase(environment.getDBCredentials());
     const propertiesArray = Array.isArray(properties) ? properties : [];
     const orderingObject = typeof ordering === "object" && !Array.isArray(ordering) ? ordering : {};
     const conditionsArray = Array.isArray(conditions) ? conditions : [];
@@ -250,7 +267,7 @@ AFModel.register = (Model) => {
     var wheres = [];
     var parameters = [];
     const modelProperties = Model.PROPERTIES;
-    const promise = new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       for (const key of propertiesArray) {
         const keyParts = key.split(".");
         if (modelProperties.hasOwnProperty(keyParts[0])) {
@@ -443,14 +460,8 @@ AFModel.register = (Model) => {
       if (environment.debug.logQueriesToConsole) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
       }
-      database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
-        if (error) {
-          console.log("TEST1");
-          console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
-          didFail({ errors: [{ error: error.code, message: error.message }] });
-          reject({ errors: [{ error: error.code, message: error.message }] });
-          return;
-        }
+      try {
+        const results = await database.query(queryParts.join(" ") + ";", parameters);
         for (var i in results) {
           const result = results[i];
           for (var key in result) {
@@ -463,16 +474,23 @@ AFModel.register = (Model) => {
           }
         }
         didSucceed({ results });
-        resolve({ results });
-      });
+        resolve(results);
+      } catch (error) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
+        didFail({ errors: [{ error: error.code, message: error.message }] });
+        reject(error);
+      }
     });
-    return promise;
   }
 
 
   /**
+   * @description Deletes all records that conform to the given conditions.
+   * 
+   * @returns {Promise<Object>}
    */
   Model.delete = ({ conditions, onFailure, onSuccess }) => {
+    const database = new AFDatabase(environment.getDBCredentials());
     const conditionsArray = Array.isArray(conditions) ? conditions : [];
     const didSucceed = typeof onSuccess === "function" ? onSuccess : () => { };
     const didFail = typeof onFailure === "function" ? onFailure : () => { };
@@ -480,7 +498,7 @@ AFModel.register = (Model) => {
     var wheres = [];
     var parameters = [];
     const modelProperties = Model.PROPERTIES;
-    return promise = new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       for (const condition of conditionsArray) { // Handle all where's
         const keyParts = condition.key.split(".");
         if (modelProperties.hasOwnProperty(keyParts[0])) {
@@ -536,25 +554,24 @@ AFModel.register = (Model) => {
       if (environment.debug.logQueriesToConsole) {
         console.log(`${ACUtil.terminalPrefix()}\x1b[36m MySQL query:\n\n\x1b[1m\x1b[35m${queryParts.join(" ")};\x1b[0m\n\n\x1b[36mParameters: \x1b[3m\x1b[35m`, parameters, "\x1b[0m");
       }
-      database.query(queryParts.join(" ") + ";", parameters, (error, results, fields) => {
-        if (error) {
-          console.log("TEST2");
-          console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
-          didFail({ errors: [{ error: error.code, message: error.message }] });
-          reject({ errors: [{ error: error.code, message: error.message }] });
-          return;
-        }
-        didSucceed({ results });
+      try {
+        const results = await database.query(queryParts.join(" ") + ";", parameters);
+        didSucceed(results);
         resolve({ results });
-      });
+      } catch (error) {
+        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error) ${error.message}.\x1b[0m`);
+        didFail({ errors: [{ error: error.code, message: error.message }] });
+        reject(error);
+      }
     });
   }
 
 
   /**
    * @description Returns AFModel.
-   * @param {Int|UUID}
-   * @param {Function}
+   * 
+   * @param {UUID|Number} ID Identifier of the model.
+   * @returns {Promise<Model>}
    */
   Model.get = (ID) => {
     const options = typeof arguments[1] === "object" ? arguments[1] : {};
@@ -563,7 +580,7 @@ AFModel.register = (Model) => {
     const model = new Model();
     return new Promise(async (resolve, reject) => {
       try {
-        const { results } = await Model.select({
+        const results = await Model.select({
           properties: Object.keys(Model.PROPERTIES),
           conditions: [{ key: Model.IDENTIFIER, value: ID }]
         });

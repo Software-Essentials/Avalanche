@@ -1,0 +1,170 @@
+import { AFController } from "avacore";
+<#import#>
+
+
+/**<#author#><#description#>
+ */
+class <#name#> extends AFController {
+
+  /**
+   * @description The index handler will return a list of <#model#>s.
+   * @param {Object} request
+   * @param {Object} response
+   */
+  index(request, response) {
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        data: results
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to display <#model#>s.",
+        errors
+      });
+    }
+    <#model#>.select({
+      properties: ["ID", "name", "createdAt", "modifiedAt"],
+      conditions: [],
+      onFailure, onSuccess
+    });
+  }
+
+
+  /**
+   * @description The show handler will return a specific <#model#>.
+   * @param {Object} request
+   * @param {Object} response
+   */
+  show(request, response) {
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        data: results
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "<#model#> doesn't exist."
+      });
+    }
+    request.query.validate("ID").number();
+    if (request.validate({ onFailure })) {
+      const { ID } = request.query;
+      <#model#>.get(ID, {
+        onFailure, onSuccess: <#model_lowercase#> => {
+          onSuccess({ results: <#model_lowercase#> });
+        }
+      });
+    }
+  }
+
+
+  /**
+   * @description The store handler is responsible for saving a newly given <#model#>.
+   * @param {Object} request
+   * @param {Object} response
+   */
+  store(request, response) {
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        message: "<#model#> created.",
+        data: results[0]
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to create <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("name").alias("Name").string().range(4, 64);
+    if (request.validate({ onFailure })) {
+      const { name } = request.body;
+      const <#model_lowercase#> = new <#model#>();
+      <#model_lowercase#>.name = name;
+      <#model_lowercase#>.save({
+        onFailure, onSuccess: () => {
+          onSuccess({ results: [{ ID: <#model_lowercase#>.ID }] });
+        }
+      });
+    };
+  }
+
+
+  /**
+   * @description The update handler is responsible for applying changes to a specific <#model#>.
+   * @param {Object} request
+   * @param {Object} response
+   */
+  update(request, response) {
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        message: "<#model#> saved."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to save <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("ID").string().length(36);
+    request.body.validate("name").alias("Name").string().range(4, 64);
+    if (request.validate({ onFailure })) {
+      const { ID, name } = request.body;
+      <#model#>.get(ID, {
+        onFailure, onSuccess: (<#model_lowercase#>) => {
+          <#model_lowercase#>.name = name;
+          <#model_lowercase#>.save({ onFailure, onSuccess });
+        }
+      });
+    }
+  }
+
+
+  /**
+   * @description The destroy handler is responsible for deleting a specific <#model#>.
+   * @param {Object} request
+   * @param {Object} response
+   */
+  destroy(request, response) {
+    const onSuccess = ({ results }) => {
+      response.json({
+        success: true,
+        message: "<#model#> deleted."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to delete <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("ID").string().length(36);
+    if (request.validate({ onFailure })) {
+      const { ID } = request.body;
+      <#model#>.delete({
+        conditions: [{ key: "ID", value: ID }],
+        onFailure, onSuccess: ({ results }) => {
+          if (results.affectedRows < 1) {
+            onFailure({ message: "<#model#> does not exist.", errors: [{ error: "notExist", message: "<#model#> does not exist." }] });
+          }
+          onSuccess({});
+        }
+      });
+    }
+  }
+
+}
+
+
+export default <#name#>;

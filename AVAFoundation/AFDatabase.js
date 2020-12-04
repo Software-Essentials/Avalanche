@@ -50,93 +50,59 @@ class AFDatabase {
 
   /**
    * @description Does a request to the database.
+   * 
    * @param {String} query 
    * @param {Object} parameters 
    * @param {Function} callback 
+   * @return {Promise<Object>} Query result
    */
-  query(query, parameters, callback) {
-    this.connection.query(query, parameters, callback);
+  query(query, parameters, callback = () => { }) {
+    return new Promise((resolve, reject) => {
+      this.connection.query(query, parameters, (error, results, fields) => {
+        callback(error, results, fields);
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(results);
+      });
+    });
   }
 
 
-  wipeAllData(options) {
+  /**
+   * @description Deletes all data in all tables.
+   * 
+   * @param {Object} options 
+   */
+  async wipeAllData(options) {
     const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
     const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
     var wipes = {};
     const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    this.query(this.preQuery() + query, [this.credentials.database], (error, _results, fields) => {
-      if (error) {
-        failure({ error });
-        return;
-      }
+    try {
+      const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
       const results = _results ? _results.slice(1)[0] : null;
       if (results.length > 0) {
         for (const result of results) {
           const table = result.name;
           wipes[table] = null;
           const query = `DELETE FROM \`${result.name}\`;`;
-          this.query(this.preQuery() + query, [], (error, _results, fields) => {
-            if (error) {
-              wipes[table] = false;
-              failure({ error });
-            } else {
-              wipes[table] = true;
-              update();
-            }
-          });
+          try {
+            const _results = await this.query(this.preQuery() + query, []);
+            wipes[table] = true;
+            update();
+          } catch (error) {
+            wipes[table] = false;
+            failure({ error });
+          }
         }
       } else {
         update();
       }
-    });
-    function update() {
-      var completed = 0;
-      var successful = 0;
-      for (const key in wipes) {
-        if (wipes[key] !== null) completed++;
-        if (wipes[key]) successful++;
-      }
-      if (completed === Object.keys(wipes).length) {
-        success({
-          total: completed,
-          success: successful
-        });
-      }
+    } catch (error) {
+      failure({ error });
     }
-  }
-
-
-  dropAllTables(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    var wipes = {};
-    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    this.query(this.preQuery() + query, [this.credentials.database], (error, _results, fields) => {
-      if (error) {
-        failure({ error });
-        return;
-      }
-      const results = _results ? _results.slice(1)[0] : null;
-      if (results.length > 0) {
-        for (const result of results) {
-          const table = result.name;
-          wipes[table] = null;
-          const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
-          this.query(this.preQuery() + query, [], (error, _results, fields) => {
-            const results = _results ? _results.slice(1) : null; // Parsed results. Use this instead of _results if you are going to utilise.
-            if (error) {
-              wipes[table] = false;
-              failure({ error });
-            } else {
-              wipes[table] = true;
-              update();
-            }
-          });
-        }
-      } else {
-        update();
-      }
-    });
     function update() {
       var completed = 0;
       var successful = 0;
@@ -155,12 +121,65 @@ class AFDatabase {
 
 
   /**
-   * @description Creates table in the database.
+   * @description Drops all tables in the database.
+   * 
+   * @param {Object} options 
+   */
+  async dropAllTables(options) {
+    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+    var wipes = {};
+    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
+    try {
+      const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
+      const results = _results ? _results.slice(1)[0] : null;
+      if (results.length > 0) {
+        for (const result of results) {
+          const table = result.name;
+          wipes[table] = null;
+          const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
+          try {
+            const _results = await this.query(this.preQuery() + query, []);
+            const results = _results ? _results.slice(1) : null; // Parsed results. Use this instead of _results if you are going to utilise.
+            wipes[table] = true;
+            update();
+          } catch (error) {
+            wipes[table] = false;
+            failure({ error });
+          }
+        }
+      } else {
+        update();
+      }
+    } catch (error) {
+      failure({ error });
+      return;
+    }
+    function update() {
+      var completed = 0;
+      var successful = 0;
+      for (const key in wipes) {
+        if (wipes[key] !== null) completed++;
+        if (wipes[key]) successful++;
+      }
+      if (completed === Object.keys(wipes).length) {
+        success({
+          total: completed,
+          success: successful
+        });
+      }
+    }
+  }
+
+
+  /**
+   * @description Creates a table in the database.
+   * 
    * @param {String} tablename Name of the table.
    * @param {Array} columns Columns.
    * @param {Object} options Options.
    */
-  createTable(tablename, columns, options) {
+  async createTable(tablename, columns, options) {
     const force = options ? options.force ? true : false : false;
     const propertyKeys = options ? options.propertyKeys ? options.propertyKeys : {} : {};
     const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
@@ -220,7 +239,7 @@ class AFDatabase {
       var length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
       if (typeProperty.type === "enum") {
         if (Array.isArray(column.options)) {
-          if (!column.options.includes(defaultVal)) {
+          if (defaultVal && !column.options.includes(defaultVal)) {
             console.log(`${terminalPrefix()}\x1b[31m (error) Default value '${defaultVal}' of enum '${tablename}.${propertyKeys[name]}' is not an option.`);
           }
           for (let i = 0; i < column.options.length; i++) {
@@ -233,7 +252,7 @@ class AFDatabase {
       }
       const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
       const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
-      
+
       const required = !!column.required;
       const unique = column.unique;
       const unsigned = typeProperty.unsignable ? column.relatable : false;
@@ -258,27 +277,27 @@ class AFDatabase {
     }
     if (force) {
       const query = `DROP TABLE IF EXISTS \`${tablename}\`;`;
-      this.query(that.preQuery() + query, [], (error, _results, fields) => {
+      try {
+        const _results = await this.query(that.preQuery() + query, []);
         const results = _results ? _results.slice(1) : null;
-        if (error) {
-          failure({ table: tablename, error: error });
-          return;
-        }
         create();
-      });
+      } catch (error) {
+        failure({ table: tablename, error: error });
+        return;
+      }
     } else {
       create();
     }
-    function create() {
+    async function create() {
       const query = `CREATE TABLE \`${tablename}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
-      that.query(that.preQuery() + query, [], (error, _results, fields) => {
+      try {
+        const _results = await that.query(that.preQuery() + query, []);
         const results = _results ? _results.slice(1) : null;
-        if (error) {
-          failure({ table: tablename, error: error });
-          return;
-        }
         success({ table: tablename });
-      });
+      } catch (error) {
+        failure({ table: tablename, error: error });
+        return;
+      }
     }
   }
 

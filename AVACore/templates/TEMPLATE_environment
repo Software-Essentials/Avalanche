@@ -1,6 +1,6 @@
 {
   "info": {
-    "title": "<#name?>"
+    "title": "<#name#>"
   },
   "network": {
     "domain": "localhost",
@@ -12,7 +12,7 @@
     "restartOnFileChange": true
   },
   "auth": {
-    "secret": "<#secret?>",
+    "secret": "<#secret#>",
     "saltRounds": 10,
     "sessionStore": "MYSQL"
   },

@@ -149,19 +149,25 @@ function make_controller() {
   inquirer.prompt(questions).then(answers => {
     const model = ACUtil.getModels().includes(answers.model) ? answers.model : null;
     const modelName = model == null ? "Entity" : model.split("-").join("_");
-    const importLine = model == null ? `// import Entity from "../models/Entity";` : `import ${modelName} from "../models/${model}";`;
-    const descriptionLine = `\n * @description ${model == null ? "Manages requests" : `Manages requests regarding the ${model} model`}.`;
-    const authorLine = pkg.author ? `\n * @author ${pkg.author}` : "";
+    const authorName = typeof pkg.author.name === "string" ? pkg.author.name : pkg.author;
+    const authorEmail = typeof pkg.author.email === "string" ? pkg.author.email : null;
+    const date = new Date().toLocaleString().split(",")[0];
+    const year = new Date().getFullYear();
+    const file = `${answers.name}.js`;
     const variables = {
-      import: importLine,
-      description: descriptionLine,
-      author: authorLine,
-      name: answers.name,
+      file, project: pkg.name ? `\n//  ${pkg.title || pkg.name}` : "",
+      import: model == null ? `// import Entity from "../models/Entity";` : `import ${modelName} from "../models/${model}";`,
+      meta_created: `\n//  Created ${authorName ? `by ${authorName} ` : ""}on ${date}.`,
+      meta_copyright: authorName ? `\n//  Copyright © ${year} ${authorName}. All rights reserved.` : "",
+      class_author: authorName ? `\n * @author ${authorName}${authorEmail ? ` <${authorEmail}>\n *` : ""}` : "",
+      class_description: `\n * @description ${model == null ? "Manages requests" : `Manages requests regarding the ${model} model`}.`,
+      class_since: pkg.version ? `\n * @since ${pkg.version}.` : "",
+      class_name: answers.name,
       model: modelName,
       model_lowercase: modelName.toLowerCase()
     };
-    makeTemplate(variables, "TEMPLATE_controller", `app/controllers/${answers.name}.js`, true);
-    // makeTemplate(variables, "TEMPLATE_route", `app/controllers/${answers.name}.js`);
+    makeTemplate(variables, "TEMPLATE_controller", `app/controllers/${file}`, true);
+    // makeTemplate(variables, "TEMPLATE_route", `app/controllers/${file}`);
   });
 }
 
@@ -477,6 +483,73 @@ function make_documentation() {
     const description = comment ? comment.split("@description")[1].split("@")[0] : "";
     return description;
   }
+  function generateParameters(endpoint) {
+    const filePath = `${projectPWD}/app/controllers/${endpoint.controller}.js`;
+    const comments = [];
+    if (fs.existsSync(filePath)) {
+      const fileData = fs.readFileSync(filePath, { encoding: "utf8" });
+      for (const codeSections of fileData.split("/**")) {
+        const codeSection = codeSections.split("(")[0];
+        if (!codeSection.includes("*/")) {
+          continue;
+        }
+        const handlerMeta = codeSection.split("*/")
+        const handler = handlerMeta[1].trim();
+        if (handler !== endpoint.handler) {
+          continue;
+        }
+        const step1 = fileData.split(handler);
+        step1.splice(0, 1);
+        const step2 = step1.join("").split("(");
+        step2.splice(0, 1);
+        const step3 = step2.join("(").split(")");
+        step3.splice(0, 1);
+        const step4 = step3.join(")").split("{");
+        step4.splice(0, 1);
+        const stepsV = step4.join("{").split(".validate");
+        console.log(`\n\n=-= ${handler} =-=\n--------------------\n`);
+        var validatorPartials = [];
+        for (const partial of stepsV) {
+          validatorPartials.push(partial);
+        }
+        var lastType = null;
+        for (let i = 0; i < validatorPartials.length; i++) {
+          const partial = validatorPartials[i].trim();
+          const pPart = partial.split(".");
+          if (lastType === "query") {
+
+            lastType = null;
+          }
+          if (lastType === "param") {
+
+            lastType = null;
+          }
+          if (lastType === "body") {
+
+            lastType = null;
+          }
+          if (pPart[pPart.length - 1] === "query") {
+            lastType = "query";
+            console.log(`I found a 'query' in ${handler}!`);
+          }
+          if (pPart[pPart.length - 1] === "param") {
+            lastType = "param";
+            console.log(`I found a 'param' in ${handler}!`);
+          }
+          if (pPart[pPart.length - 1] === "body") {
+            lastType = "body";
+            console.log(`I found a 'body' in ${handler}!`);
+          }
+
+
+          // console.log(`${handler} > PARTIAL\n\n${step}`);
+        }
+      }
+    }
+    const comment = comments.join(" ");
+    const description = comment ? comment.split("@description")[1].split("@")[0] : "";
+    return description;
+  }
   function generate() {
     const sections = [`# API Documentation\n*Generated on ${new Date().toDateString()}*`];
     const routes = [];
@@ -486,6 +559,7 @@ function make_documentation() {
         endpoint.method = route.method;
         endpoint.path = `*${route.path}`;
         endpoint.description = generateDescription(endpoint);
+        endpoint.parameters = generateParameters(endpoint);
         routes.push(endpoint);
       }
       for (const domain of Object.keys(route.domains)) {
@@ -493,6 +567,7 @@ function make_documentation() {
         endpoint.method = route.method;
         endpoint.path = `${domain}${route.path}`;
         endpoint.description = generateDescription(endpoint);
+        endpoint.parameters = generateParameters(endpoint);
         routes.push(endpoint);
       }
     }
@@ -568,7 +643,7 @@ function makeTemplate(variables, template, projectPath) {
         var content = fs.readFileSync(dest).toString();
         for (const key in variables) {
           const variable = variables[key];
-          content = content.split(`<#${key}?>`).join(variable);
+          content = content.split(`<#${key}#>`).join(variable);
         }
         fs.writeFileSync(dest, content, { encoding: "utf8" });
         console.log(`${ACUtil.terminalPrefix()}\x1b[32m Done.\x1b[0m`);

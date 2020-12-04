@@ -137,7 +137,7 @@ class AFValidator {
   }
 
   number() {
-    if (!isNaN(parseInt(this.value))) {
+    if (this.value === undefined || !isNaN(parseInt(this.value))) {
       return this;
     }
     this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];
@@ -146,7 +146,7 @@ class AFValidator {
   }
 
   string() {
-    if (typeof this.value === "string") {
+    if (this.value === undefined || typeof this.value === "string") {
       return this;
     }
     this.invalid[this.scope][this.key] = Array.isArray(this.invalid[this.scope][this.key]) ? this.invalid[this.scope][this.key] : [];

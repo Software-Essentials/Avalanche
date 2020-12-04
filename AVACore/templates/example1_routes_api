@@ -3,28 +3,22 @@
     "path": "/post",
     "method": "GET",
     "controller": "PostController",
-    "handler": "index"
-  },
-  {
-    "path": "/post/show/:ID",
-    "method": "GET",
-    "controller": "PostController",
     "handler": "show"
   },
   {
-    "path": "/post/store",
+    "path": "/post",
     "method": "POST",
     "controller": "PostController",
     "handler": "store"
   },
   {
-    "path": "/post/update",
+    "path": "/post",
     "method": "PUT",
     "controller": "PostController",
     "handler": "update"
   },
   {
-    "path": "/post/destroy",
+    "path": "/post",
     "method": "DELETE",
     "controller": "PostController",
     "handler": "destroy"

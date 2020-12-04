@@ -14,16 +14,16 @@ class ACMigrator {
   }
 
 
-  migrate(mode, callback) {
+  async migrate(mode, callback) {
     switch (mode) {
-      case "SAFE": this.execute({ wipe: false, force: false, onReady: callback }); break;
-      case "OVERWRITE": this.execute({ wipe: false, force: true, onReady: callback }); break;
-      case "WIPE": this.execute({ wipe: true, force: true, onReady: callback }); break;
+      case "SAFE": await this.execute({ wipe: false, force: false, onReady: callback }); break;
+      case "OVERWRITE": await this.execute({ wipe: false, force: true, onReady: callback }); break;
+      case "WIPE": await this.execute({ wipe: true, force: true, onReady: callback }); break;
     }
   }
 
 
-  execute(options) {
+  async execute(options) {
     const ready = options ? typeof options.onReady === "function" ? options.onReady : () => { } : () => { };
     const force = options ? typeof options.force === "boolean" ? options.force : false : false;
     const wipe = options ? typeof options.wipe === "boolean" ? options.wipe : false : false;
@@ -34,11 +34,11 @@ class ACMigrator {
     var migrations = {};
     if (wipe) {
       const animation = progressAnimation("\x1b[34mWiping tables");
-      database.dropAllTables({
-        onSuccess: ({ total, success }) => {
+      await database.dropAllTables({
+        onSuccess: async ({ total, success }) => {
           clearInterval(animation);
           console.log(`${terminalPrefix()}\x1b[32m Wipe complete. (${total}/${success} tables dropped)\x1b[0m`);
-          migrate();
+          await migrate();
         },
         onFailure: ({ error }) => {
           clearInterval(animation);
@@ -55,10 +55,10 @@ class ACMigrator {
         }
       });
     } else {
-      migrate();
+      await migrate();
     }
     var animation;
-    function migrate() {
+    async function migrate() {
       animation = progressAnimation(`\x1b[34mMigrating (0/${models.length})`);
       for (const i in models) {
         const model = models[i];
@@ -90,7 +90,7 @@ class ACMigrator {
               options.propertyKeys[Model.PROPERTIES[key].name] = key
               properties.push(Model.PROPERTIES[key]);
             }
-            database.createTable(Model.NAME, properties, options);
+            await database.createTable(Model.NAME, properties, options);
           }
           if (Model.METHOD === "STORAGE") {
             if (!storage.recordZoneExists(Model.NAME)) {

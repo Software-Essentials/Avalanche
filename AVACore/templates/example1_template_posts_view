@@ -3,7 +3,7 @@
     <a class="btn btn-link" href="/posts">&LeftAngleBracket; Back</a>
     <div class="row">
         <div class="col-12 card p-3 my-1">
-            <form method="PUT" id="createForm" name="createForm" action="/post/update">
+            <form method="PUT" id="createForm" name="createForm" action="/post">
                 <input type="hidden" name="_csrf" value="{{CSRF}}" />
                 <input type="hidden" name="ID" value="{{post.ID}}" />
                 <div class="form-group">
@@ -14,7 +14,7 @@
                 </div>
                 <button class="btn btn-primary" type="submit">Save post</button>
             </form>
-            <form class="mt-2" action="/post/destroy" method="DELETE">
+            <form class="mt-2" action="/post" method="DELETE">
                 <input type="hidden" name="_csrf" value="{{CSRF}}" />
                 <input type="hidden" name="ID" value="{{post.ID}}" />
                 <button class="btn btn-outline-danger" type="submit">Delete post</button>

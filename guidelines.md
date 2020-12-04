@@ -2,16 +2,15 @@
 
 ## HTTP Responses
 
-Each controller should generally support at least these 5 requests:
+Each entity controller should generally support at least these 4 requests:
 
-- `GET      /*/index`
-- `GET      /*/show`
-- `POST     /*/store`
-- `PUT      /*/update`
-- `DELETE   /*/destroy`
+- `GET`
+- `POST`
+- `PUT`
+- `DELETE`
 
-Ofcourse there are scenarios where not all 5 are needed.
-But generally in the context of an entity like '*Item*', '*Post*' or '*Team*'.
+Ofcourse there are scenarios where not all 4 are needed. Or scenarios where even more that 4 handlers are specified.
+But generally in the context of an entity like '*Item*', '*Post*' or '*Team*' it will be very useful to have these methods.
 
 ---
 
@@ -26,8 +25,10 @@ So a routing file could look like this for example:
 ```
 {
     "endpoints": {
-        "GET /post": "PostController.index",
-        "GET /post/show": "PostController.show"
+        "GET /post": "PostController.show",
+        "PUT /post": "PostController.update"
+        "DELETE /post": "PostController.destoy"
+        "Post /authentication/login": "AuthenticationController.login",
     }
 }
 ```
@@ -198,15 +199,13 @@ Failed response:
 
 *Routes:*
 
-`GET /post/index` // Used to display all posts
+`GET /post` // Used to display all posts or a specific post if an 'ID' is specified in the body.
 
-`GET /post/show` // Used to display a specific post
+`POST /post` // Used to create a post
 
-`POST /post/create` // Used to create a post
+`PUT /post` // Used to update a post
 
-`PUT /post/update` // Used to update a post
-
-`DELETE /post/destroy` // Used delete a post
+`DELETE /post` // Used delete a post
 
 ## Exceptional entity setup:
 

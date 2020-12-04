@@ -7,7 +7,7 @@ import { terminalPrefix } from "../../AVACore/ACUtil";
 /**
  * @description Migrate.
  */
-function migrate() {
+async function migrate() {
   const migrator = new ACMigrator();
   const seeder = new ACPopulator();
   const choices = [
@@ -34,7 +34,8 @@ function migrate() {
       suffix: "\x1b[0m"
     }
   ];
-  inquirer.prompt(questions).then(answers => {
+  try {
+    const answers = await inquirer.prompt(questions);
     const mode = ["SAFE", "OVERWRITE", "WIPE"];
     var options = {};
     choices.forEach((value, index, array) => {
@@ -43,10 +44,10 @@ function migrate() {
     const choice = options[answers.mode];
     if(typeof mode[choice] === "string") {
       const option = options[answers.mode];
-      migrator.migrate(mode[option], (success) => {
+      await migrator.migrate(mode[option], async (success) => {
         if (success) {
           if(answers.populate) {
-            seeder.seed(mode[option], () => {
+            await seeder.seed(mode[option], () => {
               process.exit(0);
             });
           } else {
@@ -57,7 +58,9 @@ function migrate() {
       return;
     }
     console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m`);
-  });
+  } catch (error) {
+    console.log("INQUIRERY ERROR", error);
+  }
 }
 
 

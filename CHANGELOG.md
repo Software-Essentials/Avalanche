@@ -5,6 +5,20 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.5.74] - 2020-12-04
+### Added
+- Added better file information to top of controller template.
+- Added implementation for asynchronous methods internally within the framework.
+- Added support for asynchronous use of ORM methods.
+- Added command that allows the developer to generate API reference documentation. `$ generate`
+
+### Fixed
+- Minor fixes.
+
+### Changes
+- Updated coding standards guideline.
+- Minor optimisations.
+
 ## [0.5.67] - 2020-07-08
 ### Added
 - Added inter-database model relations. You can set them up in an `AFModel`s property using the keys `database` & `table`. If a key is not inferrable you can use `bind` to explicitly specify it.

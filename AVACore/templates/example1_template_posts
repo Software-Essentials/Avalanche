@@ -1,7 +1,7 @@
 <div class="container jumbotron">
     <h1>Posts</h1>
     <div class="row">
-        <form class="col-12 card p-3 my-1" method="dd" action="/post/store" id="createForm" name="createForm">
+        <form class="col-12 card p-3 my-1" method="POST" action="/post" id="createForm" name="createForm">
             <input type="hidden" name="_csrf" value="{{CSRF}}" />
             <div class="form-group">
                 <input class="form-control" type="text" name="postName" placeholder="Title" />
@@ -20,7 +20,7 @@
             <div class="col-12 card p-3 my-1 d-block">
                 <div class="float-right d-flex">
                     <a class="btn btn-sm btn-outline-info mr-2" href="/posts/{{this.ID}}">Edit</a>
-                    <form method="DELETE" action="/post/destroy">
+                    <form method="DELETE" action="/post">
                         <input type="hidden" name="_csrf" value="{{CSRF}}" />
                         <input type="hidden" name="ID" value="{{this.ID}}" />
                         <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>

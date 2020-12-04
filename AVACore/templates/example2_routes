@@ -1,30 +1,24 @@
 [
   {
-    "path": "/post",
-    "method": "GET",
-    "controller": "PostController",
-    "handler": "index"
-  },
-  {
-    "path": "/post/show",
+    "path": "/show",
     "method": "GET",
     "controller": "PostController",
     "handler": "show"
   },
   {
-    "path": "/post/store",
+    "path": "/store",
     "method": "POST",
     "controller": "PostController",
     "handler": "store"
   },
   {
-    "path": "/post/update",
+    "path": "/update",
     "method": "PUT",
     "controller": "PostController",
     "handler": "update"
   },
   {
-    "path": "/post/destroy",
+    "path": "/destroy",
     "method": "DELETE",
     "controller": "PostController",
     "handler": "destroy"

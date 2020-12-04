@@ -1,21 +1,21 @@
-<#line_import_avacore?>
-<#line_const_uuid?>
+<#line_import_avacore#>
+<#line_const_uuid#>
 
 /********************************************************************************************************************\
 |*                                                                                                                  *|
 |*  This is a 'model'. Models are important because they define the structure of your entities.                     *|
 |*  You can utilize the model in your controllers to fetch data:                                                    *|
 |*                                                                                                                  *|
-|*  import <#name?> from "../models/<#name?>.js";                                                                   *|
+|*  import <#name#> from "../models/<#name#>.js";                                                                   *|
 |*                                                                                                                  *|
 |*  For more documentation please refer to the Github Wiki: https://github.com/Software-Essentials/Avalanche/wiki.  *|
 |*                                                                                                                  *|
 \********************************************************************************************************************/
 
 /**
- * @description Manages '<#name?>' entity.
+ * @description Manages '<#name#>' entity.
  */
-class <#name?> extends AFModel {
+class <#name#> extends AFModel {
 
   /**
    * @throws AFError
@@ -31,7 +31,7 @@ class <#name?> extends AFModel {
     |*                                                                    *|
     \**********************************************************************/
 
-    this.NAME = "<#name?>";
+    this.NAME = "<#name#>";
 
 
     /**********************************************************************************\
@@ -41,7 +41,7 @@ class <#name?> extends AFModel {
     |*                                                                                *|
     \**********************************************************************************/
 
-<#line_idenifier?>
+<#line_idenifier#>
 
 
     /**************************************************************************\
@@ -53,7 +53,7 @@ class <#name?> extends AFModel {
     |*                                                                        *|
     \**************************************************************************/
 
-    this.METHOD = "<#method_key?>";
+    this.METHOD = "<#method_key#>";
 
 
     /***************************************************************************\
@@ -97,21 +97,21 @@ class <#name?> extends AFModel {
       |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                    *|
       |*                                                                                             *|
       \***********************************************************************************************/
-<#line_property_id?>
+<#line_property_id#>
       "code": {
-        name: "<#column_prefix?>_code",
+        name: "<#column_prefix#>_code",
         type: "VARCHAR",
         length: 8,
         required: true
       },
       "name": {
-        name: "<#column_prefix?>_name",
+        name: "<#column_prefix#>_name",
         type: "VARCHAR",
         length: 64,
         required: true
       },
       "description": {
-        name: "<#column_prefix?>_description",
+        name: "<#column_prefix#>_description",
         type: "VARCHAR",
         length: 255
       },
@@ -172,7 +172,7 @@ class <#name?> extends AFModel {
     |*  Therefor it needs a computed default value:                                                      *|
     |*                                                                                                   *|
     \*****************************************************************************************************/
-<#line_computed_default?>
+<#line_computed_default#>
 
   }
 
@@ -186,4 +186,4 @@ class <#name?> extends AFModel {
 |*                                                                               *|
 \*********************************************************************************/
 
-export default AFModel.register(<#name?>);
+export default AFModel.register(<#name#>);

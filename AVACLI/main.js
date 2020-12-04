@@ -37,8 +37,10 @@ const cmdValue = components[0];
 const envValue = components[1];
 const argValue = components[2];
 
-main();
-function main() {
+(async () => {
+  await main();
+})();
+async function main() {
   if (typeof cmdValue !== "undefined") {
     if (cmdValue !== "update" && cmdValue !== "upgrade") {
       notifyIfInconsistentVersion();
@@ -66,7 +68,7 @@ function main() {
                 if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
                   global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+                  await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
                 } else {
                   console.log(`${terminalPrefix()}\x1b[31m (fatal error) Unable to load environment because no environment was found.\x1b[0m`);
                   process.exit(AFError.NOENV);
@@ -84,17 +86,20 @@ function main() {
                     choices: choices
                   }
                 ];
-                inquirer.prompt(questions).then(answers => {
+                try {
+                  const answers = await inquirer.prompt(questions);
                   global.environment = new AFEnvironment(answers.environment);
                   environment.setTTY(tty);
-                  command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
-                });
+                  await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+                } catch (error) {
+                  console.log("INQUIRERY ERROR", error);
+                }
               }
             } else { // Command does not depend on an environment.
-              command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+              await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
             }
           } else { // Command does not depend on a project.
-            command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+            await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
           }
         } else {
           console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
