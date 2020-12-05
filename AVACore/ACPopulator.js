@@ -59,9 +59,7 @@ class ACPopulator {
     var seedStats = {};
     const that = this;
     if (wipe) {
-      await database.wipeAllData({
-        onSuccess: proceed
-      });
+      await database.wipeAllData();
       try {
         readline.cursorTo(process.stdout, 0);
         console.log(`${terminalPrefix()}\x1b[32m Storage wiped.\x1b[0m`);
@@ -73,79 +71,70 @@ class ACPopulator {
           console.log(`${terminalPrefix()}\x1b[31m (error)\x1b[0m ${error}`);
         }
       }
-    } else {
-      proceed();
     }
+    await proceed();
     var animation;
-    function proceed() {
+    async function proceed() {
       animation = progressAnimation(`\x1b[34mPopulating (0/${that.seeds.length})`);
-      if (that.seeds.length > 0) {
-        for (let i = 0; i < that.seeds.length; i++) {
-          const seed = that.seeds[i];
-          if (seed.hasOwnProperty("zone")) {
-            seedStats[seed.zone] = null;
-            const path = `${projectPWD}/storage/${seed.zone}.json`;
-            fs.writeFileSync(path, JSON.stringify(seed.data, null, 2));
-            seedStats[seed.zone] = true;
-            update();
+      const seeds = {};;
+      for (const seed of that.seeds) {
+        if (seed.hasOwnProperty("model")) {
+          const Model = require(`${process.env.PWD}/app/models/${seed.model}.js`).default;
+          seedStats[Model.NAME] = null;
+          seeds[Model.NAME] = [];
+          // Render placeholders.
+          for (const row of seed.data) {
+            for (const property in row) {
+              const value = row[property]
+              if (value === "<#UUID#>") {
+                row[property] = new UUID().string;
+              }
+            }
           }
-          if (seed.hasOwnProperty("model")) {
-            const Model = require(`${process.env.PWD}/app/models/${seed.model}.js`).default;
-            for(const row of seed.data) {
-              for(const property in row) {
-                const value = row[property]
-                if (value === "<#UUID#>") {
-                  row[property] = new UUID().string;
+          // Convert model property names to column names.
+          var r = 0;
+          for (const record of seed.data) {
+            seeds[Model.NAME][r] = {};
+            for (const key in Model.PROPERTIES) {
+              for (const attribute in record) {
+                if (attribute == key) {
+                  seeds[Model.NAME][r][Model.PROPERTIES[key].name] = record[attribute];
                 }
               }
             }
-            seedStats[Model.NAME] = null;
-            const options = {
-              force: true,
-              onSuccess: ({ table }) => {
-                seedStats[table] = true;
-                update();
-              },
-              onFailure: ({ table, error }) => {
-                seedStats[table] = false;
-                switch (error.code) {
-                  case "ER_NOT_SUPPORTED_AUTH_MODE":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
-                    break;
-                  case "ER_ACCESS_DENIED_ERROR":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
-                    break;
-                  case "ER_NO_SUCH_TABLE":
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Table '${table}' (of model '${seed.model}') not found. Migrate before populating.\x1b[0m`);
-                    break;
-                  default:
-                    console.log(`${terminalPrefix()}\x1b[31m (error) Error while populating '${table}':\x1b[0m ${error.message}`);
-                }
-                update();
-              }
-            };
-            for(const record of seed.data) {
-              for(const key in Model.PROPERTIES) {
-                for(const attribute in record) {
-                  if (attribute == key) {
-                    record[Model.PROPERTIES[key].name] = record[attribute];
-                    delete record[attribute];
-                    break;
-                  }
-                }
-              }
-            }
-            database.insertInto(Model.NAME, seed.data, options);
+            r++;
           }
         }
-      } else {
-        update();
+      }
+      for (const table in seeds) {
+        const data = seeds[table];
+        try {
+          await database.insertInto(table, data, { force: wipe });
+          seedStats[table] = true;
+        } catch (error) {
+          seedStats[table] = false;
+          switch (error.code) {
+            case "ER_NOT_SUPPORTED_AUTH_MODE":
+              console.log(`${terminalPrefix()}\x1b[31m (error) Database doesn't support authentication protocol. Consider upgrading your database.\x1b[0m`);
+              break;
+            case "ER_ACCESS_DENIED_ERROR":
+              console.log(`${terminalPrefix()}\x1b[31m (error) Access to database was denied.\x1b[0m`);
+              break;
+            case "ER_NO_SUCH_TABLE":
+              console.log(`${terminalPrefix()}\x1b[31m (error) Table '${table}' (of model '${seed.model}') not found. Migrate before populating.\x1b[0m`);
+              break;
+            default:
+              console.log(`${terminalPrefix()}\x1b[31m (error) Error while populating '${table}':\x1b[0m ${error.message}`);
+          }
+        }
+        update({ table });
+        await new Promise((resolve, reject) => { setTimeout(() => { resolve(); }, 50) }); // Wait for a bit
       }
       if (permissionIssue) {
         console.log(`${terminalPrefix()}\x1b[33m (warning) Some files or folders weren't deleted because Avalanche doesn't have the right permissions.\x1b[0m`);
       }
     }
-    function update() {
+    function update({ table }) {
       var completed = 0;
       var successful = 0;
       for (const key in seedStats) {
@@ -153,7 +142,7 @@ class ACPopulator {
         if (seedStats[key] === true) successful++;
       }
       clearInterval(animation);
-      animation = progressAnimation(`Populating (${successful}/${completed})`);
+      animation = progressAnimation(`\x1b[34mPopulating (${successful}/${completed})${table ? ` [${table}]` : ""}                              `);
       if (completed === Object.keys(seedStats).length) {
         clearInterval(animation);
         console.log(`${terminalPrefix()}\x1b[32m Populating complete. (${completed}/${successful} tables populated)\x1b[0m`);

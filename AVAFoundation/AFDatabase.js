@@ -73,50 +73,50 @@ class AFDatabase {
   /**
    * @description Deletes all data in all tables.
    * 
-   * @param {Object} options 
+   * @returns {Promise<Object>}
    */
-  async wipeAllData(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+  wipeAllData() {
     var wipes = {};
-    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    try {
-      const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
-      const results = _results ? _results.slice(1)[0] : null;
-      if (results.length > 0) {
-        for (const result of results) {
-          const table = result.name;
-          wipes[table] = null;
-          const query = `DELETE FROM \`${result.name}\`;`;
-          try {
-            const _results = await this.query(this.preQuery() + query, []);
-            wipes[table] = true;
-            update();
-          } catch (error) {
-            wipes[table] = false;
-            failure({ error });
-          }
+    return new Promise(async (resolve, reject) => {
+      function update() {
+        var completed = 0;
+        var successful = 0;
+        for (const key in wipes) {
+          if (wipes[key] !== null) completed++;
+          if (wipes[key]) successful++;
         }
-      } else {
-        update();
+        if (completed === Object.keys(wipes).length) {
+          resolve({
+            total: completed,
+            success: successful
+          });
+        }
       }
-    } catch (error) {
-      failure({ error });
-    }
-    function update() {
-      var completed = 0;
-      var successful = 0;
-      for (const key in wipes) {
-        if (wipes[key] !== null) completed++;
-        if (wipes[key]) successful++;
+      const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
+      try {
+        const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
+        const results = _results ? _results.slice(1)[0] : null;
+        if (results.length > 0) {
+          for (const result of results) {
+            const table = result.name;
+            wipes[table] = null;
+            const query = `DELETE FROM \`${result.name}\`;`;
+            try {
+              const _results = await this.query(this.preQuery() + query, []);
+              wipes[table] = true;
+              update();
+            } catch (error) {
+              wipes[table] = false;
+              reject(error);
+            }
+          }
+        } else {
+          update();
+        }
+      } catch (error) {
+        reject(error);
       }
-      if (completed === Object.keys(wipes).length) {
-        success({
-          total: completed,
-          success: successful
-        });
-      }
-    }
+    });
   }
 
 
@@ -125,50 +125,63 @@ class AFDatabase {
    * 
    * @param {Object} options 
    */
-  async dropAllTables(options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    var wipes = {};
-    const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
-    try {
-      const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
-      const results = _results ? _results.slice(1)[0] : null;
-      if (results.length > 0) {
-        for (const result of results) {
-          const table = result.name;
-          wipes[table] = null;
-          const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
-          try {
-            const _results = await this.query(this.preQuery() + query, []);
-            const results = _results ? _results.slice(1) : null; // Parsed results. Use this instead of _results if you are going to utilise.
-            wipes[table] = true;
+  dropAllTables(options) {
+    return new Promise(async (resolve, reject) => {
+      const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+      const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+      var wipes = {};
+      const query = `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ?;`;
+      try {
+        const _results = await this.query(this.preQuery() + query, [this.credentials.database]);
+        const results = _results ? _results.slice(1)[0] : null;
+        if (results.length > 0) {
+          for (const result of results) {
+            wipes[result.name] = null;
             update();
-          } catch (error) {
-            wipes[table] = false;
-            failure({ error });
           }
+          for (const result of results) {
+            const table = result.name;
+            const query = `DROP TABLE IF EXISTS \`${result.name}\`;`;
+            try {
+              const _results = await this.query(this.preQuery() + query, []);
+              const results = _results ? _results.slice(1) : null; // Parsed results. Use this instead of _results if you are going to utilise.
+              wipes[table] = true;
+              update();
+            } catch (error) {
+              wipes[table] = false;
+              update();
+              failure({ error });
+              reject(error);
+            }
+          }
+        } else {
+          update();
         }
-      } else {
-        update();
+      } catch (error) {
+        failure({ error });
+        reject(error);
+        return;
       }
-    } catch (error) {
-      failure({ error });
-      return;
-    }
-    function update() {
-      var completed = 0;
-      var successful = 0;
-      for (const key in wipes) {
-        if (wipes[key] !== null) completed++;
-        if (wipes[key]) successful++;
+      function update() {
+        var completed = 0;
+        var successful = 0;
+        for (const key in wipes) {
+          if (wipes[key] !== null) completed++;
+          if (wipes[key]) successful++;
+        }
+        const total = Object.keys(wipes).length;
+        if (completed === total) {
+          success({
+            total: completed,
+            success: successful
+          });
+          resolve({
+            total: completed,
+            success: successful
+          });
+        }
       }
-      if (completed === Object.keys(wipes).length) {
-        success({
-          total: completed,
-          success: successful
-        });
-      }
-    }
+    });
   }
 
 
@@ -179,177 +192,167 @@ class AFDatabase {
    * @param {Array} columns Columns.
    * @param {Object} options Options.
    */
-  async createTable(tablename, columns, options) {
-    const force = options ? options.force ? true : false : false;
-    const propertyKeys = options ? options.propertyKeys ? options.propertyKeys : {} : {};
-    const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    const that = this;
-    var foreignModelIdentifier;
-    var columnStrings = [];
-    var uniqueKeys = {};
-    for (const column of columns) {
-      const name = column.name;
-      // Relation
-      // if (typeof column.model === "string" || typeof column.relation === "string" || typeof column.relation === "object") { // REMOVED DEPRECATION
-      if (typeof column.model === "string" || (typeof column.database === "string" && typeof column.table === "string") || typeof column.relation === "string" || typeof column.relation === "object") {
-        var foreignClass, onDelete, onUpdate;
-        // Model link
-        if (typeof column.model === "string") {
-          onDelete = typeof column.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[column.onDelete.toUpperCase().split(" ").join("_")] : null;
-          onUpdate = typeof column.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[column.onUpdate.toUpperCase().split(" ").join("_")] : null;
-          foreignClass = column.model;
-        }
-        // // Relation (old linking method) // REMOVED DEPRECATED
-        // const relation = column.relation;
-        // if (typeof relation === "string" || typeof relation === "object") {
-        //   const options = typeof relation === "object" ? relation : {};
-        //   onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
-        //   onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
-        //   foreignClass = typeof relation === "object" ? options.hasOwnProperty("model") ? options.model : options.hasOwnProperty("table") ? options.table : relation : relation;
-        // }
-
-        if (column.database && column.table) {
-          const foreignDatabase = column.database;
-          const foreignKey = column.bind;
-          const foreignTable = column.table;
-          const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
-          columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
-          columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignDatabase}\`.\`${foreignTable}\` (\`${foreignKey || name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
-        } else {
-          const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
-          const foreignTable = foreignModel.NAME;
-          const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
-          const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
-          columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
-          columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+  createTable(tablename, columns, options) {
+    return new Promise(async (resolve, reject) => {
+      const force = options ? options.force ? true : false : false;
+      const propertyKeys = options ? options.propertyKeys ? options.propertyKeys : {} : {};
+      const primaryKey = options ? options.primaryKey ? options.primaryKey : null : null;
+      const that = this;
+      var foreignModelIdentifier;
+      var columnStrings = [];
+      var uniqueKeys = {};
+      for (const column of columns) {
+        const name = column.name;
+        // Relation
+        // if (typeof column.model === "string" || typeof column.relation === "string" || typeof column.relation === "object") { // REMOVED DEPRECATION
+        if (typeof column.model === "string" || (typeof column.database === "string" && typeof column.table === "string") || typeof column.relation === "string" || typeof column.relation === "object") {
+          var foreignClass, onDelete, onUpdate;
+          // Model link
           if (typeof column.model === "string") {
-            foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+            onDelete = typeof column.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[column.onDelete.toUpperCase().split(" ").join("_")] : null;
+            onUpdate = typeof column.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[column.onUpdate.toUpperCase().split(" ").join("_")] : null;
+            foreignClass = column.model;
           }
-        }
-      }
-      const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
-      if (typeof type !== "string") {
-        console.log(`${terminalPrefix()}\x1b[31m (error) Unable to infer type of property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[35m [SOLUTION]: Add 'type' argument to property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[0m`);
-        continue;
-      }
-      const typeProperty = DATATYPES[type];
-      const defaultVal = column.default;
-      var length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
-      if (typeProperty.type === "enum") {
-        if (Array.isArray(column.options)) {
-          if (defaultVal && !column.options.includes(defaultVal)) {
-            console.log(`${terminalPrefix()}\x1b[31m (error) Default value '${defaultVal}' of enum '${tablename}.${propertyKeys[name]}' is not an option.`);
-          }
-          for (let i = 0; i < column.options.length; i++) {
-            column.options[i] = `'${column.options[i]}'`;
-          }
-          length = column.options.join(",");
-        } else {
-          console.log(`${terminalPrefix()}\x1b[31m (error) Enum '${tablename}.${propertyKeys[name]}' is missing 'options' argument.`);
-        }
-      }
-      const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
-      const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
+          // // Relation (old linking method) // REMOVED DEPRECATED
+          // const relation = column.relation;
+          // if (typeof relation === "string" || typeof relation === "object") {
+          //   const options = typeof relation === "object" ? relation : {};
+          //   onDelete = typeof options.onDelete === "string" ? CONSTRAINT_BEHAVIOUR[options.onDelete.toUpperCase().split(" ").join("_")] : null;
+          //   onUpdate = typeof options.onUpdate === "string" ? CONSTRAINT_BEHAVIOUR[options.onUpdate.toUpperCase().split(" ").join("_")] : null;
+          //   foreignClass = typeof relation === "object" ? options.hasOwnProperty("model") ? options.model : options.hasOwnProperty("table") ? options.table : relation : relation;
+          // }
 
-      const required = !!column.required;
-      const unique = column.unique;
-      const unsigned = typeProperty.unsignable ? column.relatable : false;
-      const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
-      columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
-      if (unique === true) {
-        columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
-      }
-      if (typeof unique === "string") {
-        if (!Array.isArray(uniqueKeys[unique])) {
-          uniqueKeys[unique] = [];
+          if (column.database && column.table) {
+            const foreignDatabase = column.database;
+            const foreignKey = column.bind;
+            const foreignTable = column.table;
+            const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
+            columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+            columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignDatabase}\`.\`${foreignTable}\` (\`${foreignKey || name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+          } else {
+            const foreignModel = require(`${projectPWD}/app/models/${foreignClass}.js`).default;
+            const foreignTable = foreignModel.NAME;
+            const foreignKey = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+            const constraintName = `${tablename} ${foreignTable} (${propertyKeys[name]})`;
+            columnStrings.push(`KEY \`${constraintName}\` (\`${name}\`)`);
+            columnStrings.push(`CONSTRAINT \`${constraintName}\` FOREIGN KEY (\`${name}\`) REFERENCES \`${foreignTable}\` (\`${foreignKey.name}\`)${onDelete ? ` ON DELETE ${onDelete}` : ""}${onUpdate ? ` ON UPDATE ${onUpdate}` : ""}`);
+            if (typeof column.model === "string") {
+              foreignModelIdentifier = foreignModel.PROPERTIES[foreignModel.IDENTIFIER];
+            }
+          }
         }
-        uniqueKeys[unique].push(`\`${name}\``);
+        const type = typeof column.type === "string" ? column.type : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("type") && typeof foreignModelIdentifier.type === "string" ? foreignModelIdentifier.type : null;
+        if (typeof type !== "string") {
+          console.log(`${terminalPrefix()}\x1b[31m (error) Unable to infer type of property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[35m [SOLUTION]: Add 'type' argument to property '${propertyKeys[name]}' in Model '${tablename}'.\x1b[0m`);
+          continue;
+        }
+        const typeProperty = DATATYPES[type];
+        const defaultVal = column.default;
+        var length = typeof column.length === "number" ? column.length : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("length") && typeof foreignModelIdentifier.length === "number" ? foreignModelIdentifier.length : null;
+        if (typeProperty.type === "enum") {
+          if (Array.isArray(column.options)) {
+            if (defaultVal && !column.options.includes(defaultVal)) {
+              console.log(`${terminalPrefix()}\x1b[31m (error) Default value '${defaultVal}' of enum '${tablename}.${propertyKeys[name]}' is not an option.`);
+            }
+            for (let i = 0; i < column.options.length; i++) {
+              column.options[i] = `'${column.options[i]}'`;
+            }
+            length = column.options.join(",");
+          } else {
+            console.log(`${terminalPrefix()}\x1b[31m (error) Enum '${tablename}.${propertyKeys[name]}' is missing 'options' argument.`);
+          }
+        }
+        const decimal = typeof column.decimal === "number" ? column.decimal : foreignModelIdentifier && foreignModelIdentifier.hasOwnProperty("decimal") && typeof foreignModelIdentifier.decimal === "number" ? foreignModelIdentifier.decimal : 0;
+        const datatype = `${typeProperty.type}${typeProperty.length && length ? `(${length}${typeProperty.decimal ? `,${decimal}` : ""}) ` : type === "UUID" ? "(36) " : " "}`;
+
+        const required = !!column.required;
+        const unique = column.unique;
+        const unsigned = typeProperty.unsignable ? column.relatable : false;
+        const autoIncrement = typeProperty.incrementable ? column.autoIncrement : false;
+        columnStrings.push(`\`${name}\` ${datatype}${unsigned ? "unsigned " : ""}${required ? "NOT NULL " : ""}${defaultVal !== undefined ? `DEFAULT ${!!typeProperty.string ? `'${defaultVal}' ` : `${defaultVal} `} ` : ""}${autoIncrement ? "AUTO_INCREMENT " : ""}`.trim());
+        if (unique === true) {
+          columnStrings.push(`UNIQUE KEY \`${name}\` (\`${name}\`)`);
+        }
+        if (typeof unique === "string") {
+          if (!Array.isArray(uniqueKeys[unique])) {
+            uniqueKeys[unique] = [];
+          }
+          uniqueKeys[unique].push(`\`${name}\``);
+        }
       }
-    }
-    for (const key in uniqueKeys) {
-      const columns = uniqueKeys[key];
-      columnStrings.push(`UNIQUE KEY \`${key}\` (${columns.join(", ")})`);
-    }
-    if (primaryKey) {
-      columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
-    }
-    if (force) {
-      const query = `DROP TABLE IF EXISTS \`${tablename}\`;`;
-      try {
-        const _results = await this.query(that.preQuery() + query, []);
-        const results = _results ? _results.slice(1) : null;
-        create();
-      } catch (error) {
-        failure({ table: tablename, error: error });
-        return;
+      for (const key in uniqueKeys) {
+        const columns = uniqueKeys[key];
+        columnStrings.push(`UNIQUE KEY \`${key}\` (${columns.join(", ")})`);
       }
-    } else {
-      create();
-    }
-    async function create() {
-      const query = `CREATE TABLE \`${tablename}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
+      if (primaryKey) {
+        columnStrings.push(`PRIMARY KEY (\`${primaryKey}\`)`);
+      }
+      const query = `${force ? `DROP TABLE IF EXISTS \`${tablename}\`;` : ""} CREATE TABLE \`${tablename}\` (${columnStrings.join(", ")}) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;`;
       try {
         const _results = await that.query(that.preQuery() + query, []);
-        const results = _results ? _results.slice(1) : null;
-        success({ table: tablename });
+        const results = _results[force ? 2 : 1];
+        resolve({ table: tablename });
       } catch (error) {
-        failure({ table: tablename, error: error });
+        reject({ table: tablename, error: error });
         return;
       }
-    }
+    });
   }
 
 
   insertInto(name, data, options) {
-    const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
-    const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
-    if (!Array.isArray(data) || data.length <= 0) {
-      failure({ table: name, error: new Error("No data given.") });
-      return;
-    }
-    var columns = Object.keys(data[0]);
-    var valuesSets = [];
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      var records = []
-      for (const key in row) {
-        const record = row[key];
-        switch (typeof record) {
-          case "string":
-            records.push(`"${isUUID(record) ? uuidToShort(record) : record}"`);
-            break;
-          case "number":
-            records.push(`${record}`);
-            break;
-          case "boolean":
-            records.push(record ? "1" : "0");
-            break;
-          case "object":
-            records.push("NULL");
-            break;
-        }
+    return new Promise(async (resolve, reject) => {
+      const success = options ? typeof options.onSuccess === "function" ? options.onSuccess : () => { } : () => { };
+      const failure = options ? typeof options.onFailure === "function" ? options.onFailure : () => { } : () => { };
+      if (!Array.isArray(data) || data.length <= 0) {
+        reject(new Error("No data given."));
+        failure({ table: name, error: new Error("No data given.") });
+        return;
       }
-      valuesSets.push(records);
-    }
-    var values = [];
-    for (const value of valuesSets) {
-      values.push(`(${value.join(", ")})`);
-    }
-    const that = this;
-    insert();
-    function insert() {
-      const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
-      that.query(that.preQuery() + query, [], (error, _results, fields) => {
-        const results = _results ? _results.slice(1) : null;
-        if (error) {
-          failure({ table: name, error: error });
-          return;
+      var columns = Object.keys(data[0]);
+      var valuesSets = [];
+      for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        var records = []
+        for (const key in row) {
+          const record = row[key];
+          switch (typeof record) {
+            case "string":
+              records.push(`"${isUUID(record) ? uuidToShort(record) : record}"`);
+              break;
+            case "number":
+              records.push(`${record}`);
+              break;
+            case "boolean":
+              records.push(record ? "1" : "0");
+              break;
+            case "object":
+              records.push("NULL");
+              break;
+          }
         }
-        success({ table: name });
-      });
-    }
+        valuesSets.push(records);
+      }
+      var values = [];
+      for (const value of valuesSets) {
+        values.push(`(${value.join(", ")})`);
+      }
+      const that = this;
+      insert();
+      function insert() {
+        const query = `INSERT INTO \`${name}\` (${columns.join(", ")}) VALUES ${values.join(", ")};`;
+        that.query(that.preQuery() + query, [], (error, _results, fields) => {
+          const results = _results ? _results.slice(1) : null;
+          if (error) {
+            failure({ table: name, error: error });
+            reject(error);
+            return;
+          }
+          success({ table: name });
+          resolve({ table: name });
+        });
+      }
+    });
   }
 
 

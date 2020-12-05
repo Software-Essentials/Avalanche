@@ -75,7 +75,7 @@
       "path": "/app/templates/partials/navbar.hbs"
     },
     {
-      "template": "example1_seeds",
+      "template": "example1_population",
       "path": "/app/migration/population/DummyData.json"
     },
     {
