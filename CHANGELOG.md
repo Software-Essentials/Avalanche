@@ -5,7 +5,7 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
-## [0.6.2] - 2020-12-05
+## [0.6.3] - 2020-12-08
 ### Fixed
 - Fixed a problem where the `ACMigrator` and `ACPopulator` would not properly handle model/table names.
 - Many more fixes.

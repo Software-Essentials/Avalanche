@@ -100,7 +100,7 @@ class ACRouter extends Router {
                 response.redirect(redirect);
                 return;
               }
-              response.json({ success: true, message: message, results: data || results });
+              response.json({ success: true, message: message, data: data || results });
             };
             const reject = ({ message, errors, status }) => {
               response.status(status || 400)

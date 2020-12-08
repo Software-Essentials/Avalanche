@@ -72,7 +72,7 @@ The properties `domains` & `middleware` are not required. If you omit them `doma
 
 ---
 
-## Controller handlers
+## Controller handlers (DEPRECATED)
 
 At the top of each controller handler you should have an `onSuccess` function and an `onFailure` function.
 
