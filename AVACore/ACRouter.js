@@ -51,9 +51,7 @@ class ACRouter extends Router {
               if (typeof routeHandler[components.handler] !== "function") {
                 console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${route.path}' leads to a handler/method that doesn't exist: '${components.handler}'.\x1b[0m`);
               }
-              components.execution = (request, response) => {
-                routeHandler[components.handler](request, response);
-              };
+              components.execution = routeHandler[components.handler];
             } else {
               console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${route.path}' leads to a controller that doesn't exist: '${components.controller}'.\x1b[0m`);
             }
@@ -95,14 +93,14 @@ class ACRouter extends Router {
         if (route.domains.hasOwnProperty("*") || route.domains.hasOwnProperty(domain)) {
           const components = route.domains.hasOwnProperty(domain) ? route.domains[domain] : route.domains["*"];
           if (typeof components.execution === "function") {
-            const resolve = ({ message, data, results, redirect }) => {
+            const resolve = ({ message, data, results, redirect } = {}) => {
               if (redirect && typeof request.headers.referer === "string") {
                 response.redirect(redirect);
                 return;
               }
               response.json({ success: true, message: message, data: data || results });
             };
-            const reject = ({ message, errors, status }) => {
+            const reject = ({ message, errors, status } = {}) => {
               response.status(status || 400)
               response.json({ success: false, message: message, errors });
             };

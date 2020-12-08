@@ -517,7 +517,7 @@ AFModel.register = (Model) => {
                     wheres.push("0 = 1");
                   }
                 } else {
-                  parameters.push(value);
+                  parameters.push((property.model || property.type === "UUID") && isUUID(value) ? uuidToShort(value) : value);
                   wheres.push(`${Model.PROPERTIES[key].name} = ?`);
                 }
               }
