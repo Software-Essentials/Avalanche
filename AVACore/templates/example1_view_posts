@@ -13,28 +13,29 @@ class PostViewController extends AFViewController {
 
 
   willLoad(request, response, self) {
+    self.layout = "app";
     const path = request.url.substring(0, 7);
-    const onFailure = ({error}) => {
+    const onFailure = ({ error }) => {
       self.variables.posts = [];
       super.willLoad(request, response, self);
     };
     if (path === "/posts/") {
       self.template = "posts.view";
       const ID = parseInt(request.params.ID);
-      const onSuccess = ({results}) => {
+      const onSuccess = ({ results }) => {
         if (results.length === 1) {
           self.variables.post = results[0];
         }
         super.willLoad(request, response, self);
       };
-      Post.where("post_id", ID, {onSuccess, onFailure});
+      Post.select({ properties: ["ID", "name", "body", "createdAt", "modifiedAt"], conditions: [{ key: "ID", value: ID }], onSuccess, onFailure });
     } else {
       self.template = "posts";
-      const onSuccess = ({results}) => {
+      const onSuccess = ({ results }) => {
         self.variables.posts = results;
         super.willLoad(request, response, self);
       };
-      Post.all({onSuccess, onFailure});
+      Post.select({ properties: ["ID", "name", "body", "createdAt", "modifiedAt"], conditions: [], onSuccess, onFailure });
     }
   }
 

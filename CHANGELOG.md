@@ -5,6 +5,201 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 
 ## [Unreleased]
 
+## [0.6.3] - 2020-12-08
+### Fixed
+- Fixed a problem where the `ACMigrator` and `ACPopulator` would not properly handle model/table names.
+- Many more fixes.
+
+### Changes
+- Changed the way handlers are written. Now much fewer code is needed to write logic (about 25% less).
+- Changed the notation of population files. They now use the model property key instead of the database table column name.
+
+### Removed
+- Removed support for `onSuccess` and `onFailure` callbacks. Now only promises are supported.
+
+## [0.5.74] - 2020-12-04
+### Added
+- Added better file information to top of controller template.
+- Added implementation for asynchronous methods internally within the framework.
+- Added support for asynchronous use of ORM methods.
+- Added command that allows the developer to generate API reference documentation. `$ avalanche make docs`
+
+### Fixed
+- Minor fixes.
+
+### Changes
+- Updated coding standards guideline.
+- Minor optimisations.
+
+## [0.5.67] - 2020-07-08
+### Added
+- Added inter-database model relations. You can set them up in an `AFModel`s property using the keys `database` & `table`. If a key is not inferrable you can use `bind` to explicitly specify it.
+
+### Fixed
+- Fixed the `delete` method in `AFModel`.
+
+### Changes
+- `updatedAt` and `updatedBy` have been deprecated and been replaced by `modifiedAt` and `modifiedBy`.
+
+## [0.5.65] - 2020-07-04
+### Fixed
+- Fixed email configuration validation.
+- Fixed `AFModel` conditions arguments parser when working with array values.
+
+## [0.5.63] - 2020-06-28
+### Added
+- Added argument aliasses to `$ avalanche make ` command.
+
+### Changes
+- Deprecated `/migration/seeds/` as a population folder.
+
+## [0.5.61] - 2020-06-03
+### Added
+- Added common options to `AFPushNotification`.
+
+### Changes
+- Optimised UUID compression.
+- Optimised `AFPushNotification` delivery reporting.
+
+## [0.5.58] - 2020-04-29
+### Added
+- Added `await` to model functions.
+- Added `ordering`, `offset`, `page` and `limit` setting to `AFModel.select`.
+- Added operator functions to items in the `conditions` setting in `AFModel.select`. This method can be used by making `conditions` an Object.
+
+## [0.5.57] - 2020-04-18
+### Added
+- Added ability to change `database.charset` in your environment files.
+
+### Changes
+- default `database.charset` has been changed from `utf8` to `utf8mb4`.
+
+## [0.5.56] - 2020-05-03
+### Added
+- Added command &nbsp;&nbsp;`$ avalanche make documentation`&nbsp;&nbsp; for generating documentation
+
+### Fixed
+- Fixed routes calculator in &nbsp;&nbsp;`$ avalanche info`&nbsp;&nbsp; command.
+
+## [0.5.55] - 2020-04-03
+### Added
+- Added request log ignore filter. Available in the environment file as 'logIgnores';
+- Added domains property to routing files;
+- Added support for enums;
+- Added modelName decoder to AFUtil;
+
+### Fixed
+- Fixed user agent specifier functions in AFUtil.
+- Fixed request logging. (Status & coloring)
+
+### Changes
+- Many small structural optimisations.
+
+## [0.5.48] - 2020-03-21
+### Added
+- Added `--notty` & `--tty=false` command-flags. Causes avalanche to skip user interaction with the terminal. Also disables terminal animations.
+- Added &nbsp;&nbsp;`$ avalanche configure`&nbsp;&nbsp; command to configure environment files.
+- Added guidelines for how to structure your code in an Avalanche application.
+- Added option in 'AFModel.select'. It is now possible to pass an array as condition value.
+- Added new short endpoint notation for routerfile.
+
+### Changes
+- Updated Dockerfile.
+- Renamed ACSeeder to ACPopulator.
+- Many small structural optimisations.
+
+## [0.5.31] - 2020-01-23
+### Added
+- Added 'code', 'description' & 'deletedAt' as default properties to model template.
+
+### Fixed
+- Fixed bug in structure loaded.
+
+## [0.5.30] - 2020-01-22
+### Added
+- Added ability to add middleware to the scope of a routes file instead of in the scope of an individual endpoint.
+
+### Changes
+- Changed the way AFLocalisation works.
+- Made it so that unix-based platforms automatically close the current running port before trying to start the application to prevent disruptions.
+- Minor optimisations.
+
+## [0.5.27] - 2020-01-21
+### Added
+- Added structure loader & helper loader.
+
+### Changes
+- Minor optimisations.
+
+## [0.5.26] - 2020-01-20
+### Added
+- Added easyer type rules to AFValidator; 'string()', 'boolean()' & 'number()' (instead of for example: 'type("string")'.
+- Added &nbsp;&nbsp;`$ avalanche stopall`&nbsp;&nbsp; command; Stops all Avalanche applications that are currently running.
+- When working with models the 'createdAt' & 'updatedAt' properties will now automatically be filled accordingly.
+- When working with models the 'unique' setting of a property can be set to a string value. All the properties with that string will be grouped as unique.
+
+### Fixed
+- Many bugfixes.
+
+## [0.5.24] - 2020-01-19
+### Added
+- Added support for decimal datatypes like 'float', 'decimal' and 'double'.
+- Added AFUtil function 'parseBoolean'.
+
+### Changes
+- Standardized terminal animations.
+
+### Fixed
+- Many bugfixes.
+
+## [0.5.21] - 2020-01-18
+### Added
+- Client-side webpage reload debug option.
+
+### Fixed
+- Fixed message when using &nbsp;&nbsp;`$ avalanche upgrade`&nbsp;&nbsp; command.
+- Fixed process killer.
+- Fixed loading animation.
+
+### Changes
+- Minor optimisations.
+
+## [0.5.19] - 2020-01-16
+### Added
+- Added &nbsp;&nbsp;`$ avalanche localise`&nbsp;&nbsp; command to the Avalanche CLI.
+- Added 'alias', 'notEmpty', 'not' & 'equals' functions to AVAValidator.
+
+### Fixed
+- Fixed bugs in existing templates.
+- Fixed ACSocketKernel.
+
+## [0.5.17] - 2019-12-22
+### Added
+- Added static functions 'select', 'delete' and 'get' to AFModel.
+- Added global localisation.
+
+### Changes
+- Changed the term 'seed' to 'populate'
+- Optimised terminal output.
+
+## [0.5.12] - 2019-12-21
+### Added
+- Added troubleshooters to `run` command.
+- Added ID method option to `make model` command.
+- Added BOOL & BOOLEAN datatypes to AFModel.
+
+### Changes
+- Changed syntax for linking models to eachother.
+- Updated model explenation comments.
+- Optimised querybuilder.
+
+## [0.5.7] - 2019-12-17
+### Added
+- Added Apple app association file.
+
+### Fixed
+- Fixed a bug where it was not possible to have 2 relations of the same table.
+
 ## [0.5.0] - 2019-11-17
 ### Added
 - Added AFPushNotification class for iOS remote notifications.
@@ -193,9 +388,9 @@ View detailed changes in our [Trello board](https://trello.com/b/EPJJJbYH/avalan
 - Project structure.
 - Added installable boilerplates.
 - Added request logger.
-- Added 'version' command.
-- Added 'info' command.
-- Added 'init' command.
-- Added 'run' command.
-- Added 'routes' command.
-- Added 'fix' command.
+- Added &nbsp;&nbsp;`$ avalanche version`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche info`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche init`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche run`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche routes`&nbsp;&nbsp; command.
+- Added &nbsp;&nbsp;`$ avalanche fix`&nbsp;&nbsp; command.

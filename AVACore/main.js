@@ -3,7 +3,7 @@
 global.projectPWD = process.cwd();
 
 require = require("esm")(module);
-const { AFEnvironment } = require("../AVAFoundation/index");
+const { AFEnvironment, AFLocalisation } = require("../AVAFoundation/index");
 const express = require("express");
 const { terminalPrefix } = require("./ACUtil");
 
@@ -13,14 +13,14 @@ const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
 if (cmdValue !== "run") {
   process.exit(0);
 } else {
-  global.environment = new AFEnvironment(envValue);
+  global.environment = new AFEnvironment(envValue, true); // Slienced initialisation
+  global.localisation = new AFLocalisation("en_GB");
+  global._ = global.localisation.translate;
 
   const ACKernel = require("./ACKernel.js").default;
   const ACWebServer = require("./ACWebServer.js").default;
 
   const app = express();
-
-  console.log(`${terminalPrefix()}\x1b[32m Starting server.\x1b[0m`);
 
   const server = new ACWebServer(app);
   const stream = server.getStream();

@@ -4,7 +4,7 @@ import { AFViewController } from "avacore";
 /**
  *
  */
-class <#name?> extends AFViewController {
+class <#name#> extends AFViewController {
 
   constructor(request, response) {
     super(request, response);
@@ -19,4 +19,4 @@ class <#name?> extends AFViewController {
 }
 
 
-export default <#name?>;
+export default <#name#>;

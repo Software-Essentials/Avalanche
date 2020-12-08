@@ -10,10 +10,11 @@
 
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
 
-    <script src="/assets/js/jquery-3.3.1.min.js"></script>
-    <script src="/assets/js/popper.min.js"></script>
-    <script src="/assets/js/bootstrap.min.js"></script>
-    <script src="/assets/js/htmlessentials.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/assets/vendor/Avalanche/js/avalanche.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/assets/js/popper.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/assets/js/htmlessentials.js"></script>
     <script>
         var csrf = "{{CSRF}}";
     </script>

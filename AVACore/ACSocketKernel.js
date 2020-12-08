@@ -1,5 +1,6 @@
 import socketIO from "socket.io";
 import { UUID } from "../AVAFoundation/AFUtil";
+import { ACUtil } from "../AVACore";
 
 
 /**
@@ -11,9 +12,9 @@ class ACSocketKernel {
     this.instance = socketIO(server);
     this.connections = [];
 
-    if (environment.capabilities.useWebSockets) {
+    if (environment.capabilities.webSockets) {
       this.setup();
-      console.log(`\x1b[32m[AVALANCHE] Sockermanager initialized.\x1b[0m`)
+      console.log(`${ACUtil.terminalPrefix()}\x1b[32m Sockermanager initialized\x1b[0m`);
     }
   }
 
@@ -23,11 +24,20 @@ class ACSocketKernel {
    */
   setup() {
     this.instance.on("connection", (socket) => {
-      const uuid = new UUID().string
-      console.log("\x1b[36m%s\x1b[0m", `[SOCKET]::[${uuid}] Connected`)
+      const uuid = new UUID().string;
+      if (environment.debug.logWebSocket) {
+        console.log(`${ACUtil.terminalPrefix()} \x1b[34m[SOCKET]::[${uuid}]\x1b[32m Connected\x1b[0m`);
+      }
+      socket.emit("update", {
+        socketID: uuid,
+        reloadIfUpDiff: environment.debug.reloadClientsAfterRestart,
+        upSince: global.socket.upSince
+      });
       this.connections[uuid] = { socket: socket };
       socket.on("disconnect", () => {
-        console.log("\x1b[33m%s\x1b[0m", `[SOCKET]::[${uuid}] Disconnected`)
+        if (environment.debug.logWebSocket) {
+          console.log(`${ACUtil.terminalPrefix()} \x1b[34m[SOCKET]::[${uuid}]\x1b[32m Disconnected\x1b[0m`);
+        }
         delete this.connections[uuid];
       })
     });

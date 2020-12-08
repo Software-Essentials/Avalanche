@@ -1,54 +1,189 @@
-import { AFModel, Util } from "avacore";
+<#line_import_avacore#>
+<#line_const_uuid#>
 
-const { UUID } = Util;
-
+/********************************************************************************************************************\
+|*                                                                                                                  *|
+|*  This is a 'model'. Models are important because they define the structure of your entities.                     *|
+|*  You can utilize the model in your controllers to fetch data:                                                    *|
+|*                                                                                                                  *|
+|*  import <#name#> from "../models/<#name#>.js";                                                                   *|
+|*                                                                                                                  *|
+|*  For more documentation please refer to the Github Wiki: https://github.com/Software-Essentials/Avalanche/wiki.  *|
+|*                                                                                                                  *|
+\********************************************************************************************************************/
 
 /**
- * @description Manages '<#name?>' entity.
+ * @description Manages '<#name#>' entity.
  */
-class <#name?> extends AFModel {
+class <#name#> extends AFModel {
 
   /**
    * @throws AFError
    */
   constructor() {
     super();
-    this.NAME = "<#name?>"; // Name of the Storage Zone / Database Table.
-    this.IDENTIFIER = "ID"; // Specifies the identifier in the PROPERTIES hash. We need this to fetch records.
-    this.METHOD = "<#method_key?>"; // Lets the model know we want to use the <#method?> as storage method. Options are "DATABASE" or "STORAGE".
+
+
+    /**********************************************************************\
+    |*                                                                    *|
+    |*  'NAME' defines the name of your model.                            *|
+    |*  This will also be the name of your corresponding database table.  *|
+    |*                                                                    *|
+    \**********************************************************************/
+
+    this.NAME = "<#name#>";
+
+
+    /**********************************************************************************\
+    |*                                                                                *|
+    |*  'IDENTIFIER' defines the primary key by which your record can be identified.  *|
+    |*  This value is usually "ID".                                                   *|
+    |*                                                                                *|
+    \**********************************************************************************/
+
+<#line_idenifier#>
+
+
+    /**************************************************************************\
+    |*                                                                        *|
+    |*  'METHOD' defines how the model data should be stored.                 *|
+    |*  The value should be set to "DATABASE" since "STORAGE" is deprecated.  *|
+    |*  Once the value is set to "DATABASE" the migrator will create a        *|
+    |*  database table to store records of the model type in                  *|
+    |*                                                                        *|
+    \**************************************************************************/
+
+    this.METHOD = "<#method_key#>";
+
+
+    /***************************************************************************\
+    |*                                                                         *|
+    |*  'PROPERTIES' defines the structure of the model properties.            *|
+    |*  There are a couple of standard keys in this list:                      *|
+    |*  'ID', 'createdBy, modifiedBy, createdAt, modifiedAt                    *|
+    |*  Ofcourse you don't have to add these properties if they don't fit      *|
+    |*  your use case, it is just a best practice in the Avalanche framework.  *|
+    |*                                                                         *|
+    \***************************************************************************/
+
     this.PROPERTIES = {
-      "ID": {
-        name: "<#name_lower?>_id",
-        type: "CHAR",
-        length: 36,
-        required: true,
-        relatable: true
-      },
-      "name": {
-        name: "<#name_lower?>_name",
-        type: "CHAR",
-        length: 255,
+
+
+      /***********************************************************************************************\
+      |*                                                                                             *|
+      |*  Our first property is 'ID'. it has a few settings that we are going to go over.            *|
+      |*                                                                                             *|
+      |*  'name'             Our property might be called 'ID' but that is not a format we want to   *|
+      |*                     use in our database, since column names need to be lower-snake-case.    *|
+      |*                     So that's what 'name' is for.                                           *|
+      |*                                                                                             *|
+      |*  'type'             This specifies what the datatype of this property is. A list of         *|
+      |*                     types can be found at the end of this file.                             *|
+      |*                                                                                             *|
+      |*  'length'           Determines the length of the datatype.                                  *|
+      |*                                                                                             *|
+      |*  'required'         When set to true it marks the column "NOT NULL" in a MySQL database.    *|
+      |*                                                                                             *|
+      |*  'model'            Creates a relation constraint between two entities.                     *|
+      |*                                                                                             *|
+      |*  'onDelete'         Determines the behaviour of the record when the parent gets deleted.    *|
+      |*                     Can be set to "set null", "cascade", "restrict", "no action".           *|
+      |*                     Can only be used when the property is connected to a foreign model.     *|
+      |*                                                                                             *|
+      |*  'onUpdate'         Determines the behaviour of the record when the parent value changes.   *|
+      |*                     Can be set to "set null", "cascade", "restrict", "no action".           *|
+      |*                     Can only be used when the property is connected to a foreign model.     *|
+      |*                                                                                             *|
+      |*  'autoIncrement'    Marks the column "AUTOINCREMENT" in an SQL database.                    *|
+      |*                                                                                             *|
+      \***********************************************************************************************/
+<#line_property_id#>
+      "code": {
+        name: "<#column_prefix#>_code",
+        type: "VARCHAR",
+        length: 8,
         required: true
       },
-      "createdAt": {
+      "name": {
+        name: "<#column_prefix#>_name",
+        type: "VARCHAR",
+        length: 64,
+        required: true
+      },
+      "description": {
+        name: "<#column_prefix#>_description",
+        type: "VARCHAR",
+        length: 255
+      },
+
+
+      /***********************************************************************************************\
+      |*                                                                                             *|
+      |*  If you have a User table in your project you can uncomment these properties.               *|
+      |*  Don't forget to properly configure them. (For example if you use a UUID instead of an INT) *|
+      |*                                                                                             *|
+      \***********************************************************************************************/
+
+      // "createdBy": {
+      //   name: "created_by",
+      //   model: "User",
+      //   onDelete: "set null",
+      //   onUpdate: "cascade"
+      // },
+      // "modifiedBy": {
+      //   name: "modified_by",
+      //   model: "User",
+      //   onDelete: "set null",
+      //   onUpdate: "cascade"
+      // },
+      // "deletedBy": {
+      //   name: "deleted_by",
+      //   model: "User",
+      //   onDelete: "set null",
+      //   onUpdate: "cascade"
+      // },
+
+      "createdAt": { // If a property called 'createdAt' exists in the model. It will automatically be filled once a new record is created.
         name: "created_at",
-        type: "BIGINT",
+        type: "INT",
         length: 1,
         required: true
       },
-      "updatedAt": {
-        name: "updated_at",
-        type: "BIGINT",
+      "modifiedAt": { // If a property called 'modifiedAt' exists in the model. It will automatically be filled once a record changes.
+        name: "modified_at",
+        type: "INT",
+        length: 1
+      },
+      "deletedAt": { // If a property called 'deletedAt' exists in the model. It can be used to mark the record as deleted.
+        name: "deleted_at",
+        type: "INT",
         length: 1
       }
+
+
     };
-    this.setupDone(arguments[0]); // Lets the super Model know that we are done with the setup of this Model.
-    // Default values.
-    this.ID = new UUID().string;
-    this.createdAt = new Date().valueOf();
+    this.setupDone(arguments[0]); // Lets the AFModel (super model) know that we are done with the setup of this entity model.
+
+
+    /*****************************************************************************************************\
+    |*                                                                                                   *|
+    |*  This is where you would define all your computed default value.                                  *|
+    |*  As an example we choose a unix-timestamp which strictly doesnt have MySQL function or datatype.  *|
+    |*  Therefor it needs a computed default value:                                                      *|
+    |*                                                                                                   *|
+    \*****************************************************************************************************/
+<#line_computed_default#>
+
   }
 
 }
 
 
-export default AFModel.register(<#name?>);
+/*********************************************************************************\
+|*                                                                               *|
+|*  Don't touch this line. It registers the model with the AVACore.              *|
+|*  Then it exports the registered model so you can use it in your controllers.  *|
+|*                                                                               *|
+\*********************************************************************************/
+
+export default AFModel.register(<#name#>);

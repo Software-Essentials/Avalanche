@@ -15,12 +15,14 @@ class AFViewController extends AFController {
     this.template = "viewControllerView";
     this.variables = {};
 
-    callback(this.willLoad, this);
+    if (typeof callback === "function") {
+      callback(this.willLoad, this);
+    }
   }
 
 
   /**
-   * Fires when view is about to load
+   * @description Fires when view is about to load
    */
   willLoad(request, response, self) {
 
@@ -42,7 +44,7 @@ class AFViewController extends AFController {
 
 
   /**
-   * Fires when view has loaded
+   * @description Fires when view has loaded
    */
   didLoad() {
   }

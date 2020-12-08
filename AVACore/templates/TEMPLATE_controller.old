@@ -1,0 +1,170 @@
+//
+//  <#file#><#project#>
+//<#meta_created#><#meta_copyright#>
+//
+
+import { AFController } from "avacore";
+<#import#>
+
+
+/**<#class_author#><#class_description#><#class_since#>
+ */
+class <#class_name#> extends AFController {
+
+  /**
+   * @description Shows all <#model_lowercase#>s or a specific <#model_lowercase#> if an 'ID' is specified in the body.
+   * 
+   * @param {Object} request
+   * @param {Object} response
+   */
+  async show({ request, response }, resolve. reject) {
+    const onSuccess = ({ message, results }) => {
+      response.json({
+        success: true,
+        message: message,
+        data: results
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "<#model#> doesn't exist.",
+        errors
+      });
+    }
+    // request.body.validate("ID").alias("ID").number(); /* Uncomment this if your model identifier is a number */
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID } = request.body;
+        const results = await <#model#>.select({
+          properties: ["ID", "name", "body", "createdAt", "modifiedAt"],
+          conditions: ID ? [{ key: "ID", value: ID }] : []
+        });
+        onSuccess({ results: ID && results.length === 1 ? results[0] : results });
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
+      }
+    }
+  }
+
+
+  /**
+   * @description Creates a new <#model_lowercase#>.
+   * 
+   * @param {Object} request
+   * @param {Object} response
+   */
+  async store({ request, response }, resolve. reject) {
+    const onSuccess = ({ message }) => {
+      if (typeof request.headers.referer === "string") {
+        response.redirect("/<#model_lowercase#>s");
+        return;
+      }
+      response.json({
+        success: true,
+        message: message || "<#model_lowercase#> created."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      if (typeof request.headers.referer === "string") {
+        response.redirect("/<#model_lowercase#>s");
+        return;
+      }
+      response.json({
+        success: false,
+        message: message || "Unable to add <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("name").alias("Name").string().notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { name } = request.body;
+        const <#model_lowercase#> = new <#model#>();
+        <#model_lowercase#>.name = name;
+        await <#model_lowercase#>.save();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
+      }
+    }
+  }
+
+
+  /**
+   * @description Updates all existing <#model_lowercase#>s with a specific ID.
+   * 
+   * @param {Object} request
+   * @param {Object} response
+   */
+  async update({ request, response }, resolve. reject) {
+    const onSuccess = ({ message }) => {
+      response.json({
+        success: true,
+        message: message || "<#model_lowercase#> updated."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to update <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("ID").alias("ID").notEmpty();
+    request.body.validate("name").alias("Name").string().notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID, name } = request.body;
+        const <#model_lowercase#> = await <#model#>.get(ID);
+        <#model_lowercase#>.name = name;
+        await <#model_lowercase#>.save();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
+      }
+    }
+  }
+
+
+  /**
+   * @description Deletes all <#model_lowercase#>s with a specific ID.
+   * 
+   * @param {Object} request
+   * @param {Object} response
+   */
+  async destroy({ request, response }, resolve. reject) {
+    const onSuccess = ({ message }) => {
+      response.json({
+        success: true,
+        message: message || "<#model#> deleted."
+      });
+    }
+    const onFailure = ({ message, errors }) => {
+      response.json({
+        success: false,
+        message: message || "Unable to delete <#model_lowercase#>.",
+        errors
+      });
+    }
+    request.body.validate("ID").alias("ID").notEmpty();
+    if (request.validate({ onFailure })) {
+      try {
+        const { ID } = request.body;
+        const <#model_lowercase#> = await <#model#>.get(ID);
+        await <#model_lowercase#>.delete();
+        onSuccess({});
+      } catch (error) {
+        console.log(error);
+        onFailure({ errors: [{ error: error.code, message: error.message }] });
+      }
+    }
+  }
+
+}
+
+
+export default <#class_name#>;

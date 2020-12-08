@@ -40,6 +40,7 @@ function routes() {
 
 module.exports.execute = routes;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "PROJECT";
 module.exports.command = "routes";
 module.exports.description = "Prints all the routes in your project.";

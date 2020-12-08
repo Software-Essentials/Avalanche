@@ -50,7 +50,7 @@ class ACKernel {
     // Session configuration
     this.sessionConfiguration = {
       name: "Auth",
-      secret: global.environment.secret,
+      secret: environment.security.secret,
       resave: false,
       saveUninitialized: true,
       cookie: {
@@ -61,11 +61,11 @@ class ACKernel {
       }
     };
     try {
-      const sessionStore = environment.auth.sessionStore;
+      const sessionStore = environment.database.sessionStore;
       if (typeof sessionStore === "string") {
         switch (sessionStore) {
           case "MYSQL":
-            this.sessionConfiguration.store = new MySQLStore({ config: environment.database, table: "_AVASession" });
+            this.sessionConfiguration.store = new MySQLStore({ config: environment.getDBCredentials(), table: environment.database.sessionTable || "_AVASession" });
             break;
         }
       }
@@ -76,7 +76,7 @@ class ACKernel {
     // Global sockets
     global.socket = new ACSocketKernel(stream);
     global.cronjobs = {};
-    global.database = new AFDatabase().connection;
+    global.database = new AFDatabase(environment.getDBCredentials()).connection;
 
     // Tell express to use EJS
     // app.set('view engine', 'ejs');
@@ -92,10 +92,10 @@ class ACKernel {
     app.use(this.middleware);
 
     // Upload file size limit
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json());
-    // app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
-    // app.use(bodyParser.json({ limit: "50mb" }));
+    // app.use(bodyParser.urlencoded({ extended: false }));
+    // app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ limit: environment.security.payloadLimit, extended: false }));
+    app.use(bodyParser.json({ limit: environment.security.payloadLimit }));
 
     // Setup static folder
     app.use(express.static("app/public"));
@@ -131,28 +131,41 @@ class ACKernel {
 
     next();
 
-    // Request logger
-    if (global.environment.logHTTPRequestsToConsole) {
-      const now = new Date();
-      const method = request.method;
-      const status = response.statusCode;
-      const log = `[${now.toLocaleString()}]\t[${method}::${status}]\t>> ${request.url}`;
-      const color = status === 200 ? 32 : status === 304 ? 33 : 31
-      const methodColor =
-        method === "GET" ? 32 :
-          method === "POST" ? 33 :
-            method === "PUT" ? 34 :
-              method === "DELETE" ? 31 : 0
-      console.log(`[\x1b[1m${now.toLocaleTimeString()}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m]::[\x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
-      if (!fs.existsSync(`${projectPWD}/logs`)) {
-        fs.mkdirSync(`${projectPWD}/logs`);
-      }
-      fs.appendFile(`${projectPWD}/logs/requests.log`, `${log}\n`, (error) => {
-        if (error) {
-          console.log(`${terminalPrefix()}\x1b[33m ${error.message}\x1b[0m`);
+    response.on("finish", () => {
+
+      // Request logger
+      if (environment.debug.logHTTPRequestsToConsole) {
+        const now = new Date();
+        const method = request.method;
+        const status = response.statusCode;
+        for (const ignore of environment.debug.logIgnores) {
+          if (request.url.startsWith(ignore)) {
+            return;
+          }
         }
-      });
-    }
+        const log = `[${now.toLocaleString()}]\t[${method} ${status}]\t>> ${request.url}`;
+        const color =
+          status < 200 ? 31 :
+            status < 300 ? 32 :
+              status < 400 ? 34 :
+                status < 500 ? 34 : 31
+        const methodColor =
+          method === "GET" ? 32 :
+            method === "POST" ? 33 :
+              method === "PUT" ? 34 :
+                method === "DELETE" ? 31 : 0
+        console.log(`[\x1b[1m${now.toLocaleTimeString()}\x1b[0m]::[\x1b[${methodColor}m\x1b[1m${method}\x1b[0m \x1b[${color}m${status}\x1b[0m] >> \x1b[4m${request.url}\x1b[0m`);
+        if (!fs.existsSync(`${projectPWD}/logs`)) {
+          fs.mkdirSync(`${projectPWD}/logs`);
+        }
+        fs.appendFile(`${projectPWD}/logs/requests.log`, `${log}\n`, (error) => {
+          if (error) {
+            console.log(`${terminalPrefix()}\x1b[33m ${error.message}\x1b[0m`);
+          }
+        });
+      }
+
+    });
 
   }
 

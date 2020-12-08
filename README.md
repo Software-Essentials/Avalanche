@@ -36,7 +36,7 @@ $ avalanche init
 ```
 $ avalanche run
 ```
-Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/noriasoft/Avalanche/wiki).
+Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/Software-Essentials/Avalanche/wiki).
 
 
 ## Troubleshooting
@@ -45,3 +45,8 @@ Done! For more info, browse the [Avalanche wiki on GitHub](https://github.com/no
 
 The default port is 80. Often times that port is in use and that causes problems.
 To resolve this issue you can do two things; you can shutdown the application that is currently using that port on your machines and then retry. Alternatively, you can change the port in the environment file. This file can be found in "*app/environments/*". By default this file is called "*development.environment.json*".
+
+
+![Screenshot](readme.assets/se_logo.png)
+
+*The Avalanche framework is an open-source project by Software Essentials*

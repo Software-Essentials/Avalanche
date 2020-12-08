@@ -4,7 +4,7 @@ import { AFMiddleware } from "avacore";
 /**
  * Ability to alter request before it reaches the controller.
  */
-class <#name?> extends AFMiddleware {
+class <#name#> extends AFMiddleware {
 
   constructor() {
     super();
@@ -23,4 +23,4 @@ class <#name?> extends AFMiddleware {
 }
 
 
-export default = <#name?>;
+export default <#name#>;

@@ -1,0 +1,10 @@
+[
+  {
+    "model": "Post",
+    "data": [
+      { "ID": 1, "name": "Post 1", "body": "First post.", "createdAt": 1566164456, "modifiedAt": null },
+      { "ID": 2, "name": "Post 2", "body": "Second post.", "createdAt": 1566164456, "modifiedAt": null },
+      { "ID": 3, "name": "Post 3", "body": "Third post.", "createdAt": 1566164456, "modifiedAt": null }
+    ]
+  }
+]

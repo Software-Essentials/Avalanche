@@ -1,24 +1,46 @@
 #!/usr/bin/env node
 require = require("esm")(module);
 const { isSemVer } = require("../AVAFoundation/AFUtil");
-const { terminalPrefix, isAVAProject, isAVACoreInstalled } = require("../AVACore/ACUtil");
+const { terminalPrefix, isAVAProject, isAVACoreInstalled, getEnvironments } = require("../AVACore/ACUtil");
 
 global.projectPWD = process.cwd();
 const npmRegistryAPIURI = "https://registry.npmjs.com/-/package/avacore/dist-tags";
 const fs = require("fs");
 const https = require("https");
+const inquirer = require("inquirer");
 const Table = require("cli-table");
 const pkg = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
 const avalanchePackage = require("../package.json");
 const AFEnvironment = require("../AVAFoundation/AFEnvironment").default;
 const AFError = require("../AVAFoundation/AFError").default;
 
-const cmdValue = process.argv[process.argv[0] === "sudo" ? 3 : 2];
-const envValue = process.argv[process.argv[0] === "sudo" ? 4 : 3];
-const argValue = process.argv[process.argv[0] === "sudo" ? 5 : 4];
+const components = [];
+const flags = [];
+for (const component of process.argv) {
+  if (component === "sudo") {
+    continue;
+  }
+  try {
+    if (fs.existsSync(component)) {
+      continue;
+    }
+  } catch (error) { }
+  if (component.substr(0, 1) === "-") {
+    flags.push(component);
+    continue;
+  }
+  components.push(component);
+}
 
-main();
-function main() {
+// These three variables SHOULD not have to be needed.
+const cmdValue = components[0];
+const envValue = components[1];
+const argValue = components[2];
+
+(async () => {
+  await main();
+})();
+async function main() {
   if (typeof cmdValue !== "undefined") {
     if (cmdValue !== "update" && cmdValue !== "upgrade") {
       notifyIfInconsistentVersion();
@@ -29,7 +51,9 @@ function main() {
       const command = require(`${path}/${key}`);
       if (cmdValue === command.command) {
         checkForUpdate();
-        notifyIfUpdate();
+        if (cmdValue !== "update" && cmdValue !== "upgrade") {
+          notifyIfUpdate();
+        }
         if (command.enabled) {
           if (command.scope === "PROJECT") {
             if (!isAVAProject()) {
@@ -38,11 +62,45 @@ function main() {
               return;
             }
             notifyIfExperimental();
-            if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
-              global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
+            if (command.requireEnvironment) {
+              const tty = !flags.includes("--notty") && !flags.includes("--tty=false") && !flags.includes("--tty=False") && !flags.includes("--tty=FALSE")
+              if (!tty) {
+                if (pkg && pkg.avalancheConfig && pkg.avalancheConfig.preferredEnvironment) {
+                  global.environment = new AFEnvironment(pkg.avalancheConfig.preferredEnvironment);
+                  environment.setTTY(tty);
+                  await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+                } else {
+                  console.log(`${terminalPrefix()}\x1b[31m (fatal error) Unable to load environment because no environment was found.\x1b[0m`);
+                  process.exit(AFError.NOENV);
+                }
+              } else {
+                const choices = getEnvironments();
+                const questions = [
+                  {
+                    type: "list",
+                    name: "environment",
+                    message: "Pick environment",
+                    default: 0,
+                    prefix: `${terminalPrefix()}\x1b[34m`,
+                    suffix: "\x1b[0m",
+                    choices: choices
+                  }
+                ];
+                try {
+                  const answers = await inquirer.prompt(questions);
+                  global.environment = new AFEnvironment(answers.environment);
+                  environment.setTTY(tty);
+                  await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
+                } catch (error) {
+                  console.log("INQUIRERY ERROR", error);
+                }
+              }
+            } else { // Command does not depend on an environment.
+              await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
             }
+          } else { // Command does not depend on a project.
+            await command.execute(envValue, argValue, components, flags); // TODO: The ONLY parameters should be 'components' and 'flags'
           }
-          command.execute(envValue, argValue);
         } else {
           console.log(`${terminalPrefix()}\x1b[31m (error) Command disabled.\x1b[0m`);
           return;
@@ -56,9 +114,10 @@ function main() {
 
 
 function checkForUpdate() {
+  const onReady = typeof arguments[0] === "function" ? arguments[0] : () => { };
   https.get(npmRegistryAPIURI, (response) => {
     var body = "";
-    response.on("data", function(chunk){
+    response.on("data", (chunk) => {
       body += chunk;
     });
     response.on("end", () => {
@@ -71,9 +130,12 @@ function checkForUpdate() {
           json.avalancheCache = { latestUpdate: data.latest };
         }
         fs.writeFileSync(`${__dirname}/../package.json`, JSON.stringify(json, null, 2), "utf8");
+        onReady();
       }
     });
-  })
+  }).on("error", (error) => {
+
+  });
 }
 
 

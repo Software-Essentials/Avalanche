@@ -6,35 +6,28 @@ import fs from "fs";
  */
 class AFLocalisation {
 
-  constructor(locale) {
-    var normalizedPath = `${projectPWD}/app/localisations`;
-    var localisations = [];
-    if (fs.existsSync(normalizedPath)) {
-      fs.readdirSync(normalizedPath).forEach(function (file) {
-        const extensions = file.split(".");
-        if (extensions.length === 2)
-          if (extensions[extensions.length - 1].toUpperCase() === "JSON")
-            localisations[extensions[0]] = require(`${projectPWD}/app/localisations/${file}`);
-      });
-      this.list = localisations[locale];
-    } else {
-      this.list = null;
-    }
-  }
-
-
-  getList() {
-    return this.list;
+  /**
+   * 
+   * @param {String} locale For example: en_GB
+   */
+  constructor() {
   }
 
 }
 
-
-export function translate(context) {
-  const localisation = new AFLocalisation("en_GB");
-  const locale = localisation.getList();
-  return typeof locale[context] === "string" ? locale[context] : context;
-};
+AFLocalisation.translate = (context, locale) => {
+  var normalizedPath = `${projectPWD}/app/localisations`;
+  var translations = {};
+  if (fs.existsSync(`${normalizedPath}/${locale}.json`)) {
+    translations = require(`${normalizedPath}/${locale}.json`);
+  } else {
+    translations = require(`${normalizedPath}/en_GB.json`);
+  }
+  if (!translations.hasOwnProperty(context)) {
+    return context;
+  }
+  return translations[context];
+}
 
 
 export default AFLocalisation;

@@ -1,9 +1,8 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
-import url from "url";
-import { AFValidator } from "../index";
-import { terminalPrefix } from "../AVACore/ACUtil";
+import AFValidator from "../AVAFoundation/AFValidator";
+import { terminalPrefix, getRoutes } from "../AVACore/ACUtil";
 
 
 /**
@@ -11,132 +10,142 @@ import { terminalPrefix } from "../AVACore/ACUtil";
  */
 class ACRouter extends Router {
 
-    constructor() {
-        super();
+  constructor() {
+    super();
 
-        const normalizedPath = `${projectPWD}/app/routes`;
-        var routes = [];
-        if (fs.existsSync(normalizedPath)) {
-            fs.readdirSync(normalizedPath).forEach((file) => {
-                const extensions = file.split(".");
-                if (extensions.length === 2) {
-                    if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-                        const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
-                        routes.push.apply(routes, route);
-                    }
-                }
-            });
+    var routes = getRoutes();
+
+    // Load required middleware.
+    const normalizedPathB = `${projectPWD}/app/middleware`;
+    var middlewareHandlers = {};
+    if (fs.existsSync(normalizedPathB)) {
+      fs.readdirSync(normalizedPathB).forEach(function (file) {
+        const extensions = file.split(".");
+        if (extensions.length === 2) {
+          if (extensions[extensions.length - 1].toUpperCase() === "JS") {
+            const middleFile = require(`${projectPWD}/app/middleware/${file}`).default;
+            middlewareHandlers[extensions[0]] = middleFile;
+          }
         }
-        const normalizedPathB = `${projectPWD}/app/middleware`;
-        var middleware = [];
-        if (fs.existsSync(normalizedPathB)) {
-            fs.readdirSync(normalizedPathB).forEach(function (file) {
-                const extensions = file.split(".");
-                if (extensions.length === 2) {
-                    if (extensions[extensions.length - 1].toUpperCase() === "JS") {
-                        const middleFile = require(`${projectPWD}/app/middleware/${file}`).default;
-                        middleware[extensions[0]] = middleFile;
-                    }
-                }
-            });
-        }
-        for (var i = 0; i < routes.length; i++) {
-            const route = routes[i];
-            const method = route.method;
-            const routePath = route.path;
-            const routeFile = route.file;
-            const routeMiddleware = route.middleware;
-            const routePermission = route.permission;
-            const controllerFile = route.controller;
-            const controllerHandler = route.handler;
-            var controller;
-            if (typeof (route.redirect) === "string") {
-                this[method.toLowerCase()](routePath, (request, response) => {
-                    response.redirect(url.format({
-                        pathname: route.redirect,
-                    }));
-                });
-                continue;
-            }
-            var routeHandler;
-            if (typeof (controllerFile) === "string") {
-                if (typeof (controllerHandler) === "string") {
-                    // Controller handler
-                    if (fs.existsSync(`${projectPWD}/app/controllers/${controllerFile}.js`)) {
-                        controller = require(`${projectPWD}/app/controllers/${controllerFile}.js`).default;
-                    } else {
-                        console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${routePath}' leads to a controller that doesn't exist: '${controllerFile}'.\x1b[0m`);
-                        continue;
-                    }
-                    routeHandler = new controller();
-                    if (typeof routeHandler[controllerHandler] !== "function") {
-                        console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${routePath}' leads to a handler/method that doesn't exist: '${controllerHandler}'.\x1b[0m`);
-                        continue;
-                    }
-                    if (typeof routeMiddleware === "object") {
-                        const filteredMiddlewareKeys = Object.keys(middleware).filter(function (i) {
-                            return routeMiddleware.includes(i);
-                        });
-                        var filteredMiddleware = [];
-                        for (let i = 0; i < filteredMiddlewareKeys.length; i++) {
-                            const key = filteredMiddlewareKeys[i];
-                            const mw = middleware[key];
-                            const mwo = new mw();
-                            filteredMiddleware[i] = (request, response, next) => {
-                                new AFValidator(request);
-                                mwo.init(request, response, next);
-                            };
-                        }
-                        this[method.toLowerCase()](routePath, filteredMiddleware, routeHandler[controllerHandler]);
-                    } else {
-                        this[method.toLowerCase()](routePath, (request, response, next) => {
-                            new AFValidator(request);
-                            next();
-                        }, routeHandler[controllerHandler]);
-                    }
-                } else {
-                    // ViewController handler
-                    if (fs.existsSync(path.join(__dirname, `./views/${controllerFile}.js`))) {
-                        controller = require(`./views/${controllerFile}.js`).default;
-                    } else {
-                        controller = require(`${projectPWD}/app/views/${controllerFile}.js`).default;
-                    }
-                    const cntrlr = new controller((routeHandler, that) => {
-                        if (typeof routeMiddleware === "object") {
-                            const filteredMiddlewareKeys = Object.keys(middleware).filter(function (i) {
-                                return routeMiddleware.includes(i);
-                            });
-                            var filteredMiddleware = [];
-                            for (let i = 0; i < filteredMiddlewareKeys.length; i++) {
-                                const key = filteredMiddlewareKeys[i];
-                                const mw = middleware[key];
-                                const mwo = new mw();
-                                filteredMiddleware[i] = (request, response, next) => { mwo.init(request, response, next, cntrlr); };;
-                            }
-                            this[method.toLowerCase()](routePath, filteredMiddleware, (request, response) => { routeHandler(request, response, that); });
-                        } else {
-                            this[method.toLowerCase()](routePath, (request, response) => { routeHandler(request, response, that); });
-                        }
-                    });
-                }
-                continue;
-            }
-            if (typeof routeFile === "string") {
-                this.get(routePath, (request, response) => {
-                    response.render(routeFile);
-                });
-                continue;
-            }
-        }
-        this.use((request, response) => {
-            const layout = "layout.hbs";
-            response.status(404);
-            response.render("status/404.hbs", {
-                layout: layout
-            });
-        });
+      });
     }
 
+    // Initialize routes.
+    for (var i = 0; i < routes.length; i++) {
+      const route = routes[i];
+      const method = route.method;
+      const routePath = route.path;
+
+      // console.log(`${route.method} ${route.path}\t\t\t\t`, Object.keys(route.domains || [])); // Debug log
+
+      // Load domain controllers
+      for (const domain of Object.keys(route.domains)) {
+        const components = route.domains[domain];
+        if (typeof components.controller === "string") {
+          if (typeof components.handler === "string") {
+            // Controller
+            var controller = null;
+            if (fs.existsSync(`${projectPWD}/app/controllers/${components.controller}.js`)) {
+              controller = require(`${projectPWD}/app/controllers/${components.controller}.js`).default;
+              const routeHandler = new controller();
+              if (typeof routeHandler[components.handler] !== "function") {
+                console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${route.path}' leads to a handler/method that doesn't exist: '${components.handler}'.\x1b[0m`);
+              }
+              components.execution = routeHandler[components.handler];
+            } else {
+              console.log(`${terminalPrefix()}\x1b[33m (warn) Endpoint '${route.path}' leads to a controller that doesn't exist: '${components.controller}'.\x1b[0m`);
+            }
+          } else {
+            // View controller
+            var controller = null;
+            if (fs.existsSync(path.join(__dirname, `./views/${components.controller}.js`))) {
+              controller = require(`./views/${components.controller}.js`).default;
+            } else {
+              controller = require(`${projectPWD}/app/views/${components.controller}.js`).default;
+            }
+            components.control = new controller();
+            components.execution = ({ request, response }, resolve, reject) => {
+              components.control.willLoad(request, response, components.control);
+            };
+          }
+        } else if (typeof components.file === "string") {
+          components.execution = (request, response) => { response.render(components.file); };
+        }
+      }
+
+      // Setup middleware
+      var middleware = (request, response, next) => {
+        const domain = request.headers.host.split(":")[0];
+        if (route.domains.hasOwnProperty("*") || route.domains.hasOwnProperty(domain)) {
+          const components = route.domains.hasOwnProperty(domain) ? route.domains[domain] : route.domains["*"];
+          handleMiddleware(middlewareHandlers, components.middleware, components.control, request, response, () => {
+            new AFValidator(request);
+            next();
+          });
+          return;
+        }
+        next();
+      };
+
+      // Setup handler
+      var handler = (request, response) => {
+        const domain = request.headers.host.split(":")[0];
+        if (route.domains.hasOwnProperty("*") || route.domains.hasOwnProperty(domain)) {
+          const components = route.domains.hasOwnProperty(domain) ? route.domains[domain] : route.domains["*"];
+          if (typeof components.execution === "function") {
+            const resolve = ({ message, data, results, redirect } = {}) => {
+              if (redirect && typeof request.headers.referer === "string") {
+                response.redirect(redirect);
+                return;
+              }
+              response.json({ success: true, message: message, data: data || results });
+            };
+            const reject = ({ message, errors, status } = {}) => {
+              response.status(status || 400)
+              response.json({ success: false, message: message, errors });
+            };
+            components.execution({
+              session: request.session,
+              params: request.params,
+              query: request.query,
+              body: request.body,
+              request, response
+            }, resolve, reject);
+          }
+        } else {
+          const layout = "layout.hbs";
+          response.status(404);
+          response.render("status/404.hbs", {
+            layout: layout
+          });
+        }
+      };
+      this[method.toLowerCase()](routePath, middleware, handler);
+    }
+
+    this.use((request, response) => {
+      const layout = "layout.hbs";
+      response.status(404);
+      response.render("status/404.hbs", {
+        layout: layout
+      });
+    });
+  }
+
+}
+
+function handleMiddleware(middlewareHandlers, middlewareNames, controller, request, response, next) {
+  if (Array.isArray(middlewareNames) && middlewareNames.length > 0) {
+    const middleware = JSON.parse(JSON.stringify(middlewareNames));
+    const mw = middlewareHandlers[middleware[0]];
+    const mwo = new mw();
+    mwo.init(request, response, () => {
+      middleware.shift();
+      handleMiddleware(middlewareHandlers, middleware, controller, request, response, next);
+    }, controller);
+  } else {
+    next();
+  }
 }
 
 

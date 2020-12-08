@@ -23,7 +23,7 @@ function update() {
     i = (i + 1) % total;
     const r = total - i;
     var dots = "〈" + new Array(i + 1).join("◼︎") + (new Array(r).join(" ")) + "〉";
-    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[32m Updating the Avalanche CLI ${dots}\x1b[0m`)
+    process.stdout.write(`${ACUtil.terminalPrefix()}\x1b[34m Updating the Avalanche CLI ${dots}\x1b[0m`)
     process.stdout.cursorTo(0);
   }, 50);
   const version = require(`${__dirname}/../../package.json`).version;
@@ -39,7 +39,7 @@ function update() {
     if (pconfigAfter.version === latestVersion) {
       process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[32m The Avalanche CLI has been updated to the latest stable version (v${pconfig.version} > v${pconfigAfter.version}).\n\x1b[0m`);
     } else {
-      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[31m Failed to update the Avalanche CLI! (This could be a permissions issue).\n\x1b[0m`);
+      process.stdout.write(`\n${ACUtil.terminalPrefix()}\x1b[31m CLI update probably failed! (This could be a permissions issue).\n\x1b[0m`);
     }
     ready();
   });
@@ -48,6 +48,7 @@ function update() {
 
 module.exports.execute = update;
 module.exports.enabled = true;
+module.exports.requireEnvironment = false;
 module.exports.scope = "GLOBAL";
 module.exports.command = "update";
 module.exports.description = "Updates the Avalanche CLI.";

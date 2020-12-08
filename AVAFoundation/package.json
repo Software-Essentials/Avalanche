@@ -4,8 +4,8 @@
   "description": "Library for Avalanche applications.",
   "main": "index.js",
   "license": "MIT",
-  "homepage": "https://github.com/noriasoft/Avalanche",
-  "bugs": "https://github.com/noriasoft/Avalanche/issues",
+  "homepage": "https://github.com/Software-Essentials/Avalanche",
+  "bugs": "https://github.com/Software-Essentials/Avalanche/issues",
   "type": "module",
   "author": {
     "name": "Lawrence Bensaid",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noriasoft/Avalanche.git"
+    "url": "git+https://github.com/Software-Essentials/Avalanche.git"
   },
   "dependencies": {
     "apn": "^2.2.0",

@@ -11,6 +11,14 @@
   ],
   "files": [
     {
+      "template": "ava_public_js",
+      "path": "/app/public/assets/vendor/Avalanche/js/avalanche.js"
+    },
+    {
+      "template": "ava_layout",
+      "path": "/app/templates/layouts/layout.hbs"
+    },
+    {
       "template": "example1_environment",
       "path": "/app/environments/development.environment.json"
     },
@@ -56,7 +64,7 @@
     },
     {
       "template": "example1_template_layout",
-      "path": "/app/templates/layouts/layout.hbs"
+      "path": "/app/templates/layouts/app.layout.hbs"
     },
     {
       "template": "example1_model",
@@ -67,8 +75,12 @@
       "path": "/app/templates/partials/navbar.hbs"
     },
     {
-      "template": "example1_seeds",
-      "path": "/app/migration/seeds/DummyData.json"
+      "template": "example1_population",
+      "path": "/app/migration/population/DummyData.json"
+    },
+    {
+      "template": "example1_environment",
+      "path": "/app/public/.well-known/apple-app-site-association"
     },
     {
       "template": "example1_assets_logo",

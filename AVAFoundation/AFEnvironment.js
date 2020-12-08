@@ -1,8 +1,12 @@
 import fs from "fs";
 import AFError from "../AVAFoundation/AFError";
 import * as ACUtil from "../AVACore/ACUtil";
+import { UUID } from "./AFUtil";
 
 const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${projectPWD}/package.json`) : undefined;
+const DB_STORE_OPTIONS = [
+  "MYSQL"
+];
 
 
 /**
@@ -10,7 +14,14 @@ const packageConfig = fs.existsSync(`${projectPWD}/package.json`) ? require(`${p
  */
 class AFEnvironment {
 
+  /**
+   * TODO: If the instance should log to the console it SHOULD BE SPECIFICALLY argumented. So please add a parameter to this constructor for that.
+   */
   constructor() {
+    this._SILENCE = typeof arguments[1] === "boolean" ? arguments[1] : false;
+    this._DEFAULTED = false;
+    this._PREFFERED_FOUND = false;
+    this._TTY = true;
 
     var normalizedPath = `${projectPWD}/app/environments`;
     var environments = [];
@@ -19,7 +30,7 @@ class AFEnvironment {
     if (fs.existsSync(normalizedPath)) {
       fs.readdirSync(normalizedPath).forEach(function (file) {
         const extensions = file.split(".");
-        if (extensions.length = 3)
+        if (extensions.length === 3)
           if (extensions[extensions.length - 1].toUpperCase() === "JSON")
             if (extensions[extensions.length - 2].toUpperCase() === "ENVIRONMENT")
               environments[extensions[0]] = require(`${projectPWD}/app/environments/${file}`);
@@ -31,7 +42,6 @@ class AFEnvironment {
       process.exit(AFError.NOENV);
     }
 
-    var prefferedEnvironmentLoaded = false;
     const environmentKeys = Object.keys(environments);
     for (var i = 0; i < environmentKeys.length; i++) {
       const environmentKey = environmentKeys[i];
@@ -40,18 +50,23 @@ class AFEnvironment {
       selectedEnvironmentKey = environmentKey;
       if (typeof arguments[0] === "string") {
         if (environmentKey === arguments[0]) {
+          this._NAME = selectedEnvironmentKey;
           this.loadEnvironment(selectedEnvironment);
-          prefferedEnvironmentLoaded = true;
+          this._PREFFERED_FOUND = true;
+          break;
         }
       } else {
         if (environmentKey === packageConfig.avalancheConfig.preferredEnvironment) {
+          this._NAME = selectedEnvironmentKey;
           this.loadEnvironment(selectedEnvironment);
-          prefferedEnvironmentLoaded = true;
+          this._PREFFERED_FOUND = true;
+          break;
         }
       }
     }
-    if (!prefferedEnvironmentLoaded) {
-      console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): Preffered environment not found; defaulting to "${selectedEnvironmentKey}".\x1b[0m`);
+    if (!this._PREFFERED_FOUND) { // Default to an environment if the preffered environment is not found.
+      this._DEFAULTED = true;
+      this._NAME = selectedEnvironmentKey;
       this.loadEnvironment(selectedEnvironment);
     }
   }
@@ -61,28 +76,100 @@ class AFEnvironment {
     return fullURL;
   }
 
+  setTTY(value) {
+    this._TTY = !!value;
+  }
+
+  isTTY() {
+    return !!this._TTY;
+  }
+  
+  getName() {
+    return this._NAME;
+  }
+
+  getTitle() {
+    return this.info.title;
+  }
+
+  getDBCredentials() {
+    const credentials = JSON.parse(JSON.stringify(this.database));
+    delete credentials.sessionStore;
+    return credentials;
+  }
+
+  save() {
+    const environment = JSON.parse(JSON.stringify(this));
+    const environmentName = environment._NAME;
+    // Prune environment object
+    delete environment._DEFAULTED;
+    delete environment._PREFFERED_FOUND;
+    delete environment._NAME;
+    delete environment._TTY;
+    delete environment._SILENCE;
+    delete environment.title;
+    delete environment.version;
+    delete environment.description;
+    delete environment.domain;
+    delete environment.host;
+    delete environment.port;
+    var normalizedPath = `${projectPWD}/app/environments/${environmentName}.environment.json`;
+    fs.writeFileSync(normalizedPath, JSON.stringify(environment, null, 2));
+  }
+
+  getSettings() {
+    const environment = JSON.parse(JSON.stringify(this));
+    if (arguments[0] === true) { // Flat
+      const flatEnvironment = this.getSettings();
+      for (const domain of Object.keys(environment)) {
+        if (typeof environment[domain] === "object") {
+          for (const key of Object.keys(environment[domain])) {
+            flatEnvironment[`${domain}.${key}`] = environment[domain][key];
+          }
+          delete flatEnvironment[domain];
+        }
+      }
+      return Object.keys(flatEnvironment);
+    } else {
+      // Prune environment object
+      delete environment.title;
+      delete environment.version;
+      delete environment.description;
+      delete environment.domain;
+      delete environment.host;
+      delete environment.port;
+    }
+    return environment;
+  }
+
   loadEnvironment(env) {
     var isValid = true;
 
     this.network = {};
     if (typeof (env.network) === "object") {
       if (typeof (env.network.domain) === "string") {
-        this.domain = env.network.domain;
+        this.domain = env.network.domain; // DEPRECATED
+        this.network.domain = env.network.domain;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No domain specified; defaulting to 'localhost'.\x1b[0m`);
-        this.domain = "localhost";
+        this.domain = "localhost"; // DEPRECATED
+        this.network.domain = "localhost";
       }
       if (typeof (env.network.host) === "string") {
-        this.host = env.network.host;
+        this.host = env.network.host; // DEPRECATED
+        this.network.host = env.network.host;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No host specified; defaulting to '127.0.0.1'.\x1b[0m`);
-        this.host = "127.0.0.1";
+        this.host = "127.0.0.1"; // DEPRECATED
+        this.network.host = "127.0.0.1";
       }
       if (typeof (env.network.port) === "number") {
-        this.port = env.network.port;
+        this.port = env.network.port; // DEPRECATED
+        this.network.port = env.network.port;
       } else {
         console.log(`${ACUtil.terminalPrefix()}\x1b[34m (notice): No port specified; defaulting to port 80.\x1b[0m`);
-        this.port = 80;
+        this.port = 80; // DEPRECATED
+        this.network.port = 80;
       }
     } else {
       isValid = false
@@ -91,43 +178,44 @@ class AFEnvironment {
 
     this.debug = {};
     if (typeof (env.debug) === "object") {
-      this.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
-      this.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
+      this.debug.logIgnores = Array.isArray(env.debug.logIgnores) ? env.debug.logIgnores : [];
+      this.debug.logHTTPRequestsToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.debug.logQueriesToConsole = typeof env.debug.logHTTPRequestsToConsole === "boolean" ? env.debug.logHTTPRequestsToConsole : false;
+      this.debug.logWebSocket = typeof env.debug.logWebSocket === "boolean" ? env.debug.logWebSocket : false;
+      this.debug.restartOnFileChange = typeof env.debug.restartOnFileChange === "boolean" ? env.debug.restartOnFileChange : false;
+      this.debug.reloadClientsAfterRestart = typeof env.debug.reloadClientsAfterRestart === "boolean" ? env.debug.reloadClientsAfterRestart : false;
     } else {
-      this.logHTTPRequestsToConsole = false;
-      this.restartOnFileChange = false;
+      this.debug.logIgnores = [];
+      this.debug.logHTTPRequestsToConsole = false;
+      this.debug.logQueriesToConsole = false;
+      this.debug.logWebSocket = false;
+      this.debug.restartOnFileChange = false;
+      this.debug.reloadClientsAfterRestart = false;
     }
 
-    this.auth = {};
-    if (typeof (env.auth) === "object") {
-      if (typeof (env.auth.secret) === "string") {
-        this.secret = env.auth.secret;
-        this.auth.secret = env.auth.secret;
-      } else {
-        isValid = false;
-        console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing secret value!\x1b[0m`);
-      }
-      this.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
-      this.auth.saltRounds = typeof env.auth.saltRounds === "number" ? env.auth.saltRounds : 0;
-      this.auth.sessionStore = typeof env.auth.sessionStore === "string" ? env.auth.sessionStore : null;
-    } else {
-      isValid = false
-      console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing auth credentials.\x1b[0m`);
-    }
-
+    const randomSecret = new UUID().string.split("-").join("");
     this.security = {};
     if (typeof (env.security) === "object") {
-      this.security.csrf = typeof env.security.csrf === "boolean" ? env.security.csrf : true;;
+      this.security.csrf = typeof env.security.csrf === "boolean" ? env.security.csrf : true;
+      this.security.payloadLimit = typeof env.security.payloadLimit === "string" ? env.security.payloadLimit : "50mb";
+      this.security.secret = typeof env.security.secret === "string" && env.security.secret !== "" ? env.security.secret : randomSecret;
+      this.security.saltRounds = typeof env.security.saltRounds === "number" ? env.security.saltRounds : 10;
     } else {
       this.security.csrf = false;
+      this.security.payloadLimit = "50mb";
+      this.security.secret = randomSecret;
+      this.security.saltRounds = 10;
     }
 
     this.capabilities = {};
     if (typeof (env.capabilities) === "object") {
       this.capabilities.isUsingSSL = typeof env.capabilities.isUsingSSL === "boolean" ? env.capabilities.isUsingSSL : true;
-      this.capabilities.useWebSockets = typeof env.capabilities.useWebSockets === "boolean" ? env.capabilities.useWebSockets : false;
-      this.capabilities.useMiddleware = typeof env.capabilities.useMiddleware === "boolean" ? env.capabilities.useMiddleware : true;
-      this.capabilities.useEmail = typeof env.capabilities.useEmail === "boolean" ? env.capabilities.useEmail : false;
+      this.capabilities.webSockets = typeof env.capabilities.useWebSockets === "boolean" ? env.capabilities.useWebSockets : false; // Deprecated
+      this.capabilities.webSockets = typeof env.capabilities.webSockets === "boolean" ? env.capabilities.webSockets : false;
+      this.capabilities.middleware = typeof env.capabilities.useMiddleware === "boolean" ? env.capabilities.useMiddleware : true; // Deprecated
+      this.capabilities.middleware = typeof env.capabilities.middleware === "boolean" ? env.capabilities.middleware : true;
+      this.capabilities.email = typeof env.capabilities.useEmail === "boolean" ? env.capabilities.useEmail : false; // Deprecated
+      this.capabilities.email = typeof env.capabilities.email === "boolean" ? env.capabilities.email : false;
     }
 
     this.email = {};
@@ -139,6 +227,13 @@ class AFEnvironment {
 
     this.database = {};
     if (typeof (env.database) === "object") {
+      if (typeof env.database.sessionStore === "string" && DB_STORE_OPTIONS.includes(env.database.sessionStore)) {
+        this.database.sessionStore = env.database.sessionStore;
+      } else if (typeof env.auth.sessionStore === "string" && DB_STORE_OPTIONS.includes(env.auth.sessionStore)) {
+        this.database.sessionStore = env.auth.sessionStore; // DEPRECATED
+      } else {
+        this.database.sessionStore = null;
+      }
       if (typeof (env.database.host) === "string") {
         this.database.host = env.database.host;
       } else {
@@ -163,6 +258,7 @@ class AFEnvironment {
         isValid = false
         console.log(`${ACUtil.terminalPrefix()}\x1b[31m (error): Environment is missing database name.\x1b[0m`);
       }
+      this.database.charset = typeof (env.database.charset) === "string" ? env.database.charset : "utf8mb4";
       if (typeof (env.database.connectionLimit) === "number")
         this.database.connectionLimit = env.database.connectionLimit;
       this.database.multipleStatements = true;
@@ -174,7 +270,6 @@ class AFEnvironment {
     this.useMapKit = typeof env.useMapKit === "boolean" ? env.useMapKit : false;
     this.allowRegister = typeof env.allowRegister === "boolean" ? env.allowRegister : false;
     this.restrictMapsToDomain = typeof env.restrictMapsToDomain === "boolean" ? env.restrictMapsToDomain : true;
-    this.reloadClientsAfterRestart = typeof env.reloadClientsAfterRestart === "boolean" ? env.reloadClientsAfterRestart : false;
 
     this.title = typeof env.info.title === "string" ? env.info.title : packageConfig.name;
     this.version = typeof env.info.version === "string" ? env.info.version : packageConfig.version;
@@ -182,6 +277,7 @@ class AFEnvironment {
     this.appleDeveloperTeamID = typeof env.appleDeveloperTeamID === "string" ? env.appleDeveloperTeamID : null;
     this.mapKitJSKeyID = typeof env.mapKitJSKeyID === "string" ? env.mapKitJSKeyID : null;
     this.APNSKeyID = typeof env.APNSKeyID === "string" ? env.APNSKeyID : null;
+    this.APNSIsProduction = typeof env.APNSIsProduction === "boolean" ? env.APNSIsProduction : false;
     this.appBundleID = typeof env.appBundleID === "string" ? env.appBundleID : null;
     this.mollieAPIKey = typeof env.mollieAPIKey === "string" ? env.mollieAPIKey : null;
 
@@ -191,7 +287,12 @@ class AFEnvironment {
     this.info.description = this.description;
 
     if (!isValid) {
+      this.save();
       process.exit(AFError.ENVINVALID);
+    }
+
+    if (!this._SILENCE) {
+      console.log(`${ACUtil.terminalPrefix()}\x1b[32m Loaded environment "${this._NAME}"${this._DEFAULTED ? "\x1b[34m (Because the preffered environment was not found)" : ""}\x1b[0m`);
     }
   }
 

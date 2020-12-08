@@ -10,7 +10,7 @@ class PostController extends AFController {
   *   Returns all posts.
   */
   index(request, response) {
-    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, updated_at AS updatedAt FROM Post ORDER BY created_at DESC";
+    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, modified_at AS modifiedAt FROM Post ORDER BY created_at DESC";
     global.database.query(query, [], (error, rows, fields) => {
       if (error) {
         response.json({
@@ -33,7 +33,7 @@ class PostController extends AFController {
   */
   show(request, response) {
     const postID = request.query.id;
-    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, updated_at AS updatedAt FROM Post WHERE post_id = ?";
+    const query = "SELECT post_id AS ID, post_name AS postName, post_body AS postBody, created_at AS createdAt, modified_at AS modifiedAt FROM Post WHERE post_id = ?";
     const parameters = [postID];
     global.database.query(query, parameters, (error, rows, fields) => {
       if (error) {

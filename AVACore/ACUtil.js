@@ -1,5 +1,6 @@
 import fs from "fs";
 import md5 from "md5";
+import readline from "readline";
 
 
 /**
@@ -61,7 +62,7 @@ export function getProjectPackage() {
 export function startWatchingSession(filePath, callback) {
   let md5Previous = null;
   let fsWait = false;
-  fs.watch(filePath, (event, filename) => {
+  return fs.watch(filePath, (event, filename) => {
     if (filename) {
       if (fsWait) return;
       fsWait = setTimeout(() => {
@@ -84,20 +85,104 @@ export function startWatchingSession(filePath, callback) {
  * @returns {Object}
  */
 export function getRoutes() {
+  // Modulate routing files.
   const normalizedPath = `${projectPWD}/app/routes`;
   var routes = [];
-  if (!fs.existsSync(normalizedPath)) {
-    return routes;
+  if (fs.existsSync(normalizedPath)) {
+    fs.readdirSync(normalizedPath).forEach((file) => {
+      const extensions = file.split(".");
+      if (extensions.length === 2) {
+        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+          const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
+          if (Array.isArray(route)) {
+            for (const endpoint of route) {
+              endpoint.domains = {};
+              endpoint.domains["*"] = {
+                controller: endpoint.controller,
+                handler: endpoint.handler,
+                middleware: endpoint.middleware
+              }
+            }
+            routes.push.apply(routes, route);
+          } else {
+            if (typeof route === "object" && Array.isArray(route.endpoints)) {
+              var domains = ["*"];
+              var additionalMiddleware = [];
+              if (Array.isArray(route.middleware)) {
+                additionalMiddleware = route.middleware;
+              }
+              if (Array.isArray(route.domains)) {
+                domains = route.domains;
+              }
+              for (let i = 0; i < route.endpoints.length; i++) {
+                const endpoint = route.endpoints[i];
+                route.endpoints[i].domains = {};
+                if (Array.isArray(endpoint.middleware)) {
+                  endpoint.middleware.push.apply(endpoint.middleware, additionalMiddleware);
+                } else {
+                  endpoint.middleware = additionalMiddleware;
+                }
+                for (const domain of domains) {
+                  route.endpoints[i].domains[domain] = {
+                    controller: endpoint.controller,
+                    handler: endpoint.handler,
+                    middleware: endpoint.middleware,
+                    file: endpoint.file
+                  }
+                }
+                delete route.endpoints[i].middleware;
+                delete route.endpoints[i].controller;
+              }
+              routes.push.apply(routes, route.endpoints);
+            }
+            if (typeof route === "object" && typeof route.endpoints === "object" && !Array.isArray(route.endpoints)) {
+              var domains = ["*"];
+              var additionalMiddleware = [];
+              const endpoints = [];
+              if (Array.isArray(route.middleware)) {
+                additionalMiddleware = route.middleware;
+              }
+              if (Array.isArray(route.domains)) {
+                domains = route.domains;
+              }
+              for (const navigation of Object.keys(route.endpoints)) {
+                const handler = route.endpoints[navigation].split(".");
+                const pair = navigation.trim().split(" ");
+                const endpoint = {
+                  method: pair[0],
+                  path: pair[1],
+                  domains: {}
+                };
+                for (const domain of domains) {
+                  endpoint.domains[domain] = {
+                    controller: handler[0],
+                    handler: handler[1],
+                    middleware: additionalMiddleware
+                  }
+                }
+                endpoints.push(endpoint);
+              }
+              routes.push.apply(routes, endpoints);
+            }
+          }
+        }
+      }
+    });
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
-    const extensions = file.split(".");
-    if (extensions.length === 2) {
-      if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
-        const route = JSON.parse(JSON.stringify(require(`${projectPWD}/app/routes/${file}`)));
-        routes.push.apply(routes, route);
+
+  // Merge method-path pairs
+  for (var i = 0; i < routes.length; i++) {
+    const route1 = routes[i];
+    for (var j = 0; j < routes.length; j++) {
+      const route2 = routes[j];
+      if (route1.path === route2.path && route1.method === route2.method) {
+        for (const domain of Object.keys(routes[j].domains)) {
+          routes[i].domains[domain] = routes[j].domains[domain];
+        }
       }
     }
-  });
+  }
+  
   return routes;
 }
 
@@ -111,7 +196,7 @@ export function getControllers() {
   if (!fs.existsSync(normalizedPath)) {
     return controllers;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -132,7 +217,7 @@ export function getMiddleware() {
   if (!fs.existsSync(normalizedPath)) {
     return middleware;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -153,7 +238,7 @@ export function getLocalisations() {
   if (!fs.existsSync(normalizedPath)) {
     return localisations;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -174,7 +259,7 @@ export function getTranslations() {
   if (!fs.existsSync(normalizedPath)) {
     return translations;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -198,7 +283,7 @@ export function getModels() {
   if (!fs.existsSync(normalizedPath)) {
     return models;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JS") {
@@ -207,6 +292,29 @@ export function getModels() {
     }
   });
   return models;
+}
+
+
+/**
+ * @returns {[String]}
+ */
+export function getEnvironments() {
+  const normalizedPath = `${projectPWD}/app/environments`;
+  var environments = [];
+  if (!fs.existsSync(normalizedPath)) {
+    return environments;
+  }
+  fs.readdirSync(normalizedPath).forEach((file) => {
+    const extensions = file.split(".");
+    if (extensions.length === 3) {
+      if (extensions[extensions.length - 2].toUpperCase() === "ENVIRONMENT") {
+        if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
+          environments.push(extensions[0]);
+        }
+      }
+    }
+  });
+  return environments;
 }
 
 
@@ -241,7 +349,7 @@ export function getMigrations() {
   if (!fs.existsSync(normalizedPath)) {
     return models;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     if (fs.lstatSync(normalizedPath).isFile()) {
       const extensions = file.split(".");
       if (extensions.length === 2) {
@@ -259,12 +367,12 @@ export function getMigrations() {
  * @returns {Object}
  */
 export function getSeedFilesNames() {
-  const normalizedPath = `${projectPWD}/app/migration/seeds`;
+  const normalizedPath = `${projectPWD}/app/migration/population`;
   var controllers = [];
   if (!fs.existsSync(normalizedPath)) {
     return controllers;
   }
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     const extensions = file.split(".");
     if (extensions.length === 2) {
       if (extensions[extensions.length - 1].toUpperCase() === "JSON") {
@@ -273,6 +381,32 @@ export function getSeedFilesNames() {
     }
   });
   return controllers;
+}
+
+export function progressAnimation(title) {
+  var iteration = 0;
+  const name = "avalanche";
+  var animation;
+  if (environment.isTTY()) {
+    animation = setInterval(() => {
+      var progressBar = "";
+      iteration = (iteration + 1) % (name.length + 1);
+      for (let i = 0; i < iteration; i++) {
+        progressBar += name[i].toUpperCase();
+      }
+      for (let i = iteration; i < name.length; i++) {
+        progressBar += name[i];
+      }
+      process.stdout.write(`\x1b[36m\x1b[1m[\x1b[34m${progressBar}\x1b[36m]\x1b[0m ${title}\x1b[0m`);
+      process.stdout.cursorTo(0);
+      // readline.cursorTo(process.stdout, 0);
+    }, 100);
+  } else {
+    animation = setInterval(() => { });
+    clearInterval(animation);
+    console.log(`${terminalPrefix()}\x1b[0m ${title}...\x1b[0m`);
+  }
+  return animation;
 }
 
 
